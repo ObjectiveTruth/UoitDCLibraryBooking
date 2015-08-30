@@ -1,0 +1,91 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+
+    >
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:windowAnimationStyle">@null</item>
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+		<style name="customButton" parent="@android:style/Widget.Button">
+	    <item name="android:background">@drawable/custom_button</item>
+		<item name="android:textColor">#FFFFFF</item> 
+		<item name="android:shadowColor">#A8A8A8</item>
+		<item name="android:shadowDx">0</item>
+		<item name="android:shadowDy">0</item>
+		<item name="android:shadowRadius">3</item>
+	</style>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
+    <style name="ActionBarIconDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_down_actionbar</item>
+        <item name="android:windowExitAnimation">@anim/slide_up_actionbar</item>
+    </style>
+    <style name="DiafragGenericAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+    <style name="flat_edittext">
+        <item name="fl_theme">@array/sea</item>
+        <item name="fl_fontFamily">roboto</item>
+        <item name="fl_fontWeight">light</item>
+        <item name="fl_fontExtension">ttf</item>
+        <item name="fl_borderWidth">2dp</item>
+        <item name="fl_cornerRadius">5dp</item>
+        <item name="fl_size">20dp</item>
+    </style>
+
+    <style name="flat_checkbox">
+        <item name="fl_theme">@array/sea</item>
+        <item name="fl_fontFamily">roboto</item>
+        <item name="fl_fontWeight">light</item>
+        <item name="fl_fontExtension">ttf</item>
+        <item name="fl_cornerRadius">5dp</item>
+        <item name="fl_size">25dp</item>
+        <item name="fl_dotMargin">3dp</item>
+    </style>
+
+    <style name="flat_radio">
+        <item name="fl_theme">@array/sea</item>
+        <item name="fl_dotMargin">3dp</item>
+        <item name="fl_fontFamily">roboto</item>
+        <item name="fl_fontWeight">normal</item>
+        <item name="fl_fontExtension">ttf</item>
+        <item name="fl_borderWidth">2dp</item>
+        <item name="fl_cornerRadius">5dp</item>
+        <item name="fl_size">20dp</item>
+    </style>
+    <style name="edittext_info">
+        <item name="android:background">@drawable/info_generic_selector</item>
+        <item name="android:layout_marginTop">7dp</item>
+        <item name="android:layout_marginLeft">-38dp</item>
+    </style>
+
+    <style name="flat_ui_button">
+        <item name="fl_theme">@array/sea</item>
+
+        <item name="fl_fontFamily">roboto</item>
+        <item name="fl_fontWeight">light</item>
+        <item name="fl_fontExtension">ttf</item>
+        <item name="fl_borderWidth">2dp</item>
+        <item name="fl_cornerRadius">5dp</item>
+        <item name="fl_size">20dp</item>
+        <item name="fl_blockButtonEffectHeight">3dp</item>
+    </style>
+</resources>

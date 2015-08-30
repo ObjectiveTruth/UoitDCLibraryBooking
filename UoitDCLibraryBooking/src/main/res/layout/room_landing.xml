@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/room_landing_scrollview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff" >
+
+    <LinearLayout
+        android:id="@+id/rooms_landing_table_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal" 
+        android:orientation="vertical"
+        >
+
+        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+            android:id="@+id/room_landing_top_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="right"
+            android:layout_marginTop="10dp"
+            android:text="ROM 999"
+            android:textColor="#0099CC"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="30dp" />
+
+        <ImageView
+            android:id="@+id/room_landing_room_picture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="Picture of the room"
+            android:scaleType="centerCrop"
+            android:src="@drawable/room_picture" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_floor_word"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:layout_height="wrap_content"
+                android:text="Floor:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_floor_number"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:textColor="#0099CC"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                
+                android:text="#"
+                
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_seating_cap_word"
+                android:layout_width="0dp"
+                android:gravity="right"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Seating Cap:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_seating_capacity"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:textColor="#0099CC"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:text="#"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_min_bookers_word"
+                android:layout_width="0dp"
+                android:gravity="right"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Min. Bookers:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_min_bookers"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:textColor="#0099CC"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:text="#"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_max_bookable_word"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:layout_height="wrap_content"
+                android:text="Max. Time:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_max_time"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:textColor="#0099CC"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:text="# Hours"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_comments_word"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:text="Facilities: "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                android:id="@+id/room_landing_comments"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:textColor="#0099CC"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+
+                android:text="comments"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="15dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

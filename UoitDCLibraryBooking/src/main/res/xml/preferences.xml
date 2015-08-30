@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory 
+        android:title="Calendar"
+        android:key="pref_key_calendar_settings">
+        
+        <CheckBoxPreference
+            android:key="pref_key_refresh_after_room_interaction"
+            android:summary="Only auto-refresh after successfully creating, leaving or joining a booking"
+            android:title="Refresh after confirmation"
+            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="pref_key_refresh_on_calendar_load"
+            android:summary="Only auto-refresh when selecting it from the menu"
+            android:title="Refresh when calendar opens"
+            android:defaultValue="true"/>
+        
+        <CheckBoxPreference
+            android:key="is_first_load_tutorial"
+            android:summary="Show the tutorial screen next time app starts"
+            android:title="Show tutorial"
+            android:defaultValue="false"/>
+        
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Credentials"
+        android:key="pref_key_credentials">
+        
+        <CheckBoxPreference
+        android:key="saveLogin"
+        android:summary="Remember username/password for future use"
+        android:title="Remember me"
+        android:defaultValue="false"/>
+    </PreferenceCategory>
+<!--     <PreferenceCategory
+        android:title="Bug Reporting"
+        android:key="pref_key_bugreporting">
+        
+        <CheckBoxPreference
+        android:key="shakeToBug"
+        android:summary="Shaking the screen causes a bug report to be started with an attachment of a screen capture. This helps in getting improvement suggestions and bug reporting. No information will be sent without you seeing the contents"
+        android:title="Shake for bug report"
+        android:defaultValue="true"/>
+    </PreferenceCategory> -->
+</PreferenceScreen>

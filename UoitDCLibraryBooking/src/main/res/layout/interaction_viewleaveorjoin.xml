@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/interaction_viewleaveorjoin_scrollview"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    	            android:layout_marginLeft="15dp"
+	            android:layout_marginRight="15dp"
+	    android:layout_gravity="center" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/background_light"
+        android:orientation="vertical" >
+        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+
+            android:id="@+id/viewleaveorjoin_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:text="Tuesday, March 22, 1988, 3:00 PM"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/blue_font"
+
+            android:textSize="@dimen/dialog_title_text" />
+        <ImageView
+            android:id="@+id/room_landing_room_picture"
+            android:layout_width="350dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:layout_below="@+id/viewleaveorjoin_date"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="Picture of the room"
+            android:scaleType="centerCrop"
+            android:src="@drawable/unknown_room" />
+
+        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/viewleaveorjoin_error_text"
+            android:visibility="invisible"
+            android:layout_width="350dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/viewleaveorjoin_date"
+            android:minLines="3"
+            android:textColor="@color/booked_red"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="center_horizontal"
+            android:text="@string/error_room_no_exist_comment"
+            />
+        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+            android:id="@+id/room_word"
+            android:layout_below="@+id/room_landing_room_picture"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="right"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/room_landing_room_picture"
+            android:layout_marginLeft="110dp"
+            android:text="Room: "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+            android:id="@+id/viewleaveorjoin_room"
+            android:layout_width="wrap_content"
+            android:layout_alignTop="@+id/room_word"
+            android:layout_below="@+id/room_landing_room_picture"
+            android:layout_toRightOf="@+id/room_word"
+            android:layout_marginLeft="10dp"
+            android:textColor="#0099CC"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:text="LIB999"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:layout_below="@+id/viewleaveorjoin_room"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp" >
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                    android:id="@+id/textView3"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:text="Group Name:"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                    android:id="@+id/viewleaveorjoin_groupname"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="#0099CC"
+                    android:layout_height="wrap_content"
+                    android:text="Medium Text"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:text="Group Code:"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                    android:id="@+id/viewleaveorjoin_groupcode"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:textColor="#0099CC"
+                    android:layout_height="wrap_content"
+                    android:text="Medium Text"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </LinearLayout>
+
+                    <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:text="Time:"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                    android:id="@+id/viewleaveorjoin_timerange"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:textColor="#0099CC"
+                    android:layout_height="wrap_content"
+                    android:text="Medium Text"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:text="Institution:"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                    android:id="@+id/viewleaveorjoin_institution"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:textColor="#0099CC"
+                    android:layout_height="wrap_content"
+                    android:text="Medium Text"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:text="Notes: "
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+                    android:id="@+id/viewleaveorjoin_notes"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:textColor="#0099CC"
+                    android:layout_height="wrap_content"
+                    android:text="Medium Text"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/LinearLayout1"
+                android:layout_width="match_parent"
+                android:layout_marginTop="20dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <com.cengalabs.flatui.views.FlatButton
+                    style="@style/flat_ui_button"
+                    android:id="@+id/viewleaveorjoin_leave_group_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:text="Leave" />
+                <com.cengalabs.flatui.views.FlatButton
+                    style="@style/flat_ui_button"
+                    android:id="@+id/viewleaveorjoin_join_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:text="Join" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</ScrollView>

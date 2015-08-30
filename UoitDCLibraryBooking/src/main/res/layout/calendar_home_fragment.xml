@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    
+    >
+    <it.sephiroth.android.library.widget.HListView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/table_height"
+        android:id="@+id/roomsListHorizontal"
+        android:padding="0dp"
+        android:layout_centerHorizontal="true"
+        app:hlv_footerDividersEnabled="false"
+        app:hlv_headerDividersEnabled="false"
+        android:visibility="invisible"
+        />
+<!--    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+
+        </FrameLayout>-->
+    <ImageView
+        android:id="@+id/sorryCartoon"
+        android:layout_gravity="bottom"
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/roomsListHorizontal"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+
+
+        android:src="@drawable/ic_book_confused"
+        android:visibility="invisible"
+        />
+
+    <com.objectivetruth.uoitlibrarybooking.TableFixHeaders
+        android:id="@+id/calendar_table"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:visibility="visible"
+        />
+
+    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        android:id="@+id/admob_frame_pager"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#ff000000"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textColor="#ffffff"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</RelativeLayout>

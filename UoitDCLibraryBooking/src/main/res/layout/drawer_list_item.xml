@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_linearlayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        android:id="@+id/drawer_stripe_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:background="#33B5E5"
+        android:text=" "
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <ImageView
+        android:id="@+id/drawer_item_imageview"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_action_calendar_year_zoom" 
+        android:contentDescription="calendar icon"
+        />
+
+    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        android:id="@+id/drawer_item_textview"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="left"
+        android:layout_weight="1"
+        
+        android:gravity="center_vertical"
+        android:text="MediumText"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
+</LinearLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="incorrect_hint">#80ff0000</color>
+    <color name="disabled_button_text">#66000000</color>
+    <color name="bright_blue">#5ba8f5</color>
+    <color name="light_gray">#ffcccccc</color>
+    <color name="gridview_divider">#22000000</color>
+    <color name="booked_red">#ffff4444</color>
+    <color name="blue_font">#2d72d9</color>
+    <color name="very_light_blue">#d7f0fc</color>
+    <color name="white">#ffff</color>
+    <color name="shadow_start">#80000000</color>
+    <color name="shadow_end">#00000000</color>
+
+</resources>

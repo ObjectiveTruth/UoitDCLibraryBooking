@@ -1,0 +1,82 @@
+<android.support.v4.widget.DrawerLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/drawer_layout"
+android:layout_width="match_parent"
+android:layout_height="match_parent" 
+
+>
+	<ScrollView
+	    android:id="@+id/landing_scrollview"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+        android:background="@color/white"
+	    
+
+	    >
+
+
+
+		<RelativeLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    android:background="@color/white"
+		    android:padding="20dp" >
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+
+                android:id="@+id/book_date_actual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:text="Scan QR Code to begin"
+                android:gravity="center"
+                android:layout_alignParentTop="true"
+                android:textColor="@color/blue_font"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/dialog_title_text" />
+
+            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+			    	    android:id="@+id/textView1"
+			    	    android:layout_width="350dp"
+			    	    android:layout_height="wrap_content"
+			    	    android:layout_below="@+id/book_date_actual"
+			    	    android:layout_centerHorizontal="true"
+			    	    android:gravity="center"
+                        android:layout_marginTop="20dp"
+			    	    android:layout_marginBottom="15dp"
+			    	    android:text="@string/qrreceive_instructions"
+			    	    android:textAppearance="?android:attr/textAppearanceMedium"
+			    	    android:textColor="@color/blue_font" />
+
+                    <com.cengalabs.flatui.views.FlatButton
+                        android:id="@+id/capturecamerabutton"
+                        style="@style/flat_ui_button"
+			    	    android:layout_width="wrap_content"
+			    	    android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+			    	    android:layout_below="@+id/textView1"
+			    	    android:layout_centerHorizontal="true"
+			    	    android:layout_centerVertical="true"
+			    	    android:text="Start Capture" />
+			    				    
+		</RelativeLayout>
+
+	
+	</ScrollView>
+
+
+
+	<ListView
+	    android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/top_bar"
+        android:layout_gravity="start"
+        android:background="#444444"
+        android:choiceMode="singleChoice"
+        android:divider="#444444"
+         />
+
+
+
+</android.support.v4.widget.DrawerLayout>

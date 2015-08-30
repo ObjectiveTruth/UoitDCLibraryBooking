@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gridview_item_frame_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        android:id="@+id/gridview_text_view"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:text="Medium"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    <ImageView
+        android:id="@+id/gridview_imageview"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:contentDescription="closed"
+        android:gravity="center"
+        android:src="@drawable/ic_fileclose"
+        android:visibility="visible" />
+
+
+
+</FrameLayout>
