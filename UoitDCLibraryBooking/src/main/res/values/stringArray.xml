@@ -2,7 +2,6 @@
 <resources>
     <string-array name="menuItems">
         <item>Calendar</item>
-        <item>QR Receive</item>
         <item>Policies</item>
         <item>About</item>
         
@@ -11,7 +10,6 @@
     <string-array name="menuItemsPremium">
         <item>Calendar</item>
         <item>Account</item>
-        <item>QR Receive</item>
         <item>Rooms</item>
         <item>Policies</item>
         <item>About</item>

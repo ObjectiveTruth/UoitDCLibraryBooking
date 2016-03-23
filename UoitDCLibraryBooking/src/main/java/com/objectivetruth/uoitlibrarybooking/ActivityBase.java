@@ -43,13 +43,13 @@ public abstract class ActivityBase extends ActionBarActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
-        else if(position == 2 && position != ACTIVITYPAGENUMBER){
+        else if(position == 1 && position != ACTIVITYPAGENUMBER){
             Intent intent = new Intent(this, GuidelinesPoliciesActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
 
         }
-        else if(position==3 && position != ACTIVITYPAGENUMBER){
+        else if(position == 2 && position != ACTIVITYPAGENUMBER){
             Intent intent = new Intent(this, ActivityAboutMe.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
