@@ -24,6 +24,13 @@ Happy Coding!
 
 -Miguel
 
+## RoadMap
+
+1. Code Cleanup (no major refactor)
+2. Hook up a Continous Integration (CI) System. Jenkins? Travis?
+3. Add basic tests
+4. Major Refactor, possibly Kotlin?
+
 ## Development Environment Setup
 
 ### Existing IntelliJ installation (MacOSX)
