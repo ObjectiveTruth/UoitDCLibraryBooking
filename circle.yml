@@ -11,6 +11,8 @@ dependencies:
 
 test:
   override:
+    # Run unit tests first (results will be collected at the last step)
+    - ./gradlew test -PdisablePreDex
     # start the emulator
     - emulator -avd circleci-android22 -no-audio -no-window:
         background: true
@@ -20,7 +22,7 @@ test:
     # unlock the emulator screen
     - sleep 30
     - adb shell input keyevent 82
-    # run tests  against the emulator.
+    # run Androidtests  against the emulator.
     - ./gradlew connectedAndroidTest -PdisablePreDex
     # copy the build outputs to artifacts
     - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
