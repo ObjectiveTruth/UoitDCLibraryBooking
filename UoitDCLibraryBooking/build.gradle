@@ -40,6 +40,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dexOptions {
+        // local.properties only exists when IntelliJ creates the project. Thus preDexLibraries will only be
+        // enabled on a local dev machine and disabled on the Continuous Integration (CI) server to speed up the build
+        def filecheck = new File( 'local.properties' )
+        if (filecheck.exists()) {
+            preDexLibraries true
+        } else {
+            preDexLibraries false
+        }
+    }
 }
 
 dependencies {
