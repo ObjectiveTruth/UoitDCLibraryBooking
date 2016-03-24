@@ -1,5 +1,8 @@
 # UOITDCLibraryBooking
+Build status:
+[![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master)
 
+Have a question?
 [![Join the chat at https://gitter.im/ObjectiveTruth/UoitDCLibraryBooking](https://badges.gitter.im/ObjectiveTruth/UoitDCLibraryBooking.svg)](https://gitter.im/ObjectiveTruth/UoitDCLibraryBooking?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Description
