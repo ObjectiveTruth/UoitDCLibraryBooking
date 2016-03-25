@@ -16,6 +16,15 @@ android:
     - extra-google-m2repository
     - extra-android-m2repository
     - extra-android-support
+before_cache:
+  # Remove the important lock file that can change in the cache directory
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
+cache:
+  directories:
+    # So we dont have to redownload gradle on each build
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 before_install:
   # Decrypt the release keystore
