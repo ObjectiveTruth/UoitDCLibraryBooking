@@ -33,7 +33,7 @@ def getVersionFromContinuousIntegrationEnvironment() {
     // Added to make sure it doesn't conflict with the old way of naming which was arbitrary. Now it follows the
     // Continious Integration Environment Build Number
     def CONTINUOUS_INTEGRATION_BUILD_NUMBER_ENV_VARIABLE = "TRAVIS_BUILD_NUMBER"
-    def buildNumberPrefix = 20000
+    def buildNumberPrefix = 20020
     def BuildNumberFromCIWithPrefix = buildNumberPrefix +
             (System.getenv(CONTINUOUS_INTEGRATION_BUILD_NUMBER_ENV_VARIABLE) as Integer ?: 0)
     return BuildNumberFromCIWithPrefix as Integer
