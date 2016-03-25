@@ -30,3 +30,15 @@ test:
     - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
     - cp -r UoitDCLibraryBooking/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+
+deployment:
+  beta:
+    branch: beta
+    commands:
+      - sudo apt-get update; sudo apt-get install gnupg
+      # Decrypt the release keystore
+      - echo ${CI_RELEASE_KEYSTORE_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "UoitDCLibraryBooking/release_key.keystore.gpg" > UoitDCLibraryBooking/release_key.keystore
+      # Decrypt the google play api key
+      - echo ${CI_GOOGLE_PLAY_API_KEY_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "UoitDCLibraryBooking/google_play_android_developer_api_keys.json.gpg" > UoitDCLibraryBooking/google_play_android_developer_api_keys.json
+      - ./gradlew publishApkRelease -Dorg.gradle.project.track=beta
+
