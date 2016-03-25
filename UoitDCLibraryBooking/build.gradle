@@ -29,8 +29,8 @@ repositories {
 def getVersionFromContinuousIntegrationEnvironment() {
     // Added to make sure it doesn't conflict with the old way of naming which was arbitrary. Now it follows the
     // Continious Integration Environment Build Number
-    def buildNumberPrefix = "1"
-    def circleCIBuildNumWithPrefix = buildNumberPrefix + (System.getenv("CIRCLE_BUILD_NUM") ?: "9999")
+    def buildNumberPrefix = 20000
+    def circleCIBuildNumWithPrefix = buildNumberPrefix + (System.getenv("CIRCLE_BUILD_NUM") as Integer ?: 0)
     return circleCIBuildNumWithPrefix as Integer
 }
 
