@@ -19,4 +19,4 @@ else
     exit 1
 fi
 
-echo "If build succeeds, apk will be pushed to ${ANDROID_APK_RELEASE} track"
+echo "If build succeeds, apk will be pushed to ${ANDROID_APK_RELEASE_TRACK} track"
