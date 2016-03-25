@@ -1,3 +1,9 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply plugin: 'com.github.triplet.play'
+
+def versionMajor = "1"
+
 buildscript {
     repositories {
         jcenter()
@@ -6,14 +12,26 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.github.triplet.gradle:play-publisher:1.1.4'
     }
 }
-apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+
+play {
+    jsonFile = file('google_play_android_developer_api_keys.json')
+    track = 'beta'
+}
 
 repositories {
     jcenter()
     maven { url 'https://maven.fabric.io/public' }
+}
+
+def getVersionFromContinuousIntegrationEnvironment() {
+    // Added to make sure it doesn't conflict with the old way of naming which was arbitrary. Now it follows the
+    // Continious Integration Environment Build Number
+    def buildNumberPrefix = "1"
+    def circleCIBuildNumWithPrefix = buildNumberPrefix + (System.getenv("CIRCLE_BUILD_NUM") ?: "9999")
+    return circleCIBuildNumWithPrefix as Integer
 }
 
 android {
@@ -25,8 +43,8 @@ android {
         applicationId "com.objectivetruth.uoitlibrarybooking"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode getVersionFromContinuousIntegrationEnvironment()
+        versionName versionMajor + "." + getVersionFromContinuousIntegrationEnvironment()
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -34,10 +52,19 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+    signingConfigs {
+        release {
+            storeFile file("release_key.keystore")
+            storePassword System.getenv("CI_RELEASE_KEYSTORE_PASSWORD")
+            keyAlias System.getenv("CI_RELEASE_KEYSTORE_ALIAS")
+            keyPassword System.getenv("CI_RELEASE_KEYSTORE_KEY_PASSWORD")
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
