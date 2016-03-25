@@ -17,7 +17,7 @@ android:
     - extra-android-m2repository
     - extra-android-support
 before_cache:
-  # Remove the important lock file that can change in the cache directory
+  # Remove the lock file as per https://docs.travis-ci.com/user/languages/android#Caching
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 
 cache:
