@@ -17,5 +17,14 @@ android:
     - extra-android-m2repository
     - addon-google_apis-google-19
     - extra-android-support
+before_install:
+  # Decrypt the release keystore
+  - echo ${CI_RELEASE_KEYSTORE_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "UoitDCLibraryBooking/release_key.keystore.gpg" > UoitDCLibraryBooking/release_key.keystore
+  # Decrypt the google play api key
+  - echo ${CI_GOOGLE_PLAY_API_KEY_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "UoitDCLibraryBooking/google_play_android_developer_api_keys.json.gpg" > UoitDCLibraryBooking/google_play_android_developer_api_keys.json
+
+script:
+  - ./gradlew publishApkRelease -Dorg.gradle.project.track=${TRAVIS_BRANCH}
+
 
 
