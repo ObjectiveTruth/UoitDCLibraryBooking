@@ -33,7 +33,8 @@ before_install:
   - echo ${CI_GOOGLE_PLAY_API_KEY_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "UoitDCLibraryBooking/google_play_android_developer_api_keys.json.gpg" > UoitDCLibraryBooking/google_play_android_developer_api_keys.json
 
 script:
-  - ./gradlew publishApkRelease -Dorg.gradle.project.track=${TRAVIS_BRANCH}
+  - ./scripts/set_release_track_env_variable_based_on_ci_branch.sh
+  - ./gradlew publishApkRelease -Dorg.gradle.project.track=${ANDROID_APK_RELEASE_TRACK}
 
 
 
