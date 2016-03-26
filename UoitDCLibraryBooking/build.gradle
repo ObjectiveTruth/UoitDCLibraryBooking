@@ -26,6 +26,11 @@ play {
     track = 'beta' //Default track if none is specific in the commandline
 }
 
+// Options for spoon
+spoon {
+    adbTimeout = 60 * 3
+}
+
 repositories {
     jcenter()
     maven { url 'https://maven.fabric.io/public' }
