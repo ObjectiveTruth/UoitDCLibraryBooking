@@ -32,7 +32,7 @@ public class ActivityAboutMe extends ActivityBase {
 	static SharedPreferences defaultPreferences;
 	static SharedPreferences.Editor defaultPrefsEditor;
 	
-	final int ACTIVITYPAGENUMBER = 3;
+	final int ACTIVITYPAGENUMBER = 2;
 	final String ACTIVITYTITLE = "About";
 
 	@Override
