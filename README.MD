@@ -1,9 +1,15 @@
 # UOITDCLibraryBooking
-Build status:
-[![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master)
 
-Have a question?
-[![Join the chat at https://gitter.im/ObjectiveTruth/UoitDCLibraryBooking](https://badges.gitter.im/ObjectiveTruth/UoitDCLibraryBooking.svg)](https://gitter.im/ObjectiveTruth/UoitDCLibraryBooking?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+**Build Healthcheck :ambulance:**
+
+| branch | tests | deployment
+| --- | --- | --- |
+| Master/Prod: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master) | ![master_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=master) |
+| Beta: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/beta.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/beta) | ![beta_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=beta) |
+
+
+Have a question? join our
+[![Slack Status](http://uoitdclibrarybookingslackin.objectivetruth.ca/badge.svg)](http://uoitdclibrarybookingslackin.objectivetruth.ca)
 
 ## Description
 
