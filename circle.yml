@@ -24,9 +24,10 @@ test:
     - adb shell input keyevent 82
     # run all android tests using spoon against the emulator.
     - ./gradlew spoon -PdisablePreDex
-    # copy the build outputs to artifacts
+    # copy the build outputs and spoon to artifacts
     - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
-    - cp -r UoitDCLibraryBooking/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
 
 
