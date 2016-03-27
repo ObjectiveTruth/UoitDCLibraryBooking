@@ -26,9 +26,22 @@ play {
     track = 'beta' //Default track if none is specific in the commandline
 }
 
-// Options for spoon
+// Options for spoon.
+// Timeout added because of this issue http://stackoverflow.com/questions/34775440/spoon-timeout-getting-device-list
 spoon {
     adbTimeout = 60 * 3
+}
+
+// The following 2 blocks are needed to disable animations during instrumentation testing
+// See http://product.reverb.com/2015/06/06/disabling-animations-in-espresso-for-android-testing/ for steps
+task grantAnimationPermission(type: Exec, dependsOn: 'installDebug') {
+    def cmdToGiveSetAnimationScalePermission = "../scripts/adb_all.sh shell pm grant com.objectivetruth.uoitlibrarybooking android.permission.SET_ANIMATION_SCALE"
+    commandLine cmdToGiveSetAnimationScalePermission.split(' ')
+}
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith('spoon')) {
+        task.dependsOn grantAnimationPermission
+    }
 }
 
 repositories {
