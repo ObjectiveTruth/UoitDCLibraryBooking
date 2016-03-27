@@ -13,8 +13,10 @@ test:
   override:
     # Run unit tests first (results will be collected at the last step)
     - ./gradlew test -PdisablePreDex
+    # Create a mounted sd card to save android screenshots to (the custom CI emulator's sd card is read only)
+    - mksdcard -l e 512M mysdcard.img
     # start the emulator
-    - emulator -avd circleci-android22 -no-audio -no-window:
+    - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img:
         background: true
         parallel: true
     # wait for it to have booted
