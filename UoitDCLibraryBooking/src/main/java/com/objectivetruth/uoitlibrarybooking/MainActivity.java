@@ -64,7 +64,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     public static final String SHARED_PREF_REGISTRATION_VERSION = "shared_pref_registration_version";
     public static final String SHARED_PREF_APPVERSION = "shared_pref_appversion_db";
     public static final String SHARED_PREF_HAS_LEARNED_HELP = "shared_pref_has_learned_help";
-    private static final String SHARED_PREF_IS_FIRST_TIME_LAUNCH = "shared_pref_is_first_time_launch";
+    public static final String SHARED_PREF_IS_FIRST_TIME_LAUNCH = "shared_pref_is_first_time_launch";
     public static final int MAX_BOOKINGS_ALLOWED = 20; //This can safely be changed
     public static final String SHARED_PREF_INSTITUTION = "shared_pref_institution";
     public static final String SHARED_PREF_KEY_BOOKINGS_LEFT = "shared_pref_bookings_left";
@@ -1282,6 +1282,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         animY.setRepeatCount(1);
         animY.setStartDelay(1000);
         animY.addListener(new Animator.AnimatorListener() {
+            int repeatCount = 0;
             @Override
             public void onAnimationStart(Animator animation) {
 
@@ -1289,8 +1290,11 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                animY.setStartDelay(750);
-                animY.start();
+                if (repeatCount < 5) {
+                    repeatCount++;
+                    animY.setStartDelay(750);
+                    animY.start();
+                }
             }
 
             @Override
@@ -1300,7 +1304,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
             }
         });
         animY.setRepeatMode(ObjectAnimator.REVERSE);

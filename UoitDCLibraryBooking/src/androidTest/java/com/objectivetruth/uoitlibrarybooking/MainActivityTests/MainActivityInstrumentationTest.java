@@ -16,8 +16,10 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -35,27 +37,19 @@ public class MainActivityInstrumentationTest {
     @Before
     public void setUp() {
         mActivity = mActivityRule.getActivity();
-        SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(InstrumentationRegistry.getTargetContext());
-        // Use commit instead of apply. Espresso handles background thread timings for you!
-        // Stop all the animations, otherwise will go on forever waiting for all animations to stop
-        preferences.edit()
-                .putBoolean(MainActivity.SHARED_PREF_HASLEARNED_MYACCOUNT, true)
-                .putBoolean(MainActivity.SHARED_PREF_HAS_LEARNED_HELP, true)
-                .putBoolean(MainActivity.hasLEARNED_REFRESH, true)
-                .commit();
     }
 
     @After
     public void tearDown() {
         mActivity = null;
-        PreferenceManager.getDefaultSharedPreferences((InstrumentationRegistry.getTargetContext()))
-                .edit().clear().commit();
     }
 
     @Test
-    public void isGridViewDisplayed(){
-        Spoon.screenshot(mActivity, "first_view");
-        onView(ViewMatchers.withId(R.id.drawer_frame_layout)).check(matches(isDisplayed()));
+    public void usersFirstExperienceFlow(){
+        Spoon.screenshot(mActivity, "initial_view");
+        onView(withId(R.id.refresh_calendar)).perform(click());
+        Spoon.screenshot(mActivity, "after_refresh_clicked");
+        onView(withId(R.id.user_account)).perform(click());
+        onView(ViewMatchers.withId(R.id.titleMyAccount)).check(matches(isDisplayed()));
     }
 }
