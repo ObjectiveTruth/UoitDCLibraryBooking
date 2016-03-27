@@ -7,9 +7,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.widget.ListView;
 import timber.log.Timber;
 
-/**
- * Created by ObjectiveTruth on 8/19/2014.
- */
 public abstract class ActivityBase extends ActionBarActivity {
 
     @Override
@@ -54,7 +51,6 @@ public abstract class ActivityBase extends ActionBarActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
-        //mDrawerList.setItemChecked(position, true);
         setTitle(getMenuItems()[position]);
         getmDrawerLayout().closeDrawer(getmDrawerList());
     }
