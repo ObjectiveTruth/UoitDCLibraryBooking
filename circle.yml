@@ -23,7 +23,9 @@ test:
     - sleep 15
     - adb shell input keyevent 82
     # run all android tests using spoon against the emulator.
-    - ./gradlew spoon -PdisablePreDex
+    - ./gradlew spoon -PdisablePreDex:
+        timeout: 900
+
     # copy the build outputs and spoon to artifacts
     - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
     - cp -r UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
