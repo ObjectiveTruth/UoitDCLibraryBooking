@@ -34,7 +34,6 @@ import android.util.SparseArray;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
-import com.crashlytics.android.Crashlytics;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -52,23 +51,17 @@ import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.*;
+
 
 public class MainActivity extends ActivityBase implements ActionBar.TabListener, AsyncResponse{
     public static final String MY_ACCOUNT_DIALOGFRAGMENT_TAG = "myAccountDiaFrag";
     public static final String PASSWORD_INFO_DIALOGFRAGMENT_TAG = "passwordInfoDiaFrag";
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
-    public static final String SHARED_PREF_REGISTRATIONID = "shared_pref_gcm_registration_id";
-    public static final String SHARED_PREF_REGISTRATION_VERSION = "shared_pref_registration_version";
-    public static final String SHARED_PREF_APPVERSION = "shared_pref_appversion_db";
-    public static final String SHARED_PREF_HAS_LEARNED_HELP = "shared_pref_has_learned_help";
-    public static final String SHARED_PREF_IS_FIRST_TIME_LAUNCH = "shared_pref_is_first_time_launch";
     public static final int MAX_BOOKINGS_ALLOWED = 20; //This can safely be changed
-    public static final String SHARED_PREF_INSTITUTION = "shared_pref_institution";
-    public static final String SHARED_PREF_KEY_BOOKINGS_LEFT = "shared_pref_bookings_left";
-    public static final String SHARED_PREF_HASLEARNED_MYACCOUNT = "shared_pref_haslearned_myaccount";
     private static final long AUTO_REFRESH_DELAY = 6000;
-    public static final String SHARED_PREF_UUID = "shared_pref_uuid" ;
     private static final String HELP_DIALOGFRAGMENT_TAG = "helpDiaFrag";
+    private static final String WHATSNEW_DIALOGFRAGMENT_TAG = "WHATS_NEW_DIALOG_FRAG";
     public static boolean isDialogShowing = false;
     private final String TAG = "MainActivity";
     public long activityStartTime = System.currentTimeMillis();
@@ -128,8 +121,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
      */
     ViewPager mViewPager;
 	public ArrayList<CalendarMonth> calendarCache = null;
-	
-
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,73 +230,11 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                 };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        //TODO enable this for GCM
-/*        if (checkPlayServices()) {
-            String registrationId = getRegistrationId();
-            if (registrationId == null) {
-                Timber.i("GCM registrationId not found, getting new registrationId");
-                new AsyncGcmRegistration().execute(this);
-            }
-            else{
-                Timber.i("GCM RegistrationId found and valid");
-                Crashlytics.setString(SHARED_PREF_REGISTRATIONID, registrationId);
-            }
-        } else {
-            Timber.i("GCM: No valid Google Play Services APK found.");
-            Toast.makeText(this, "Google Play Services Not Found, some content may not work", Toast.LENGTH_LONG);
-        }*/
-
-        //if its the first time using the app
-        boolean isFirstTimeAppOpening = defaultPreferences.getBoolean(SHARED_PREF_IS_FIRST_TIME_LAUNCH, true);
-        if(isFirstTimeAppOpening){
-            Crashlytics.setBool(SHARED_PREF_IS_FIRST_TIME_LAUNCH, true);
-            defaultPrefsEditor.putBoolean(SHARED_PREF_IS_FIRST_TIME_LAUNCH, false);
-        }
-        else{
-            Crashlytics.setBool(SHARED_PREF_IS_FIRST_TIME_LAUNCH, false);
-        }
         OttoBusSingleton.getInstance().register(this);
 
 
     }
 
-    /**
-     * checks if the registration id (if present) is valid for new version, or not
-     * @return null if no valid registrationId found (checks for app version too)
-     */
-    private String getRegistrationId(){
-        String registrationId = defaultPreferences.getString(SHARED_PREF_REGISTRATIONID, "");
-        int registrationVersion = defaultPreferences.getInt(SHARED_PREF_REGISTRATION_VERSION, -1);
-
-        if (registrationId.isEmpty() || registrationVersion < 0) {
-            return null;
-        }
-        // Check if app was updated; if so, it must clear the registration ID
-        // since the existing regID is not guaranteed to work with the new
-        // app version.
-        int registeredVersion = registrationVersion;
-        int currentVersion = BuildConfig.VERSION_CODE;
-        if (registeredVersion != currentVersion) {
-            Timber.i("GCM: App version changed, invalidating GCM Reg Id, must run new GCM Registraion...");
-            return null;
-        }
-        return registrationId;
-
-    }
-
-
-    /**
-     * Checks for GooglePlayServices Availabity
-     * @return true if available, false if not
-     */
-    private boolean checkPlayServices(){
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if(ConnectionResult.SUCCESS == resultCode){
-            return true;
-        }else{
-            return false;
-        }
-    }
     @Override
     protected int getActivityPageNumber() {
         return ACTIVITYPAGENUMBER;
@@ -329,25 +258,13 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // If the nav drawer is open, hide action items related to the content
-        // view
+        // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
         if(drawerOpen){
         	return false;
         }
         return super.onPrepareOptionsMenu(menu);
     }
-
-/*    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
-        // ActionBarDrawerToggle will take care of this.
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        // Handle action buttons
-        return true;
-    }*/
 
     /* The click listner for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -364,6 +281,10 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+
+        if(UOITLibraryBookingApp.IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL) {
+            WhatsNewDialog.show(this);
+        }
 
         // Sync the toggle state after onRestoreInstanceState has occurred.
         mDrawerToggle.syncState();
@@ -383,13 +304,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     	//getMenuInflater().inflate(R.menu.debugmenu, menu);
         refreshItem = menu.findItem(R.id.refresh_calendar);
         myAccountItem = menu.findItem(R.id.user_account);
-        //defaultPreferences.getBoolean("is_first_load_tutorial", true) &&
-        if(defaultPreferences.getBoolean("is_first_load_tutorial", true) && isNewInstance == true){
-            //showDisclaimer();
-
-        	defaultPrefsEditor.putBoolean("is_first_load_tutorial", false)
-    		.commit();
-        }
 
         if(!defaultPreferences.getBoolean(hasLEARNED_REFRESH, false)){
 
@@ -433,23 +347,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
 
         return true;
-    }
-
-    private void showDisclaimer(){
-        String disclaimerString = getResources().getString(R.string.showcaseIntro);
-        SpannableString disclaimerSpan = new SpannableString(disclaimerString);
-        Object span = new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER);
-        disclaimerSpan.setSpan(span, 0, disclaimerString.length() - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        new AlertDialog.Builder(this)
-                .setTitle("Disclaimer")
-                .setMessage(disclaimerSpan)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                })
-                .setIcon(R.drawable.ic_dialog_alert)
-                .show();
     }
 
 
@@ -1365,6 +1262,24 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         DiaFragHelp currentFrag = new DiaFragHelp();
         currentFrag.show(fragMan, HELP_DIALOGFRAGMENT_TAG);
     }
+
+/*    private void launchWhatsNewDialog() {
+        Timber.i("Showing What's new Dialog");
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(!sharedPreferences.getBoolean(SHARED_PREF_FIRST_TIME, false)){
+            long firstHelpClickDelay = activityStartTime - System.currentTimeMillis();
+            t.send(new HitBuilders.EventBuilder()
+                    .setCategory("Calendar Home")
+                    .setAction("HelpDialog")
+                    .setLabel("First Time Help Pressed")
+                    .setValue(firstHelpClickDelay)
+                    .build());
+            sharedPreferences.edit().putBoolean(SHARED_PREF_HAS_LEARNED_HELP, true).commit();
+        }
+        FragmentManager fragMan = getSupportFragmentManager();
+        DiaFragHelp currentFrag = new DiaFragHelp();
+        currentFrag.show(fragMan, WHATSNEW_DIALOGFRAGMENT_TAG);
+    }*/
 
     /**
      * Emulates the user clicking. Will check if refresh is already happening and will cancel it if
