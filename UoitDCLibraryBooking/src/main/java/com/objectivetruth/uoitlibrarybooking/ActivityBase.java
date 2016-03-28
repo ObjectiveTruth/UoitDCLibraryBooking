@@ -40,7 +40,7 @@ public abstract class ActivityBase extends ActionBarActivity {
     }
 
 
-    protected void selectItem(int position) {
+    void selectItem(int position) {
         Timber.i("Position " + String.valueOf(position) + " selected");
         int ACTIVITYPAGENUMBER = getActivityPageNumber();
 

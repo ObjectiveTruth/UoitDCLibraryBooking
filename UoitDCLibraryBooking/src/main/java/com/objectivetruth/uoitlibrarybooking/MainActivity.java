@@ -405,9 +405,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             intent.putExtra("date", "March 15, 1984, Monday");
         	startActivity(intent);
         }
-        else if(mDrawerToggle.onOptionsItemSelected(item)) {
-
-        }
 
         return super.onOptionsItemSelected(item);
     }
