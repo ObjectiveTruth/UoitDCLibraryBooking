@@ -43,8 +43,8 @@ tasks.whenTaskAdded { task ->
     if (task.name.startsWith('spoon')) {
         task.dependsOn grantAnimationPermission
     }
-    if (task.name.startsWith('assembleDebug')) {
-        task.dependsOn uninstallDebug
+    if (task.name.startsWith('installDebugAndroidTest')) {
+        task.dependsOn(uninstallDebug)
     }
 }
 
