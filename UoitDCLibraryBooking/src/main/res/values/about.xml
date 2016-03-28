@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_me_monologue">
+        <p>Hey, thanks for checking out this page.\n\nI\'m a UOIT Comp Sci student and this is my first android app.
+        Sorry if there are any bugs but I hope you find it useful since the old booking system is so archaic.\n\n Check
+        out my blog at <a href="www.ObjectiveTruth.ca">www.ObjectiveTruth.ca</a> and read up on the adventures of getting this thing off the ground.
+        If you have any comments or suggestions feel free to comment there.\n\n
+
+        Last thing, sorry about the ads, but it took about 4 months to get all this working, and I figure if you found it useful,
+        you wouldn\'t mind seeing a few ads here and there. Hope i\'m not wrong. \n\nIf you do hate it enough you can disable them all with the button above.\n\n
+        Cheers!
+    </p>
+    </string>
+</resources>
