@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_APPVERSION;
+
 public class DbHelper extends SQLiteOpenHelper {
 	
 	public final String DATABASE_NAME; //Declared in constructor below
@@ -81,20 +83,19 @@ public class DbHelper extends SQLiteOpenHelper {
 		super(context, "infocache", factory, version);
 		this.dbContext = context;
 		DATABASE_NAME = "infocache";
-	    if (checkDataBase()) {
-	        openDataBase();
-	    } else
-	    {
-	        try {
-	            getReadableDatabase();
-	            copyDataBase();
-	            close();
-	            openDataBase();
-	
-	        } catch (IOException e) {
-	            throw new Error("Error copying database");
-	        }
-	        Toast.makeText(context, "Initial Setup Complete. Please Refresh", Toast.LENGTH_LONG).show();
+	    if (shouldDatabaseBeCopied()) {
+			try {
+				getReadableDatabase();
+				copyDataBase();
+				close();
+				openDataBase();
+
+			} catch (IOException e) {
+				throw new Error("Error copying database");
+			}
+			Toast.makeText(context, "Initial Setup Complete. Please Refresh", Toast.LENGTH_LONG).show();
+	    } else {
+			openDataBase();
 	    }
 	    
 		
@@ -119,53 +120,27 @@ public class DbHelper extends SQLiteOpenHelper {
      * This returns based on if the database is present or the app version has changed
      * @return true if all good, false if there's an issue and will copy the default database
      */
-	private boolean checkDataBase() {
-	    SQLiteDatabase checkDB = null;
-	    boolean exist = false;
+	private boolean shouldDatabaseBeCopied() {
+	    boolean shouldCopyDatabase = false;
+		// Attempt to open then close the database to make sure it works
 	    try {
 	        String dbPath = DATABASE_PATH + DATABASE_NAME;
-	        checkDB = SQLiteDatabase.openDatabase(dbPath, null,
+			SQLiteDatabase openAndImmediatelyCloseMe = SQLiteDatabase.openDatabase(dbPath, null,
 					SQLiteDatabase.OPEN_READONLY);
+            openAndImmediatelyCloseMe.close();
 	    } catch (SQLiteException e) {
-	        Timber.i("database does't exist");
+			shouldCopyDatabase = true;
 	    }
 	
-	    if (checkDB != null) {
-            Timber.i("databse exists");
-	        exist = true;
-            //checkDB.close();
-
-	    }
-        //checks version if the db exists
-        if(dbContext != null){
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(dbContext);
-            int oldAppVersion = sharedPreferences.getInt(MainActivity.SHARED_PREF_APPVERSION, -1);
-            if(oldAppVersion < 0){
-                Crashlytics.setBool("Upgradeing" , false);
-                Timber.i("Version Number for the databse doesn't exist, writing current app version " + BuildConfig.VERSION_CODE);
-                sharedPreferences.edit().putInt(MainActivity.SHARED_PREF_APPVERSION, BuildConfig.VERSION_CODE).commit();
-                return exist;
-            }
-            else if(oldAppVersion != BuildConfig.VERSION_CODE){
-                Crashlytics.setBool("Upgradeing" , true);
-                Timber.i("Version number doesn't agre with the current version, updating and placing new app version code");
-                sharedPreferences.edit().putInt(MainActivity.SHARED_PREF_APPVERSION, BuildConfig.VERSION_CODE).commit();
-                return false;
-            }
-            else{
-                Crashlytics.setBool("Upgradeing" , false);
-                Timber.i("Version number is the same as before, leaving everything the same");
-            }
-
-        }
-
-	    return exist;
+		if (UOITLibraryBookingApp.IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL) {
+			shouldCopyDatabase = true;
+		}
+	    return shouldCopyDatabase;
 	}
 	
 	public void openDataBase() throws SQLException {
 	    String dbPath = DATABASE_PATH + DATABASE_NAME;
 	    dataBase = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READWRITE);
-	    
 	}
 	
 	
