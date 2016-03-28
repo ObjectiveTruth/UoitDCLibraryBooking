@@ -30,6 +30,7 @@ play {
 // Timeout added because of this issue http://stackoverflow.com/questions/34775440/spoon-timeout-getting-device-list
 spoon {
     adbTimeout = 60 * 3
+    debug = true
 }
 
 // The following 2 blocks are needed to disable animations during instrumentation testing
@@ -41,6 +42,8 @@ task grantAnimationPermission(type: Exec, dependsOn: 'installDebug') {
 tasks.whenTaskAdded { task ->
     if (task.name.startsWith('spoon')) {
         task.dependsOn grantAnimationPermission
+    }
+    if (task.name.startsWith('assembleDebug')) {
         task.dependsOn uninstallDebug
     }
 }
