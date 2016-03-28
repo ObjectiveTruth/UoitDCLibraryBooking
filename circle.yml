@@ -34,4 +34,8 @@ test:
     # copy the test results to the test results directory.
     - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
 
+notify:
+  webhooks:
+    # When build completes, send the Device Farm server the results
+    - url: http://api.uoitdclibrarybooking.objectivetruth.ca/circleci_build_webhook/run
 
