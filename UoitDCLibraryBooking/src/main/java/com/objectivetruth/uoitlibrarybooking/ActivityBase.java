@@ -32,13 +32,13 @@ public abstract class ActivityBase extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle bundleExtras) {
         super.onCreate(bundleExtras);
-
-        // If in debug mode, unlock the screen
-        if (BuildConfig.DEBUG) {
+        if (UOITLibraryBookingApp.IS_DEBUG_MODE) {
+            // Programmatically unlock the screen for testing
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         }
     }
+
 
     protected void selectItem(int position) {
         Timber.i("Position " + String.valueOf(position) + " selected");
