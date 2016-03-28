@@ -376,10 +376,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         // Inflate the menu; this adds items to the action bar if it is present.
     	if(BuildConfig.DEBUG){
         	getMenuInflater().inflate(R.menu.debugmenu, menu);
-
-            // Unlock the screen
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         }
         else{
         	getMenuInflater().inflate(R.menu.main, menu);

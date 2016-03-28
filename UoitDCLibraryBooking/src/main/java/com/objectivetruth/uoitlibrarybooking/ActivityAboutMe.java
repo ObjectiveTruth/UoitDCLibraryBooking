@@ -91,11 +91,6 @@ public class ActivityAboutMe extends ActivityBase {
 
                 };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        // If in debug mode, unlock the screen
-        if (BuildConfig.DEBUG) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        }
 	}
     @Override
     protected int getActivityPageNumber() {
