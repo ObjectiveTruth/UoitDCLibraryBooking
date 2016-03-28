@@ -39,7 +39,7 @@ public class CalendarMonth {
 
                 c.setTime(date);
                 int IntDayOfTheWeek = c.get(Calendar.DAY_OF_WEEK);
-                dayOfTheWeek = namesOfDays[IntDayOfTheWeek-1];
+                dayOfTheWeek = namesOfDays[IntDayOfTheWeek];
                 Timber.i("Date object is set to: " + c.getTime().toString());
 				Timber.i("Day of the week calculated to be " + IntDayOfTheWeek + " which means its a " + dayOfTheWeek);
 			} catch (ParseException e) {
