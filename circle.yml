@@ -14,25 +14,25 @@ test:
     # Run unit tests first (results will be collected at the last step)
     - ./gradlew test -PdisablePreDex
     # Create a mounted sd card to save android screenshots to (the custom CI emulator's sd card is read only)
-    - mksdcard -l e 512M mysdcard.img
+#    - mksdcard -l e 512M mysdcard.img
     # start the emulator
-    - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img:
-        background: true
-        parallel: true
+#    - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img:
+#        background: true
+#        parallel: true
     # wait for it to have booted
-    - circle-android wait-for-boot
+#    - circle-android wait-for-boot
     # unlock the emulator screen
-    - sleep 15
-    - adb shell input keyevent 82
+#    - sleep 15
+#    - adb shell input keyevent 82
     # run all android tests using spoon against the emulator.
-    - ./gradlew spoon -PdisablePreDex:
-        timeout: 900
+#    - ./gradlew spoon -PdisablePreDex:
+#        timeout: 900
 
     # copy the build outputs and spoon to artifacts
-    - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
-    - cp -r UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
+#    - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
+#    - cp -r UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
-    - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
+#    - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
 
 notify:
   webhooks:
