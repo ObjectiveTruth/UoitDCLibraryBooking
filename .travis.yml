@@ -36,5 +36,8 @@ script:
   - ./scripts/set_release_track_env_variable_based_on_ci_branch.sh
   - ./gradlew publishApkRelease -Dorg.gradle.project.track=${ANDROID_APK_RELEASE_TRACK}
 
-
-
+# Must be present. DO NOT REMOVE
+branches:
+  only:
+    - master
+    - beta

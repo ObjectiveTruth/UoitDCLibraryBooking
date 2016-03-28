@@ -2,34 +2,43 @@ package com.objectivetruth.uoitlibrarybooking;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ListView;
 import timber.log.Timber;
 
 public abstract class ActivityBase extends ActionBarActivity {
+    protected abstract int              getActivityPageNumber();
+    protected abstract String[]         getMenuItems();
+    protected abstract DrawerLayout     getmDrawerLayout();
+    protected abstract ListView         getmDrawerList();
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-
         super.onConfigurationChanged(newConfig);
+
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             Timber.i("Configuration Changed to LANDSCAPE");
         }
         else{
             Timber.i("Configuration Changed to PORTRAIT");
         }
-
-
     }
 
-    protected abstract int getActivityPageNumber();
+    @Override
+    protected void onCreate(Bundle bundleExtras) {
+        super.onCreate(bundleExtras);
 
-    protected abstract String[] getMenuItems();
-
-    protected abstract DrawerLayout getmDrawerLayout();
-
-    protected abstract ListView getmDrawerList();
+        // If in debug mode, unlock the screen
+        if (BuildConfig.DEBUG) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        }
+    }
 
     protected void selectItem(int position) {
         Timber.i("Position " + String.valueOf(position) + " selected");
@@ -54,4 +63,6 @@ public abstract class ActivityBase extends ActionBarActivity {
         setTitle(getMenuItems()[position]);
         getmDrawerLayout().closeDrawer(getmDrawerList());
     }
+
+
 }
