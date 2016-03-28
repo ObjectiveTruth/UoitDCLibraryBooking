@@ -39,5 +39,3 @@ script:
 # Must be present. DO NOT REMOVE
 branches:
   only:
-    - master
-    - beta
