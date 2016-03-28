@@ -8,4 +8,7 @@
 
     <!-- Used by spoon during development only. To take pictures at various stages of the tests -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Used during functional tests to unlock the screen so no manual input is required-->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 </manifest>

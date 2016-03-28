@@ -8,9 +8,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -93,10 +91,11 @@ public class ActivityAboutMe extends ActivityBase {
 
                 };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-		
-		
-		
+        // If in debug mode, unlock the screen
+        if (BuildConfig.DEBUG) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        }
 	}
     @Override
     protected int getActivityPageNumber() {

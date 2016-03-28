@@ -1,6 +1,7 @@
 package com.objectivetruth.uoitlibrarybooking;
 
 import android.app.Application;
+import android.app.KeyguardManager;
 import android.preference.PreferenceManager;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -38,7 +39,6 @@ public class UOITLibraryBookingApp extends Application {
 	
 	return t;
 	}
-
     @Override
     public void onCreate() {
         super.onCreate();
