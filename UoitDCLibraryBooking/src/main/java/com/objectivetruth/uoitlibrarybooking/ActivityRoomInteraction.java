@@ -27,8 +27,6 @@ import android.widget.*;
 import android.widget.AdapterView.OnItemSelectedListener;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.squareup.otto.Subscribe;
@@ -77,7 +75,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
     static String commentsStringActual = "";
 	//Changable Variables
 	boolean justPurchased = false;
-    private InterstitialAd interstitial;
     int SECRET_TAPS = 5; //Minimum is 3 (just trust me it is the minimum)
 
 	
@@ -93,7 +90,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		mActivity = this;
         OttoBusSingleton.getInstance().register(this);
 		t = ((UOITLibraryBookingApp) mActivity.getApplication()).getTracker();
-	    getActionBar().setDisplayHomeAsUpEnabled(true);
         //TODO added the eventViewstateGenerrator to the main head part, now use it in the book instance
         if (bundleExtras != null){
             eventValidation = bundleExtras.getString("eventValidation");
@@ -111,20 +107,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
             Timber.v("viewState: " + viewState);
             Timber.v("viewStateGenerator: " + viewStateGenerator);
             Timber.v("date: " + date);
-
-
-            //creating interstartial if not premium
-            if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(MainActivity.SHARED_PREFS_IS_PREMIUM, false)){
-                interstitial = new InterstitialAd(this);
-                interstitial.setAdUnitId("ca-app-pub-2551853901091663/7055677236");
-                AdRequest adRequest = new AdRequest.Builder()
-                        .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)       // Emulator
-                        .addTestDevice("3C327D408E452416CA5EC52117B41B50") //Nexus 4
-                        .addTestDevice("0194BEFB83171A187CCCEB55C1828E67") //Motog
-                        .addTestDevice("E9DC433AD7F2319E1609424366E19C73") //Nexus 7
-                        .build();
-                interstitial.loadAd(adRequest);
-            }
         }
 /*		if(mRequestQueue == null){
 			mRequestQueue = Volley.newRequestQueue(this);
@@ -236,7 +218,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
                             };
                             if(isNetworkAvailable()){
                                 new AsyncRoomConfirmation(cookieManager, mActivity).execute(fieldData);
-                                displayInterstitial();
                             }
                             else{
                                 new AlertDialog.Builder(mActivity)
@@ -326,7 +307,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 				public void onClick(View view) {
 					if(isNetworkAvailable()){
 						new AsyncBridgeJoinOrLeaveToCreate(cookieManager, mActivity, viewState, eventValidation, viewStateGenerator).execute();
-                        displayInterstitial();
 		        	}
 		        	else{
 		        		new AlertDialog.Builder(mActivity)
@@ -424,7 +404,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 
                         if(isNetworkAvailable()){
                             new AsyncRoomJoin(cookieManager, mActivity).execute(joinGroupInput);
-                            displayInterstitial();
                         }
                         else{
                             new AlertDialog.Builder(mActivity)
@@ -470,7 +449,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 
                         if(isNetworkAvailable()){
                             new AsyncRoomLeave(cookieManager, mActivity).execute(leaveGroupInput);
-                            displayInterstitial();
                         }
                         else{
                             new AlertDialog.Builder(mActivity)
@@ -567,7 +545,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 
                         if(isNetworkAvailable()){
                             new AsyncRoomViewJoin(cookieManager, mActivity).execute(joinGroupInput);
-                            displayInterstitial();
                         }
                         else{
                             new AlertDialog.Builder(mActivity)
@@ -609,7 +586,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 
                         if(isNetworkAvailable()){
                             new AsyncRoomViewLeave(cookieManager, mActivity).execute(leaveGroupInput);
-                            displayInterstitial();
                         }
                         else{
                             new AlertDialog.Builder(mActivity)
@@ -1267,13 +1243,4 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
             super.onBackPressed();
         }
     }*/
-    public void displayInterstitial() {
-        if (interstitial != null && interstitial.isLoaded()) {
-            interstitial.show();
-        }
-    }
-
-
-
-
 }

@@ -37,8 +37,6 @@ import android.widget.*;
 import com.crashlytics.android.Crashlytics;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -151,9 +149,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 		setContentView(R.layout.activity_main);
 		defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		defaultPrefsEditor = defaultPreferences.edit();
-
-        RelativeLayout admobRelativeLayout = (RelativeLayout) findViewById(R.id.admob_frame);
-        admobRelativeLayout.setVisibility(View.GONE);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -368,13 +363,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     }
 
 
-
-/*    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }*/
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -878,10 +866,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 				progDialogQRCode.dismiss();
 			}
     	}
-    	
-    	//mViewPager.getCurrentItem()
-        
-    	
     }
 
     @Subscribe
@@ -911,10 +895,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                 public void run() {
                     if(tabNumber > -1 && tabNumber < calendarCache.size()){
                         Timber.i("Setting the tab to " + tabNumber);
-                        //actionBar.setSelectedNavigationItem(tabNumber);
                         mViewPager.setCurrentItem(tabNumber, false);
-                        //getSupportActionBar().selectTab(getSupportActionBar().getTabAt(tabNumber));
-                        //mViewPager.setCurrentItem(tabNumber);
                     }
                 }
             }, 100);
@@ -1082,22 +1063,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         if(intentExtras == null){
         	
         }
-        /*else if(intentExtras.getBoolean("purchased")){
-        	getIntent().removeExtra("purchased");
-	    	AdView adView = (AdView) findViewById(R.id.admob_calendar_home);
-	    	if(adView != null){
-	    		adView.setEnabled(false);
-	    		adView.setVisibility(View.GONE);
-	    	}
-	    	ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
-	    	if(mDrawerList != null){
-	    		mDrawerList.invalidateViews();
-	    	}
-    		RelativeLayout admobRelativeLayout = (RelativeLayout) findViewById(R.id.admob_frame);
-    		if (admobRelativeLayout !=null){
-    			admobRelativeLayout.setVisibility(View.GONE);	
-    		}
-        }*/
         else if(intentExtras.getIntArray("qrCode") != null){
         	int[] qrInfo = intentExtras.getIntArray("qrCode");
         	//qrInfo [null, row, column, page]

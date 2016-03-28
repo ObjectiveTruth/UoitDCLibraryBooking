@@ -15,20 +15,8 @@
             android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/admob_frame"
             android:background="@null"
             tools:context="com.objectivetruth.uoitlibrarybooking.MainActivity" />
-
-        <RelativeLayout
-			android:id="@+id/admob_frame"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentBottom="true"
-            android:background="@android:color/black"
-            >
-        
-        </RelativeLayout>
-
     </RelativeLayout>
 
     <ListView
