@@ -48,14 +48,4 @@
         android:orderInCategory="251"
         android:title="Debug - Book Room"
         app:showAsAction="never"/>
-    <item
-        android:id="@+id/debug_premium"
-        android:orderInCategory="300"
-        android:title="Debug - Premium"
-        app:showAsAction="never"/>
-   	<item
-        android:id="@+id/debug_premium_consume"
-        android:orderInCategory="350"
-        android:title="Debug - Consume Premium"
-        app:showAsAction="never"/>
 </menu>

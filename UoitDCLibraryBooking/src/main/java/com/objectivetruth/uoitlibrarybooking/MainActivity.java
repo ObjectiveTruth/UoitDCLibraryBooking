@@ -55,7 +55,6 @@ import java.util.List;
 
 public class MainActivity extends ActivityBase implements ActionBar.TabListener, AsyncResponse{
     public static final String MY_ACCOUNT_DIALOGFRAGMENT_TAG = "myAccountDiaFrag";
-    public static final String SHARED_PREFS_IS_PREMIUM = "shared_pref_is_premium";
     public static final String PASSWORD_INFO_DIALOGFRAGMENT_TAG = "passwordInfoDiaFrag";
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
     public static final String SHARED_PREF_REGISTRATIONID = "shared_pref_gcm_registration_id";
@@ -107,8 +106,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 	int gridViewLastVisiblePosition;
 	boolean isForQRCode = false;
 	ProgressDialog progDialogQRCode = null;
-	final static String SKU_PREMIUM = "uoit_dc_booking_premium";
-	//final static String SKU_PREMIUM = "android.test.purchased";
 
 	final int ACTIVITYPAGENUMBER = 0;
 	int shareRow = 0;
@@ -510,15 +507,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             intent.putExtra("room", "Lib999");
             intent.putExtra("date", "March 15, 1984, Monday");
         	startActivity(intent);
-        }
-        
-        else if(id == R.id.debug_premium){
-
-        }
-        else if(id == R.id.debug_premium_consume){
-
-        	
-
         }
         else if(mDrawerToggle.onOptionsItemSelected(item)) {
 

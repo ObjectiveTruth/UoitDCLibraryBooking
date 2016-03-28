@@ -17,9 +17,6 @@ public class UOITLibraryBookingApp extends Application {
 	//Logging TAG
 	private static final String TAG = "UOITLibraryBookingApp";
 
-	String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyWiJKYNadTZh746EgXiI4GWYpWWbGu+F+UAnGz6kuCkH2gIxknj8gXNw/3pESTIsC/LWg06VT/Z/P8dAFR5qV5VcytyqKvAwqPYvKn8an7A+dV6CFIL2QrFI0771oOhvLC/Jj2XiX/M9iAX3kNcYMXwvwHY7T9SP6wX6gCnrFA9Pgc0vIM8JvvSJR6iyb9diJpEhf2a8ZRul6A97n06+926n1hexPZPOKlm2UvvlwMmMwDLsZ68OJoX45pZWdtUp86AW0pkx6c1sAYvCZrtW3chVI8YpxlsB6jLV65ov4Jj+3SN1AMyyqBlF0srtyFdKZgJya72ps8nrZhS+O6v7cwIDAQAB";
-	private boolean isPremium = false;
-
 	public UOITLibraryBookingApp() {
 			super();
 	}
@@ -37,9 +34,6 @@ public class UOITLibraryBookingApp extends Application {
                 mUUID = UUID.randomUUID().toString();
             }
             t.set("&cid", mUUID);
-			
-			//analytics.setAppOptOut(true);
-			
 		}
 	
 	return t;

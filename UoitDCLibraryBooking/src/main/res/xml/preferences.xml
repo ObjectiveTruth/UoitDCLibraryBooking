@@ -32,14 +32,4 @@
         android:title="Remember me"
         android:defaultValue="false"/>
     </PreferenceCategory>
-<!--     <PreferenceCategory
-        android:title="Bug Reporting"
-        android:key="pref_key_bugreporting">
-        
-        <CheckBoxPreference
-        android:key="shakeToBug"
-        android:summary="Shaking the screen causes a bug report to be started with an attachment of a screen capture. This helps in getting improvement suggestions and bug reporting. No information will be sent without you seeing the contents"
-        android:title="Shake for bug report"
-        android:defaultValue="true"/>
-    </PreferenceCategory> -->
 </PreferenceScreen>

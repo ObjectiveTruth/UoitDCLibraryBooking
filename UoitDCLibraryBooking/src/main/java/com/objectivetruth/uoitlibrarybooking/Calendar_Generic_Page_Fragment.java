@@ -102,14 +102,6 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
         View rootView;
-/*		if(((UOITLibraryBookingApp) getActivity().getApplication()).getIsPremium()){
-			TextView admobFrame = (TextView) v.findViewById(R.id.admob_frame_pager);
-			admobFrame.setVisibility(View.GONE);	
-		}*/
-		/*if(!firstTimeRunning){
-				
-			firstTimeRunning = false;
-		}*/
         Timber.i("Page position " + pageNumberStr);
 		mCalendarAdapter = new CalendarAdapter(getActivity());
         if(hasRooms){
