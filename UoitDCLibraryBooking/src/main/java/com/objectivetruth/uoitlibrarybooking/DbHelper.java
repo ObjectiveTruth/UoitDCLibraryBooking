@@ -128,7 +128,7 @@ public class DbHelper extends SQLiteOpenHelper {
 			SQLiteDatabase openAndImmediatelyCloseMe = SQLiteDatabase.openDatabase(dbPath, null,
 					SQLiteDatabase.OPEN_READONLY);
             openAndImmediatelyCloseMe.close();
-	    } catch (SQLiteException e) {
+	    } catch (Exception e) {
 			shouldCopyDatabase = true;
 	    }
 	
