@@ -41,6 +41,7 @@ task grantAnimationPermission(type: Exec, dependsOn: 'installDebug') {
 tasks.whenTaskAdded { task ->
     if (task.name.startsWith('spoon')) {
         task.dependsOn grantAnimationPermission
+        task.dependsOn uninstallDebug
     }
 }
 

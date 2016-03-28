@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
@@ -47,9 +48,18 @@ public class MainActivityInstrumentationTest {
     @Test
     public void usersFirstExperienceFlow(){
         Spoon.screenshot(mActivity, "initial_view");
+
+        onView(withId(android.R.id.button1)).check(matches(isClickable()));
+        Spoon.screenshot(mActivity, "whatsnew_dialog");
+
+        onView(withId(android.R.id.button1)).perform(click());
+        Spoon.screenshot(mActivity, "after_dismiss_whatsnew");
+
         onView(withId(R.id.refresh_calendar)).perform(click());
         Spoon.screenshot(mActivity, "after_refresh_clicked");
+
         onView(withId(R.id.user_account)).perform(click());
         onView(ViewMatchers.withId(R.id.titleMyAccount)).check(matches(isDisplayed()));
+        Spoon.screenshot(mActivity, "after_my_account_clicked");
     }
 }

@@ -1,0 +1,13 @@
+Version 1.20041
+===============
+‣ Removed all ads!
+‣ No more premium version
+‣ Removed QR feature completely
+‣ Can add bookings to phone's calendar
+‣ Lots of bug fixes
+‣ App is now Open Source!
+
+See About section for more info
+and how you can get involved!
+
+
