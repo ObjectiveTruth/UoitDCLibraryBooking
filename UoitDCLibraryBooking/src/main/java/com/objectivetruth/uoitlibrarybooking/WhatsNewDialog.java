@@ -3,10 +3,6 @@ package com.objectivetruth.uoitlibrarybooking;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.text.Layout;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.AlignmentSpan;
 import com.objectivetruth.uoitlibrarybooking.Utilities.ResourceLoadingUtilities;
 
 class WhatsNewDialog {
@@ -21,13 +17,9 @@ class WhatsNewDialog {
             return;
         }
 
-        SpannableString disclaimerSpan = new SpannableString(disclaimerString);
-        Object span = new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER);
-        disclaimerSpan.setSpan(span, 0, disclaimerString.length() - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
         new AlertDialog.Builder(context)
                 .setTitle(WHATS_NEW_DIALOG_TITLE)
-                .setMessage(disclaimerSpan)
+                .setMessage(disclaimerString)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         //Nothing special, by default closes the dialog
