@@ -37,6 +37,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
+import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
+import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
+
 public class ActivityRoomInteraction extends FragmentActivity implements CommunicatorRoomInteractions {
 	final public String TAG = "ActivityRoomInteraction";
 	CookieManager cookieManager;
@@ -196,9 +200,9 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
                 public void onClick(View view) {
                     if(isValidBook()) {
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                        String inputUsername = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_USERNAME, null);
-                        String inputPassword = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_PASSWORD, null);
-                        String institutionSpinnerValue = sharedPreferences.getString(MainActivity.SHARED_PREF_INSTITUTION, null);
+                        String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                        String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                        String institutionSpinnerValue = sharedPreferences.getString(SHARED_PREF_INSTITUTION, null);
                         //Checks if the sharedPrefs values are valid
                         if(inputPassword != null && inputUsername != null && institutionSpinnerValue != null){
                             String[] fieldData = new String[]{
@@ -387,8 +391,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 				public void onClick(View view) {
 
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                    String inputUsername = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                    String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] joinGroupInput = new String[]{
@@ -432,8 +436,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 				@Override
 				public void onClick(View view) {
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                    String inputUsername = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                    String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] leaveGroupInput = new String[]{
@@ -529,8 +533,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 				@Override
 				public void onClick(View view) {
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                    String inputUsername = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                    String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] joinGroupInput = new String[]{
@@ -571,8 +575,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 				@Override
 				public void onClick(View view) {
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                    String inputUsername = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                    String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] leaveGroupInput = new String[]{
