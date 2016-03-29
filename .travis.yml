@@ -39,4 +39,5 @@ script:
 # Must be present. DO NOT REMOVE
 branches:
   only:
-    - some_branch_that_should_never_exist
+    - master
+    - beta
