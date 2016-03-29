@@ -96,6 +96,11 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
 
 5. Profit :boom:
 
+## Code Pipeline
+
+![commit_pipeline](readme_pictures/UoitDCLibraryBookingCommitPipelines.png)
+
+
 ## License
 
 --------
