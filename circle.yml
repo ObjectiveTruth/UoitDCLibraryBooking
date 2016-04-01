@@ -1,4 +1,6 @@
 machine:
+  node:
+    version: 5.5.0
   environment:
     TERM: "dumb"
     ADB_INSTALL_TIMEOUT: "10"
@@ -23,8 +25,8 @@ dependencies:
 
 test:
   override:
-    # Run the device_farm_receive_server with harmony (ES6 Compatible mode)
-    - node server.js --harmony:
+    # Run the device_farm_receive_server
+    - node server.js:
         pwd:
           device_farm_receive_server
 
