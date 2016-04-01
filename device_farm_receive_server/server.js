@@ -55,7 +55,8 @@ function sendAPKsToDeviceFarmServer() {
     var requestForCircleCIServer = new FormData();
     requestForCircleCIServer.append('instrumentation', fs.createReadStream(ANDROID_TEST_INSTRUMENTATION_APK_LOCATION));
     requestForCircleCIServer.append('debug', fs.createReadStream(ANDROID_DEBUG_APK_LOCATION));
-    requestForCircleCIServer.append('callback', process.env[NGROK_TUNNEL_URL_ENV_VARIABLE_NAME]);
+    console.log('URL is ' +  process.env[NGROK_TUNNEL_URL_ENV_VARIABLE_NAME]);
+    //requestForCircleCIServer.append('callback', process.env[NGROK_TUNNEL_URL_ENV_VARIABLE_NAME]);
     requestForCircleCIServer.submit(DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT, function(error, response){
         if(error) {
             console.log(`Error sending results to Device Farm Server. Error:  ${error}`);
