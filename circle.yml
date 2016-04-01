@@ -23,7 +23,8 @@ dependencies:
 
 test:
   override:
-    - node server.js:
+    # Run the device_farm_receive_server with harmony (ES6 Compatible mode)
+    - node server.js --harmony:
         pwd:
           device_farm_receive_server
 
