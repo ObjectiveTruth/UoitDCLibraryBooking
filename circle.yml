@@ -15,11 +15,12 @@ machine:
     - NGROK_TUNNEL_URL="$(wget 127.0.0.1:4040/api/tunnels | jq ".tunnels[0].public_url" -r)":9292/reply
 
 dependencies:
+  override:
+    - npm install:
+      pwd: device_farm_receive_server
   pre:
     - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23
     - echo y | android update sdk --no-ui --all --filter "build-tools-23.0.2"
-    - npm install:
-      pwd: device_farm_receive_server
 
 test:
   override:
