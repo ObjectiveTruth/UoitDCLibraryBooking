@@ -3,16 +3,32 @@ machine:
     TERM: "dumb"
     ADB_INSTALL_TIMEOUT: "10"
     GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+  post:
+    # Creates a random introspective tunnel to the CircleCI container
+    - wget https://s3.amazonaws.com/build-tools-prd/ngrok.zip
+    - unzip ngrok.zip
+    - ./ngrok -log $CIRCLE_ARTIFACTS/ngrok.log 9292:
+        background: true
+    # Utility for parsing JSON
+    - wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+    # Save the NGROK URL by using the API on the ngrok server and appending the desired callback url
+    - NGROK_TUNNEL_URL="$(wget 127.0.0.1:4040/api/tunnels | jq ".tunnels[0].public_url" -r)":9292/reply
 
 dependencies:
   pre:
     - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23
     - echo y | android update sdk --no-ui --all --filter "build-tools-23.0.2"
+    - npm install
+      pwd: device_farm_receive_server
 
 test:
   override:
+    - node server.js
+
     # Run unit tests first (results will be collected at the last step)
-    - ./gradlew test -PdisablePreDex
+#    - ./gradlew test -PdisablePreDex
+    # Send hook to orchestrator to run the instrumentation tests
+
     # Create a mounted sd card to save android screenshots to (the custom CI emulator's sd card is read only)
 #    - mksdcard -l e 512M mysdcard.img
     # start the emulator
@@ -34,8 +50,15 @@ test:
     # copy the test results to the test results directory.
 #    - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
 
+    # Send the debug and instrumentation apks to the device farm
+    - "curl
+      -F instrumentation=@UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk
+      -F debug=@UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-unaligned.apk
+      -F callback=${NGROK_TUNNEL_URL}
+      http://api.uoitdclibrarybooking.objectivetruth.ca/circleci_build_webhook/upload_to_devicefarm"
+
 notify:
   webhooks:
     # When build completes, send the Device Farm server the results
-    - url: http://api.uoitdclibrarybooking.objectivetruth.ca/circleci_build_webhook/run
+    #- url: http://api.uoitdclibrarybooking.objectivetruth.ca/circleci_build_webhook/run
 
