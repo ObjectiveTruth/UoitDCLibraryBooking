@@ -25,6 +25,11 @@ dependencies:
 
 test:
   override:
+    # Assemble the AndroidTest Instrumentation build in build/outputs/apk
+    - ./gradlew assembleAndroidTest
+    # Assemble the debug build in build/outputs/apk
+    - ./gradlew assembleDebug
+
     # Run the device_farm_receive_server
     - node server.js:
         pwd:
@@ -54,13 +59,6 @@ test:
 #    - cp -r UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
 #    - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
-
-    # Send the debug and instrumentation apks to the device farm
-    - "curl
-      -F instrumentation=@UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk
-      -F debug=@UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-unaligned.apk
-      -F callback=${NGROK_TUNNEL_URL}
-      http://api.uoitdclibrarybooking.objectivetruth.ca/circleci_build_webhook/upload_to_devicefarm"
 
 notify:
   webhooks:
