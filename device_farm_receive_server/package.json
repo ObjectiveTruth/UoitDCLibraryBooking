@@ -1,0 +1,16 @@
+{
+  "name": "device_farm_receive_server",
+  "version": "1.0.0",
+  "description": "Deployed during the build stage and receives messages from the device farm",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Miguel <miguel@objectivetruth.ca>",
+  "license": "GPL-2.0",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "multer": "^1.1.0"
+  }
+}
