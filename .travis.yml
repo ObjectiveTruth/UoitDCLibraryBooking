@@ -41,3 +41,6 @@ branches:
   only:
     - master
     - beta
+
+notifications:
+  slack: ${SLACK_CHANNEL_AND_API_TOKEN}
