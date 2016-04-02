@@ -30,35 +30,21 @@ test:
     # Assemble the debug build in build/outputs/apk
     - ./gradlew assembleDebug
 
-    # Run the device_farm_receive_server
+    # Run the device_farm_receive_server and write the exit state to $DEVICE_FARM_RECEIVE_SERVER_RESPONSE
+    # Needs to be written to a variable because failing any command will fail the build
     - node server.js:
         pwd:
           device_farm_receive_server
 
-    # Run unit tests first (results will be collected at the last step)
-#    - ./gradlew test -PdisablePreDex
-    # Send hook to orchestrator to run the instrumentation tests
+    - ./scripts/circle_ci_emulator_tests.sh
+        timeout: 900
 
-    # Create a mounted sd card to save android screenshots to (the custom CI emulator's sd card is read only)
-#    - mksdcard -l e 512M mysdcard.img
-    # start the emulator
-#    - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img:
-#        background: true
-#        parallel: true
-    # wait for it to have booted
-#    - circle-android wait-for-boot
-    # unlock the emulator screen
-#    - sleep 15
-#    - adb shell input keyevent 82
-    # run all android tests using spoon against the emulator.
-#    - ./gradlew spoon -PdisablePreDex:
-#        timeout: 900
+    # Copy the build outputs and spoon to artifacts
+    - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
 
-    # copy the build outputs and spoon to artifacts
-#    - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
-#    - cp -r UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
-#    - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
+    - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
 
 notify:
   webhooks:
