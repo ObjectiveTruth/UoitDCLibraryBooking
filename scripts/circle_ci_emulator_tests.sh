@@ -35,8 +35,9 @@ else
     sleep 15
     adb shell input keyevent 82
 
-    # Run all android tests using spoon against the emulator.
-    curl -o spoon-runner-with-dependancies.jar https://search.maven.org/remote_content?g=com.squareup.spoon&a=spoon-runner&v=1.3.2&c=jar-with-dependencies
+    # Download the spoon jar and run all androidTests
+    curl -o spoon-runner-with-dependancies.jar -L \
+        --remote-name "https://search.maven.org/remote_content?g=com.squareup.spoon&a=spoon-runner&v=1.3.2&c=jar-with-dependencies"
     java -jar spoon-runner-with-dependencies.jar \
         --apk UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-unaligned.apk \
         --test-apk UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk
