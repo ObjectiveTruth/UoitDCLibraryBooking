@@ -50,7 +50,7 @@ app.post('/reply', upload.fields([
         process.exit(res.body[DEVICE_FARM_RESULT_CODE_FIELDNAME]);
     });
 
-if (isADeviceFarmServerAvailable(fs.readFileSync(EXIT_CODE_FILE_LOCATION))) {
+if (isADeviceFarmServerAvailable()) {
     app.listen(LISTEN_PORT, function () {
         console.log(`Device Farm Receive Server listening on port ${LISTEN_PORT}!`);
     });
@@ -84,7 +84,8 @@ function sendAPKsToDeviceFarmServer() {
     
 }
 
-function isADeviceFarmServerAvailable(code) {
+function isADeviceFarmServerAvailable() {
+    var code = fs.readFileSync(EXIT_CODE_FILE_LOCATION);
     console.log(code);
     return code !== '69';
 }
