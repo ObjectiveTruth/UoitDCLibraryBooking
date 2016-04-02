@@ -1,8 +1,8 @@
+const EXIT_CODE_ENV_VARIABLE_NAME = 'DEVICE_FARM_RECEIVE_SERVER_RESPONSE';
 process.env[EXIT_CODE_ENV_VARIABLE_NAME] = '1'; // Set failure incase we quit early
 
 const LISTEN_PORT = 9292;
 const ARTIFACTS_SAVE_DIR = '../UoitDCLibraryBooking/UoitDCLibraryBooking/build';
-const EXIT_CODE_ENV_VARIABLE_NAME = 'DEVICE_FARM_RECEIVE_SERVER_RESPONSE';
 const DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT = 
     'http://api.uoitdclibrarybooking.objectivetruth.ca/circleci_build_webhook/upload_to_devicefarm';
 const NGROK_TUNNEL_URL_ENV_VARIABLE_NAME = 
