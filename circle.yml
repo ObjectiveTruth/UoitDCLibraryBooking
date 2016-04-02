@@ -12,6 +12,7 @@ machine:
     - ./ngrok http -log $CIRCLE_ARTIFACTS/ngrok.log -log-level debug -log-format json 9292:
         background: true
     # Save the NGROK URL by using the API on the ngrok server and appending the desired callback url
+    - sleep 5
     - export NGROK_TUNNEL_URL="$(curl 127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url' -r)":9292/reply
     - printenv
 
