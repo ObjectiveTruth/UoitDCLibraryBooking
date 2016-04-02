@@ -1,4 +1,7 @@
 #!/bin/bash
+set -o verbose
+set -o errexit
+set -o nounset
 ##############################################################################
 ##
 ##  Custom script executed by CircleCI to open emulator in container and run test
