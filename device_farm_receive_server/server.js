@@ -80,9 +80,9 @@ function sendAPKsToDeviceFarmServer() {
             console.log(error || response.statusMessage);
             console.log(`Writing 69 to ${EXIT_CODE_FILE_LOCATION}`);
             fs.writeFileSync(EXIT_CODE_FILE_LOCATION, '69');
-            shouldWaitForServerFarmResponse = true;
         }else {
             console.log(`Successfully transferred results to Device Farm Server, will wait for results...`);
+            shouldWaitForServerFarmResponse = true;
         }
     });
     
