@@ -11,9 +11,11 @@
 # then the code was either 1 or 0 which means the tests occured or something went terribly bad earlier in the commands
 # In that case, we just return the code that was returned to us and CircleCI will interpret that as success or fail
 # accordingly
-if [[ $DEVICE_FARM_RECEIVE_SERVER_RESPONSE -ne 69 ]] ; then
+DEVICE_FARM_EXIT_CODE=`cat device_farm_receive_server_exit_code.txt`
+
+if [[ $DEVICE_FARM_EXIT_CODE -ne 69 ]] ; then
     echo "Device Farm already ran tests, skipping CircleCI container emulator testing";
-    exit $DEVICE_FARM_RECEIVE_SERVER_RESPONSE
+    exit $DEVICE_FARM_EXIT_CODE
 else
     echo "Device Farm couldn't be contacted. Running tests on CircleCI container using emulation";
 
