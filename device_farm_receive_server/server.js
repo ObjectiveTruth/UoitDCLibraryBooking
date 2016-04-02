@@ -35,10 +35,6 @@ var NGROK_TUNNEL_URL_CALLBACK = fs.readFileSync(NGROK_TUNNEL_URL_LOCATION);
 
 
 //==============MAIN=================
-var shouldWaitForServerFarmResponse = false;
-
-sendAPKsToDeviceFarmServer();
-
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -46,20 +42,14 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.post('/reply', upload.fields([
     { name: 'artifacts', maxCount: 1 }
 ]), function(req, res) {
-        const DEVICE_FARM_RESULT_CODE_FIELDNAME = 'result_code';
-        var resultCode = res.body[DEVICE_FARM_RESULT_CODE_FIELDNAME];
-        console.log(`Received response from device farm. Result Code: ${resultCode}, writing to ${EXIT_CODE_FILE_LOCATION}`);
-        fs.writeFileSync(EXIT_CODE_FILE_LOCATION, resultCode);
-        process.exit(resultCode);
-    });
+    const DEVICE_FARM_RESULT_CODE_FIELDNAME = 'result_code';
+    var resultCode = res.body[DEVICE_FARM_RESULT_CODE_FIELDNAME];
+    console.log(`Received response from device farm. Result Code: ${resultCode}, writing to ${EXIT_CODE_FILE_LOCATION}`);
+    fs.writeFileSync(EXIT_CODE_FILE_LOCATION, resultCode);
+    process.exit(resultCode);
+});
 
-if (shouldWaitForServerFarmResponse) {
-    app.listen(LISTEN_PORT, function () {
-        console.log(`Device Farm Receive Server listening on port ${LISTEN_PORT}!`);
-    });
-}else {
-    process.exit(0);
-}
+sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app);
 
 
 
@@ -67,7 +57,7 @@ if (shouldWaitForServerFarmResponse) {
 
 //============Utility Functions================
 
-function sendAPKsToDeviceFarmServer() {
+function sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app) {
     console.log(`Sending the debug and instrumentation apks to the device farm. ${NGROK_TUNNEL_URL_CALLBACK}`);
 
     var requestForCircleCIServer = new FormData();
@@ -80,9 +70,12 @@ function sendAPKsToDeviceFarmServer() {
             console.log(error || response.statusMessage);
             console.log(`Writing 69 to ${EXIT_CODE_FILE_LOCATION}`);
             fs.writeFileSync(EXIT_CODE_FILE_LOCATION, '69');
+            process.exit(0);
         }else {
             console.log(`Successfully transferred results to Device Farm Server, will wait for results...`);
-            shouldWaitForServerFarmResponse = true;
+            app.listen(LISTEN_PORT, function () {
+                console.log(`Device Farm Receive Server listening on port ${LISTEN_PORT}!`);
+            });
         }
     });
     
