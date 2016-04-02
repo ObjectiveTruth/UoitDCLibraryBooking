@@ -28,9 +28,13 @@ var storage = multer.diskStorage({
 });
 var upload = multer({storage: storage});
 
+
+
+
 //==============MAIN=================
 
 sendAPKsToDeviceFarmServer();
+
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -43,9 +47,14 @@ app.post('/reply', upload.fields([
         process.exit(res.body[DEVICE_FARM_RESULT_CODE_FIELDNAME]);
     });
 
-app.listen(LISTEN_PORT, function () {
-    console.log(`Device Farm Receive Server listening on port ${LISTEN_PORT}!`);
-});
+if (isADeviceFarmServerAvailable(process.env[EXIT_CODE_ENV_VARIABLE_NAME])) {
+    app.listen(LISTEN_PORT, function () {
+        console.log(`Device Farm Receive Server listening on port ${LISTEN_PORT}!`);
+    });
+}else {
+    process.exit(0);
+}
+
 
 
 
@@ -71,4 +80,8 @@ function sendAPKsToDeviceFarmServer() {
         }
     });
     
+}
+
+function isADeviceFarmServerAvailable(code) {
+    return code !== '69';
 }
