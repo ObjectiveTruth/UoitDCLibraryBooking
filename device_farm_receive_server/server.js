@@ -35,6 +35,7 @@ var NGROK_TUNNEL_URL_CALLBACK = fs.readFileSync(NGROK_TUNNEL_URL_LOCATION);
 
 
 //==============MAIN=================
+var shouldWaitForServerFarmResponse = false;
 
 sendAPKsToDeviceFarmServer();
 
@@ -46,11 +47,13 @@ app.post('/reply', upload.fields([
     { name: 'artifacts', maxCount: 1 }
 ]), function(req, res) {
         const DEVICE_FARM_RESULT_CODE_FIELDNAME = 'result_code';
-        console.log(`Received response from device farm. Result Code: ${res.body[DEVICE_FARM_RESULT_CODE_FIELDNAME]}`);
-        process.exit(res.body[DEVICE_FARM_RESULT_CODE_FIELDNAME]);
+        var resultCode = res.body[DEVICE_FARM_RESULT_CODE_FIELDNAME];
+        console.log(`Received response from device farm. Result Code: ${resultCode}, writing to ${EXIT_CODE_FILE_LOCATION}`);
+        fs.writeFileSync(EXIT_CODE_FILE_LOCATION, resultCode);
+        process.exit(resultCode);
     });
 
-if (isADeviceFarmServerAvailable()) {
+if (shouldWaitForServerFarmResponse) {
     app.listen(LISTEN_PORT, function () {
         console.log(`Device Farm Receive Server listening on port ${LISTEN_PORT}!`);
     });
@@ -77,6 +80,7 @@ function sendAPKsToDeviceFarmServer() {
             console.log(error || response.statusMessage);
             console.log(`Writing 69 to ${EXIT_CODE_FILE_LOCATION}`);
             fs.writeFileSync(EXIT_CODE_FILE_LOCATION, '69');
+            shouldWaitForServerFarmResponse = true;
         }else {
             console.log(`Successfully transferred results to Device Farm Server, will wait for results...`);
         }
@@ -84,8 +88,3 @@ function sendAPKsToDeviceFarmServer() {
     
 }
 
-function isADeviceFarmServerAvailable() {
-    var code = fs.readFileSync(EXIT_CODE_FILE_LOCATION);
-    console.log(code);
-    return code !== '69';
-}
