@@ -5,9 +5,9 @@ const DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT =
 const NGROK_TUNNEL_URL_ENV_VARIABLE_NAME = 
     'NGROK_TUNNEL_URL';
 const ANDROID_TEST_INSTRUMENTATION_APK_LOCATION = 
-    'UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk';
+    '../UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk';
 const ANDROID_DEBUG_APK_LOCATION = 
-    'UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-unaligned.apk';
+    '../UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-unaligned.apk';
 
 var express = require('express');
 var fs = require('fs');
@@ -50,17 +50,17 @@ app.listen(LISTEN_PORT, function () {
 //============Utility Functions================
 
 function sendAPKsToDeviceFarmServer() {
-    console.log('Sending the debug and instrumentation apks to the device farm');
+    console.log(`Sending the debug and instrumentation apks to the device farm. ${process.env[NGROK_TUNNEL_URL_ENV_VARIABLE_NAME]}`);
 
     var requestForCircleCIServer = new FormData();
     requestForCircleCIServer.append('instrumentation', fs.createReadStream(ANDROID_TEST_INSTRUMENTATION_APK_LOCATION));
     requestForCircleCIServer.append('debug', fs.createReadStream(ANDROID_DEBUG_APK_LOCATION));
-    console.log('URL is ' +  process.env[NGROK_TUNNEL_URL_ENV_VARIABLE_NAME]);
     //requestForCircleCIServer.append('callback', process.env[NGROK_TUNNEL_URL_ENV_VARIABLE_NAME]);
     requestForCircleCIServer.submit(DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT, function(error, response){
-        if(error) {
-            console.log(`Error sending results to Device Farm Server. Error:  ${error}`);
-            // 69 is Service Unavailable
+        if(error || (response.statusCode < 200 || response.statusCode > 299)) {
+            console.log(`Error Code: ${response.statusCode} when sending results to Device Farm Server`);
+            console.log(error || response.statusMessage);
+            // 69 is Error Code: Service Unavailable
             process.exit(69);
         }else {
             console.log(`Successfully transferred results to Device Farm Server, will wait for results...`);
