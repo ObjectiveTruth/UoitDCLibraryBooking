@@ -19,9 +19,6 @@ if [[ $DEVICE_FARM_EXIT_CODE -ne 69 ]] ; then
 else
     echo "Device Farm couldn't be contacted. Running tests on CircleCI container using emulation";
 
-    # Run unit tests first (results will be collected at the last step)
-    ./gradlew test -PdisablePreDex
-
     # Create a mounted sd card to save android screenshots to (the custom CI emulator's sd card is read only)
     mksdcard -l e 512M mysdcard.img
 
@@ -36,6 +33,9 @@ else
     adb shell input keyevent 82
 
     # Run all android tests using spoon against the emulator.
-    ./gradlew spoon -PdisablePreDex:
+    curl -o spoon-runner-with-dependancies.jar https://search.maven.org/remote_content?g=com.squareup.spoon&a=spoon-runner&v=1.3.2&c=jar-with-dependencies
+    java -jar spoon-runner-with-dependencies.jar \
+        --apk UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-unaligned.apk \
+        --test-apk UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk
 
 fi

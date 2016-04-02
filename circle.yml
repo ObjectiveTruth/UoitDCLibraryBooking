@@ -37,7 +37,7 @@ test:
           device_farm_receive_server
 
     - ./scripts/circle_ci_emulator_tests.sh:
-        timeout: 1800
+        timeout: 900
 
     # Copy the build outputs and spoon to artifacts
     - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
