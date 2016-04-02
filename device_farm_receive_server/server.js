@@ -74,6 +74,7 @@ function sendAPKsToDeviceFarmServer() {
             console.log(error || response.statusMessage);
             // 69 is Error Code: Service Unavailable
             process.env[EXIT_CODE_ENV_VARIABLE_NAME] = '69';
+            console.log(process.env[EXIT_CODE_ENV_VARIABLE_NAME]);
         }else {
             process.env[EXIT_CODE_ENV_VARIABLE_NAME] = '0';
             console.log(`Successfully transferred results to Device Farm Server, will wait for results...`);
@@ -83,5 +84,6 @@ function sendAPKsToDeviceFarmServer() {
 }
 
 function isADeviceFarmServerAvailable(code) {
+    console.log(code);
     return code !== '69';
 }
