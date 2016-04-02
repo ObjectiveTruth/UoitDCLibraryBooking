@@ -41,10 +41,9 @@ test:
 
     # Copy the build outputs and spoon to artifacts
     - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
-    - cp -rv UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
 
     # copy the test results to the test results directory.
-    - cp -rv UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
+    - cp -rv UoitDCLibraryBooking/build/outputs/spoon/junit-reports $CIRCLE_TEST_REPORTS/junit
 
 notify:
   webhooks:

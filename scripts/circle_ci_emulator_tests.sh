@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x # Debug mode
+set -o xtrace  # Debug mode
 set -o errexit # Exit if any commands gives non-zero return code
 set -o nounset # Exit if referencing any variable that's not been set
 ##############################################################################
@@ -40,6 +40,7 @@ else
         --remote-name "https://search.maven.org/remote_content?g=com.squareup.spoon&a=spoon-runner&v=1.3.2&c=jar-with-dependencies"
     java -jar spoon-runner-with-dependencies.jar \
         --apk UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-unaligned.apk \
-        --test-apk UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk
+        --test-apk UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk \
+        --output UoitDCLibraryBooking/build/outputs/spoon/
 
 fi
