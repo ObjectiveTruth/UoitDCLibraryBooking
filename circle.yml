@@ -37,14 +37,14 @@ test:
           device_farm_receive_server
 
     - ./scripts/circle_ci_emulator_tests.sh:
-        timeout: 900
+        timeout: 1800
 
     # Copy the build outputs and spoon to artifacts
-    - cp -r UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
-    - cp -r UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
+    - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
+    - cp -rv UoitDCLibraryBooking/build/spoon $CIRCLE_ARTIFACTS
 
     # copy the test results to the test results directory.
-    - cp -r UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
+    - cp -rv UoitDCLibraryBooking/build/spoon/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
 
 notify:
   webhooks:
