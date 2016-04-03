@@ -11,6 +11,7 @@ machine:
     - unzip ngrok-stable-linux-amd64.zip
     - ./ngrok http -log $CIRCLE_ARTIFACTS/ngrok.log -log-level debug -log-format json 9292:
         background: true
+    - sleep 15
     # Save the NGROK URL by using the API on the ngrok server and appending the desired callback url
     - echo "$(curl 127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url' -r)":9292/reply > UoitDCLibraryBooking/ngrok_url.txt
 
