@@ -2,7 +2,6 @@ machine:
   node:
     version: 5.5.0
   environment:
-    TERM: "dumb"
     ADB_INSTALL_TIMEOUT: "10"
     GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
   post:
@@ -13,7 +12,7 @@ machine:
         background: true
     - sleep 15
     # Save the NGROK URL by using the API on the ngrok server and appending the desired callback url
-    - echo "$(curl 127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url' -r)":9292/reply > UoitDCLibraryBooking/ngrok_url.txt
+    - echo "$(curl 127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url' -r)"/reply > UoitDCLibraryBooking/ngrok_url.txt
 
 dependencies:
   override:

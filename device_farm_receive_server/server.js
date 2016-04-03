@@ -1,7 +1,9 @@
 const LISTEN_PORT = 9292;
-const ARTIFACTS_SAVE_DIR = '../UoitDCLibraryBooking/UoitDCLibraryBooking/build';
-const DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT = 
-    'http://api.uoitdclibrarybooking.objectivetruth.ca/circleci_build_webhook/upload_to_devicefarm';
+const ARTIFACTS_SAVE_DIR = '../UoitDCLibraryBooking/build';
+const DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT_HOST = 
+    'api.uoitdclibrarybooking.objectivetruth.ca';
+const DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT_PATH =
+    '/circleci_build_webhook/upload_to_devicefarm';
 const ANDROID_TEST_INSTRUMENTATION_APK_LOCATION =
     '../UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-debug-androidTest-unaligned.apk';
 const ANDROID_DEBUG_APK_LOCATION = 
@@ -42,13 +44,19 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.post('/reply', upload.fields([
     { name: 'artifacts', maxCount: 1 }
 ]), function(req, res) {
-    const DEVICE_FARM_RESULT_CODE_FIELDNAME = 'result_code';
-    var resultCode = res.body[DEVICE_FARM_RESULT_CODE_FIELDNAME];
-    console.log(`Received response from device farm. Result Code: ${resultCode}, writing to ${EXIT_CODE_FILE_LOCATION}`);
+    const DEVICE_FARM_RESULT_CODE_QUERY_STRING_FIELDNAME = 'resultcode';
+    var resultCode = req.query[DEVICE_FARM_RESULT_CODE_QUERY_STRING_FIELDNAME];
+    console.log(`Received response from device farm. Result Code: ${resultCode}, writing it to ${EXIT_CODE_FILE_LOCATION}`);
     fs.writeFileSync(EXIT_CODE_FILE_LOCATION, resultCode);
     process.exit(resultCode);
 });
 
+app.post('*', function(request, response) {
+    response.send('Server is Up!');
+});
+app.get('*', function(request, response) {
+    response.send('Server is Up!');
+});
 sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app);
 
 
@@ -58,15 +66,18 @@ sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app);
 //============Utility Functions================
 
 function sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app) {
-    const DEVICE_FARM_UPLOAD_ENDPOINT_WITH_QUERY_PARAMS = DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT +
-        '?callback=' + encodeURIComponent(NGROK_TUNNEL_URL_CALLBACK);
-    console.log(`Sending the debug and instrumentation apks to the device farm with URL ` + 
-        `${DEVICE_FARM_UPLOAD_ENDPOINT_WITH_QUERY_PARAMS}. Callback is ${NGROK_TUNNEL_URL_CALLBACK}`);
+    console.log(`Sending the debug and instrumentation apks to the device farm located at ` + 
+        `${DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT_HOST}${DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT_PATH}. ` + 
+        `Callback is ${NGROK_TUNNEL_URL_CALLBACK}`);
 
     var requestForCircleCIServer = new FormData();
     requestForCircleCIServer.append('instrumentation', fs.createReadStream(ANDROID_TEST_INSTRUMENTATION_APK_LOCATION));
     requestForCircleCIServer.append('debug', fs.createReadStream(ANDROID_DEBUG_APK_LOCATION));
-    requestForCircleCIServer.submit(DEVICE_FARM_UPLOAD_ENDPOINT_WITH_QUERY_PARAMS, function(error, response){
+    requestForCircleCIServer.submit({
+        host: DEVICE_FARM_UPLOAD_ENDPOINT_WITH_QUERY_PARAMS,
+        path: DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT_PATH +
+            '?callback=' + encodeURIComponent(NGROK_TUNNEL_URL_CALLBACK)
+    }, function(error, response){
         if(error || (response.statusCode < 200 || response.statusCode > 299)) {
             console.log(`Error Code: ${response.statusCode} when sending results to Device Farm Server`);
             console.log(error || response.statusMessage);
