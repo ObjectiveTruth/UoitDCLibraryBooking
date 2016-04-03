@@ -31,6 +31,7 @@ play {
 spoon {
     adbTimeout = 60 * 3
     debug = true
+    baseOutputDir = file("$buildDir/outputs")
 }
 
 // The following 2 blocks are needed to disable animations during instrumentation testing

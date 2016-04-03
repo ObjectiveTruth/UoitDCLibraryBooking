@@ -27,7 +27,7 @@ var storage = multer.diskStorage({
         callback(null, ARTIFACTS_SAVE_DIR);
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + '.zip');
+        cb(null, file.fieldname + '.tar');
     }
 });
 var upload = multer({storage: storage});
@@ -74,7 +74,7 @@ function sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app) {
     requestForCircleCIServer.append('instrumentation', fs.createReadStream(ANDROID_TEST_INSTRUMENTATION_APK_LOCATION));
     requestForCircleCIServer.append('debug', fs.createReadStream(ANDROID_DEBUG_APK_LOCATION));
     requestForCircleCIServer.submit({
-        host: DEVICE_FARM_UPLOAD_ENDPOINT_WITH_QUERY_PARAMS,
+        host: DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT_HOST,
         path: DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT_PATH +
             '?callback=' + encodeURIComponent(NGROK_TUNNEL_URL_CALLBACK)
     }, function(error, response){
