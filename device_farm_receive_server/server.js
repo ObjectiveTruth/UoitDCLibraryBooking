@@ -58,14 +58,15 @@ sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app);
 //============Utility Functions================
 
 function sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app) {
-    console.log(`Sending the debug and instrumentation apks to the device farm at ` + 
-        `${DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT}. Callback is ${NGROK_TUNNEL_URL_CALLBACK}`);
+    const DEVICE_FARM_UPLOAD_ENDPOINT_WITH_QUERY_PARAMS = DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT +
+        '?callback=' + encodeURIComponent(NGROK_TUNNEL_URL_CALLBACK);
+    console.log(`Sending the debug and instrumentation apks to the device farm with URL ` + 
+        `${DEVICE_FARM_UPLOAD_ENDPOINT_WITH_QUERY_PARAMS}. Callback is ${NGROK_TUNNEL_URL_CALLBACK}`);
 
     var requestForCircleCIServer = new FormData();
     requestForCircleCIServer.append('instrumentation', fs.createReadStream(ANDROID_TEST_INSTRUMENTATION_APK_LOCATION));
     requestForCircleCIServer.append('debug', fs.createReadStream(ANDROID_DEBUG_APK_LOCATION));
-    requestForCircleCIServer.submit(DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT + '?callback=' +
-            encodeURIComponent(NGROK_TUNNEL_URL_CALLBACK), function(error, response){
+    requestForCircleCIServer.submit(DEVICE_FARM_UPLOAD_ENDPOINT_WITH_QUERY_PARAMS, function(error, response){
         if(error || (response.statusCode < 200 || response.statusCode > 299)) {
             console.log(`Error Code: ${response.statusCode} when sending results to Device Farm Server`);
             console.log(error || response.statusMessage);
