@@ -58,7 +58,8 @@ sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app);
 //============Utility Functions================
 
 function sendAPKsToDeviceFarmServerAndListenIfGoodResponse(app) {
-    console.log(`Sending the debug and instrumentation apks to the device farm. ${NGROK_TUNNEL_URL_CALLBACK}`);
+    console.log(`Sending the debug and instrumentation apks to the device farm at ` + 
+        `${DEVICE_FARM_UPLOAD_APKS_FOR_TESTING_ENDPOINT}. Callback is ${NGROK_TUNNEL_URL_CALLBACK}`);
 
     var requestForCircleCIServer = new FormData();
     requestForCircleCIServer.append('instrumentation', fs.createReadStream(ANDROID_TEST_INSTRUMENTATION_APK_LOCATION));
