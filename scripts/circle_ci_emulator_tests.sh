@@ -17,7 +17,12 @@ set -o nounset # Exit if referencing any variable that's not been set
 DEVICE_FARM_EXIT_CODE=`cat device_farm_receive_server_exit_code.txt`
 
 if [[ $DEVICE_FARM_EXIT_CODE -ne 69 ]] ; then
-    echo "Device Farm already ran tests, skipping CircleCI container emulator testing";
+    echo "Device Farm already ran tests so, no need to do it again"
+    echo "Unzipping device farm tests results";
+    set +e
+    cd UoitDCLibraryBooking/build
+    tar -xvf artifacts.tgz
+    set -e
     exit $DEVICE_FARM_EXIT_CODE
 else
     echo "Device Farm couldn't be contacted. Running tests on CircleCI container using emulation";

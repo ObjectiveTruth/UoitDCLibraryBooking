@@ -26,7 +26,7 @@ var storage = multer.diskStorage({
         callback(null, ARTIFACTS_SAVE_DIR);
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + '.tar');
+        cb(null, file.fieldname + '.tgz');
     }
 });
 var upload = multer({storage: storage});
