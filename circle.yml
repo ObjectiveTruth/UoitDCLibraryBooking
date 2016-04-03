@@ -43,7 +43,7 @@ test:
     - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
 
     # copy the test results to the test results directory.
-    - cp -rv UoitDCLibraryBooking/build/outputs/spoon/junit-reports $CIRCLE_TEST_REPORTS/junit
+    - cp -rv UoitDCLibraryBooking/build/outputs/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
 
 notify:
   webhooks:
