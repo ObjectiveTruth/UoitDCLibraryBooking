@@ -39,12 +39,19 @@ Happy Coding!
 
 -Miguel
 
-## RoadMap
+## RoadMap/Milestones:page_with_curl:
 
-1. Code Cleanup (no major refactor)
-2. Hook up a Continous Integration (CI) System. Jenkins? Travis?
-3. Add basic tests
-4. Major Refactor, possibly Kotlin?
+View the Milestones [here](https://github.com/ObjectiveTruth/UoitDCLibraryBooking/milestones)
+
+## Branch Map :rotating_light:
+
+**prod** = Code for the live Google Play Store App
+
+**master** = Code for the Beta version.
+
+To Opt-in to view the beta version on android click [here](https://play.google.com/apps/testing/com.objectivetruth.uoitlibrarybooking)
+
+  **Warning:** Beta may be unstable and crash at any time, but you can see latest changes
 
 ## Development Environment Setup
 
