@@ -6,8 +6,8 @@
 
 | branch | tests | deployment |
 | --- | --- | --- |
-| Master/Prod: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master) | ![master_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=master) |
-| Beta: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/beta.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/beta) | ![beta_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=beta) |
+| master/beta: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master) | ![master_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=master) |
+| prod: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/beta.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/beta) | ![beta_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=beta) |
 
 [View Current Test Report with ScreenShots](http://testreports.uoitdclibrarybooking.objectivetruth.ca/)
 
