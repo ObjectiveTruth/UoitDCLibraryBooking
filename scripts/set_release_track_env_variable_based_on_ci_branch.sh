@@ -4,16 +4,16 @@
 ##  Custom script executed by Travis-CI before deploying an apk.
 ##
 ##  Sets ANDROID_APK_RELEASE_TRACK based on the current Travis-CI branch
-##  master = production
-##  beta = beta
+##  master = beta
+##  prod = production
 ##
 ##############################################################################
 
 
 if [ "$TRAVIS_BRANCH" == "master" ]; then
-    export ANDROID_APK_RELEASE_TRACK=prod
-elif [ "$TRAVIS_BRANCH" == "beta" ]; then
     export ANDROID_APK_RELEASE_TRACK=beta
+elif [ "$TRAVIS_BRANCH" == "prod" ]; then
+    export ANDROID_APK_RELEASE_TRACK=prod
 else
     echo "TRAVIS_BRANCH env variable not set"
     exit 1
