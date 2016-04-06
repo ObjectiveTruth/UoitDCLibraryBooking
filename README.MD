@@ -1,6 +1,6 @@
 # UOITDCLibraryBooking
 
-![repository_logo](readme_pictures/repository_logo.png)
+[![repository_logo](readme_pictures/repository_logo.png)](https://play.google.com/store/apps/details?id=com.objectivetruth.uoitlibrarybooking)
 
 **Build Healthcheck :ambulance:**
 
@@ -20,6 +20,9 @@ Have a question? join our
 [UOIDCLibraryBooking](https://play.google.com/store/apps/details?id=com.objectivetruth.uoitlibrarybooking) is an android app published to the Google Play Store.
 
 It aims to streamline the booking of study rooms at the [University of Ontario Institute of Technology](https://www.uoit.ca)/[Durham College's](https://www.durhamcollege.ca) library located in **Oshawa, Ontario**
+
+[![google_play_download_logo](readme_pictures/Google-Play-button.png)](https://play.google.com/store/apps/details?id=com.objectivetruth.uoitlibrarybooking)
+
 
 ## History
 
