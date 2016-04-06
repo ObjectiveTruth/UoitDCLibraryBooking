@@ -1,5 +1,7 @@
 # UOITDCLibraryBooking
 
+![repository_logo](readme_pictures/repository_logo.png)
+
 **Build Healthcheck :ambulance:**
 
 | branch | tests | deployment |
