@@ -46,7 +46,7 @@ public class MainActivityInstrumentationTest {
     }
 
     @Test
-    public void usersFirstExperienceFlow(){
+    public void initialWhatsNewDialogWhenInstalledForFirstTime(){
         Spoon.screenshot(mActivity, "initial_view");
 
         onView(withId(android.R.id.button1)).check(matches(isClickable()));
@@ -54,11 +54,16 @@ public class MainActivityInstrumentationTest {
 
         onView(withId(android.R.id.button1)).perform(click());
         Spoon.screenshot(mActivity, "after_dismiss_whatsnew");
+    }
 
-        onView(withId(R.id.refresh_calendar)).perform(click());
-        Spoon.screenshot(mActivity, "after_refresh_clicked");
+    @Test
+    public void showMyAccountWhenMyIconClicked() {
+        Spoon.screenshot(mActivity, "initial_view");
+        onView(withId(android.R.id.button1)).perform(click());
 
+        onView(withId(R.id.user_account)).check(matches(isClickable()));
         onView(withId(R.id.user_account)).perform(click());
+
         onView(ViewMatchers.withId(R.id.titleMyAccount)).check(matches(isDisplayed()));
         Spoon.screenshot(mActivity, "after_my_account_clicked");
     }

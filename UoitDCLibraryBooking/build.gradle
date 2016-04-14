@@ -40,12 +40,22 @@ task grantAnimationPermission(type: Exec, dependsOn: 'installDebug') {
     def cmdToGiveSetAnimationScalePermission = "../scripts/adb_all.sh shell pm grant com.objectivetruth.uoitlibrarybooking android.permission.SET_ANIMATION_SCALE"
     commandLine cmdToGiveSetAnimationScalePermission.split(' ')
 }
+
+task uninstallAppFromAllAttachedDevices(type: Exec) {
+    def cmdToUninstallDebugAppFromAllDevices =
+            "../scripts/adb_all.sh shell pm uninstall com.objectivetruth.uoitlibrarybooking".split(' ')
+    def cmdToUninstallTestAppFromAllDevices =
+            "../scripts/adb_all.sh shell pm uninstall com.objectivetruth.uoitlibrarybooking.test".split(' ')
+    commandLine cmdToUninstallDebugAppFromAllDevices
+    commandLine cmdToUninstallTestAppFromAllDevices
+}
+
 tasks.whenTaskAdded { task ->
-    if (task.name.startsWith('spoon')) {
+    if (task.name.startsWith('spoonDebugAndroidTest')) {
         task.dependsOn grantAnimationPermission
     }
-    if (task.name.startsWith('installDebugAndroidTest')) {
-        task.dependsOn(uninstallDebug)
+    if (task.name.startsWith('install')) {
+        task.dependsOn uninstallAppFromAllAttachedDevices
     }
 }
 
