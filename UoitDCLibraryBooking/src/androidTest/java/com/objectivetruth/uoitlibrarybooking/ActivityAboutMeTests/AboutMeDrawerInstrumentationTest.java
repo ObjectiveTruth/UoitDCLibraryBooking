@@ -22,7 +22,7 @@ import static org.hamcrest.CoreMatchers.not;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class DrawerInstrumentationTest {
+public class AboutMeDrawerInstrumentationTest {
     private ActivityAboutMe mActivity;
 
     @Rule
