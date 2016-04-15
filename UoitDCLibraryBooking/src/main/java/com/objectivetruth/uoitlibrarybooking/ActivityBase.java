@@ -39,30 +39,37 @@ public abstract class ActivityBase extends ActionBarActivity {
         }
     }
 
+    void selectItem(int positionSelected) {
+        Timber.i("Drawer Position " + String.valueOf(positionSelected) + " selected");
+        final int POSITION_OF_THIS_ACTIVITY_IN_DRAWER = getActivityPageNumber();
+        _startIntentForActivityAtPositionInDrawerIfAppropriate(POSITION_OF_THIS_ACTIVITY_IN_DRAWER, positionSelected);
 
-    void selectItem(int position) {
-        Timber.i("Position " + String.valueOf(position) + " selected");
-        int ACTIVITYPAGENUMBER = getActivityPageNumber();
-
-        if(position == 0 && position != ACTIVITYPAGENUMBER){
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-        }
-        else if(position == 1 && position != ACTIVITYPAGENUMBER){
-            Intent intent = new Intent(this, GuidelinesPoliciesActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-
-        }
-        else if(position == 2 && position != ACTIVITYPAGENUMBER){
-            Intent intent = new Intent(this, ActivityAboutMe.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
-        }
-        setTitle(getMenuItems()[position]);
+        setTitle(getMenuItems()[positionSelected]);
         getmDrawerLayout().closeDrawer(getmDrawerList());
     }
 
+    private void _startIntentForActivityAtPositionInDrawerIfAppropriate(int position_of_this_activity_in_drawer,
+                                                                        int positionSelected) {
+        if(positionSelected == position_of_this_activity_in_drawer) {return;}
 
+        Intent intentToOpenActivity = null;
+        switch (positionSelected) {
+            case 0:
+                intentToOpenActivity = new Intent(this, MainActivity.class);
+                break;
+            case 1:
+                intentToOpenActivity = new Intent(this, GuidelinesPoliciesActivity.class);
+                break;
+            case 2:
+                intentToOpenActivity = new Intent(this, ActivityAboutMe.class);
+                break;
+            default:
+                break;
+        }
+
+        if(intentToOpenActivity != null) {
+            intentToOpenActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intentToOpenActivity);
+        }
+    }
 }
