@@ -24,11 +24,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.text.Layout;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.AlignmentSpan;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
@@ -36,11 +32,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.*;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment.RoomFragmentDialog;
@@ -51,10 +44,14 @@ import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.*;
+import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HASLEARNED_MYACCOUNT;
+import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HAS_LEARNED_HELP;
 
 
 public class MainActivity extends ActivityBase implements ActionBar.TabListener, AsyncResponse{
+    final static private String ACTIVITY_TITLE = "Calendar";
+    final static private int ACTIVITYPAGENUMBER = 0;
+
     public static final String MY_ACCOUNT_DIALOGFRAGMENT_TAG = "myAccountDiaFrag";
     public static final String PASSWORD_INFO_DIALOGFRAGMENT_TAG = "passwordInfoDiaFrag";
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
@@ -65,7 +62,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     public static boolean isDialogShowing = false;
     private final String TAG = "MainActivity";
     public long activityStartTime = System.currentTimeMillis();
-	ActionBarActivity mActivity = this;
+	AppCompatActivity mActivity = this;
 	public static DbHelper mdbHelper;
     private boolean isRefreshWaiting = false;
 	private DrawerLayout mDrawerLayout;
@@ -100,7 +97,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 	boolean isForQRCode = false;
 	ProgressDialog progDialogQRCode = null;
 
-	final int ACTIVITYPAGENUMBER = 0;
 	int shareRow = 0;
 	int shareColumn = 0;
 	int pageNumberInt = 0;
@@ -241,20 +237,9 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     }
 
     @Override
-    protected String[] getMenuItems() {
-        return menuItems;
+    protected String getActivityTitle() {
+        return ACTIVITY_TITLE;
     }
-
-    @Override
-    protected DrawerLayout getmDrawerLayout() {
-        return mDrawerLayout;
-    }
-
-    @Override
-    protected ListView getmDrawerList() {
-        return mDrawerList;
-    }
-
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -1043,7 +1028,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 	@Override
 	protected void onStart() {
 		super.onStart();
-		GoogleAnalytics.getInstance(this).reportActivityStart(this);
         hasManuallyRefreshedSinceOpeningActivity = false;
         Timber.i("Main Activity: onStart()");
         if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
@@ -1064,7 +1048,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     @Override
 	protected void onStop() {
         Timber.i("Main Activity: onStop()");
-        GoogleAnalytics.getInstance(this).reportActivityStop(this);
         isRefreshWaiting = false;
 		super.onStop();
 	}

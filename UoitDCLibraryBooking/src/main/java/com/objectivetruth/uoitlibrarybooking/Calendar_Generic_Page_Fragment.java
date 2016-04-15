@@ -20,6 +20,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -47,7 +48,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 	String pageNumberStr = null;
 	int pageNumberInt;
 	boolean firstTimeRunning = true; //this is to know when to add fragments
-	ActionBarActivity mActivity;
+	AppCompatActivity mActivity;
 	String[][] correspondingArr;
 	String[][] arrayToUse;
     ImageView sorryCartoonIV;
@@ -185,7 +186,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 		
 	}*/
 
-	public Calendar_Generic_Page_Fragment newInstance(int pageNumberInt, ActionBarActivity mActivity){
+	public Calendar_Generic_Page_Fragment newInstance(int pageNumberInt, AppCompatActivity mActivity){
 
 		Calendar_Generic_Page_Fragment fragment = new Calendar_Generic_Page_Fragment();
 		fragment.pageNumberInt = pageNumberInt;
@@ -194,7 +195,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 		//Log.i("CalendarGeneric", "First I'm " + fragment.pageNumberStr);
 		return fragment;
 	}
-	public Calendar_Generic_Page_Fragment newInstance(int pageNumberInt, ActionBarActivity mActivity, ArrayList<CalendarMonth> calendarCache){
+	public Calendar_Generic_Page_Fragment newInstance(int pageNumberInt, AppCompatActivity mActivity, ArrayList<CalendarMonth> calendarCache){
 		
 		Calendar_Generic_Page_Fragment fragment = new Calendar_Generic_Page_Fragment();
 		fragment.calendarCache = calendarCache;
