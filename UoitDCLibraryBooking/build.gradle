@@ -41,12 +41,15 @@ task grantAnimationPermission(type: Exec, dependsOn: 'installDebug') {
     commandLine cmdToGiveSetAnimationScalePermission.split(' ')
 }
 
-task uninstallAppFromAllAttachedDevices(type: Exec) {
+task uninstallDebugAppFromAllAttachedDevices(type: Exec) {
     def cmdToUninstallDebugAppFromAllDevices =
             "../scripts/adb_all.sh shell pm uninstall com.objectivetruth.uoitlibrarybooking".split(' ')
+    commandLine cmdToUninstallDebugAppFromAllDevices
+}
+
+task uninstallTestAppFromAllAttachedDevices(type: Exec) {
     def cmdToUninstallTestAppFromAllDevices =
             "../scripts/adb_all.sh shell pm uninstall com.objectivetruth.uoitlibrarybooking.test".split(' ')
-    commandLine cmdToUninstallDebugAppFromAllDevices
     commandLine cmdToUninstallTestAppFromAllDevices
 }
 
@@ -55,7 +58,8 @@ tasks.whenTaskAdded { task ->
         task.dependsOn grantAnimationPermission
     }
     if (task.name.startsWith('install')) {
-        task.dependsOn uninstallAppFromAllAttachedDevices
+        task.dependsOn uninstallDebugAppFromAllAttachedDevices
+        task.dependsOn uninstallTestAppFromAllAttachedDevices
     }
 }
 
