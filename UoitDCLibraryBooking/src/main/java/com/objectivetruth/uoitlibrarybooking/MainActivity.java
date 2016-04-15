@@ -405,6 +405,10 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             intent.putExtra("date", "March 15, 1984, Monday");
         	startActivity(intent);
         }
+        // Required for some reason, if removed, the drawer won't open when pressed
+        else if(mDrawerToggle.onOptionsItemSelected(item)) {
+
+        }
 
         return super.onOptionsItemSelected(item);
     }
