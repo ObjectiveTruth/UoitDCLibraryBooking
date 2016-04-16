@@ -51,5 +51,5 @@ test:
 notify:
   webhooks:
     # When build completes, send the Device Farm server the results so it can decide if a release is a good idea
-    - url: http://api.uoitdclibrarybooking.objectivetruth.ca/circleci_build_webhook/deploy_release
+    - url: https://skzyy6va72.execute-api.us-west-2.amazonaws.com/prod/circlecibuildfinishwebhook
 
