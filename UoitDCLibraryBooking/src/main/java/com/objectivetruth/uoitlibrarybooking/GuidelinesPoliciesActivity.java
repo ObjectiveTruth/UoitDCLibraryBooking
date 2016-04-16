@@ -1,8 +1,8 @@
 package com.objectivetruth.uoitlibrarybooking;
 
-
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 
 public class GuidelinesPoliciesActivity extends ActivityBase {
     final static private int ACTIVITY_PAGE_NUMBER = 1;
@@ -33,5 +33,11 @@ public class GuidelinesPoliciesActivity extends ActivityBase {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.global, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        getActionBarDrawerToggle().onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
 }

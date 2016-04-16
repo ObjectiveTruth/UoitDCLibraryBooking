@@ -1,7 +1,5 @@
 package com.objectivetruth.uoitlibrarybooking;
 
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
@@ -20,16 +16,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.*;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.HitBuilders;
@@ -58,20 +54,13 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     public static final int MAX_BOOKINGS_ALLOWED = 20; //This can safely be changed
     private static final long AUTO_REFRESH_DELAY = 6000;
     private static final String HELP_DIALOGFRAGMENT_TAG = "helpDiaFrag";
-    private static final String WHATSNEW_DIALOGFRAGMENT_TAG = "WHATS_NEW_DIALOG_FRAG";
     public static boolean isDialogShowing = false;
     private final String TAG = "MainActivity";
     public long activityStartTime = System.currentTimeMillis();
 	AppCompatActivity mActivity = this;
 	public static DbHelper mdbHelper;
     private boolean isRefreshWaiting = false;
-	private DrawerLayout mDrawerLayout;
-	private ListView mDrawerList;
-	private ActionBarDrawerToggle mDrawerToggle;
     public static String hasLEARNED_REFRESH = "has_learned_refresh";
-	private CharSequence mDrawerTitle;
-	//private CharSequence mTitle =  "Calendar";
-	private String[] menuItems;
 	public static CookieManager cookieManager;
 	MenuItem refreshItem;
     MenuItem myAccountItem;
@@ -130,7 +119,11 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     		t = ((UOITLibraryBookingApp) getApplication()).getTracker();
     	}
 
-		setContentView(R.layout.activity_main);
+        configureAndSetupLayoutAndDrawer(
+                R.layout.activity_main,
+                R.id.drawer_layout,
+                R.id.left_drawer);
+
 		defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		defaultPrefsEditor = defaultPreferences.edit();
 
@@ -176,56 +169,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                             .setTabListener(this));
         }
 
-        mDrawerTitle = getTitle();
-        menuItems = getResources().getStringArray(R.array.menuItems);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
-        // set a custom shadow that overlays the main content when the drawer
-        // opens
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new DrawerListAdapter(this,
-                R.layout.drawer_list_item, menuItems, ACTIVITYPAGENUMBER, this));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        // enable ActionBar app icon to behave as action to toggle nav drawer
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(menuItems[ACTIVITYPAGENUMBER]);
-        //getActionBar().setHomeButtonEnabled(true);
-
-        // ActionBarDrawerToggle ties together the the proper interactions
-        // between the sliding drawer and the action bar app icon
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this, /* host Activity */
-                mDrawerLayout, /* DrawerLayout object */
-                R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
-                R.string.navigation_drawer_open, /*
-                                       * "open drawer" description for
-                                       * accessibility
-                                       */
-                R.string.navigation_drawer_close /*
-                                       * "close drawer" description for
-                                       * accessibility
-                                       */
-                ) {
-                    @Override
-                    public void onDrawerClosed(View view) {
-                        getSupportActionBar().setTitle(menuItems[ACTIVITYPAGENUMBER]);
-                        invalidateOptionsMenu(); // creates call to
-                                                 // onPrepareOptionsMenu()
-                    }
-
-                    @Override
-                    public void onDrawerOpened(View drawerView) {
-                        getSupportActionBar().setTitle(mDrawerTitle);
-                        invalidateOptionsMenu(); // creates call to
-                                                 // onPrepareOptionsMenu()
-                    }
-
-                };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
         OttoBusSingleton.getInstance().register(this);
 
 
@@ -242,38 +185,11 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        if(drawerOpen){
-        	return false;
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    /* The click listner for ListView in the navigation drawer */
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            
-        	selectItem(position);
-            
-        }
-    }
-
-
-
-    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-
         if(UOITLibraryBookingApp.IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL) {
             WhatsNewDialog.show(this);
         }
-
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
-        
     }
 
     @Override
@@ -390,9 +306,9 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             intent.putExtra("date", "March 15, 1984, Monday");
         	startActivity(intent);
         }
-        // Required for some reason, if removed, the drawer won't open when pressed
-        else if(mDrawerToggle.onOptionsItemSelected(item)) {
-
+        // If the item that was clicked is in the drawer then do its workflow
+        else {
+            getActionBarDrawerToggle().onOptionsItemSelected(item);
         }
 
         return super.onOptionsItemSelected(item);
@@ -1041,8 +957,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                 }
             }, AUTO_REFRESH_DELAY);
         }
-		
-		
 	}
 	
     @Override
@@ -1052,28 +966,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 		super.onStop();
 	}
     
-    public class SimpleEula {
-
-        private String EULA_PREFIX = "eula_";
-        private Activity mActivity;
-
-        public SimpleEula(Activity context) {
-            mActivity = context;
-        }
-
-        private PackageInfo getPackageInfo() {
-            PackageInfo pi = null;
-            try {
-                pi = mActivity.getPackageManager().getPackageInfo(mActivity.getPackageName(), PackageManager.GET_ACTIVITIES);
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-            return pi;
-        }
-
-    }
-
-
     @Subscribe
     public void toggleActionBarVisibility(ToggleActionBarVisibilityEvent event){
         if(event.hideTheActionBar){
@@ -1246,24 +1138,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         DiaFragHelp currentFrag = new DiaFragHelp();
         currentFrag.show(fragMan, HELP_DIALOGFRAGMENT_TAG);
     }
-
-/*    private void launchWhatsNewDialog() {
-        Timber.i("Showing What's new Dialog");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(!sharedPreferences.getBoolean(SHARED_PREF_FIRST_TIME, false)){
-            long firstHelpClickDelay = activityStartTime - System.currentTimeMillis();
-            t.send(new HitBuilders.EventBuilder()
-                    .setCategory("Calendar Home")
-                    .setAction("HelpDialog")
-                    .setLabel("First Time Help Pressed")
-                    .setValue(firstHelpClickDelay)
-                    .build());
-            sharedPreferences.edit().putBoolean(SHARED_PREF_HAS_LEARNED_HELP, true).commit();
-        }
-        FragmentManager fragMan = getSupportFragmentManager();
-        DiaFragHelp currentFrag = new DiaFragHelp();
-        currentFrag.show(fragMan, WHATSNEW_DIALOGFRAGMENT_TAG);
-    }*/
 
     /**
      * Emulates the user clicking. Will check if refresh is already happening and will cancel it if

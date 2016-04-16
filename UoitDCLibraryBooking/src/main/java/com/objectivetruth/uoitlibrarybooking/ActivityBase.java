@@ -111,6 +111,16 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
+    ActionBarDrawerToggle getActionBarDrawerToggle() {
+        if(_mDrawerToggle != null) {
+            return _mDrawerToggle;
+        }else {
+            throw new IllegalStateException(
+                    "This Activity did not initialize the ActionBarDrawerToggle, did you forget to call " +
+                            "configureAndSetupLayoutAndDrawer()?");
+        }
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
