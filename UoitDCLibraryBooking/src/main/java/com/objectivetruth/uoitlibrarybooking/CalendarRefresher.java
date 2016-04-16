@@ -4,7 +4,7 @@ import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth>> {
 	
 	AsyncResponse comm;
-	ActionBarActivity mContext;
+	AppCompatActivity mContext;
 	ProgressDialog progDialog;
 	int mProgress;
 	Tracker t;
@@ -157,7 +157,7 @@ class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth
 
 	final String TAG = "CalendarRefresher";
 	
-	public CalendarRefresher(ActionBarActivity comm){
+	public CalendarRefresher(AppCompatActivity comm){
 		this.mContext = comm;
 		this.comm = (AsyncResponse) comm;
 		t = ((UOITLibraryBookingApp) mContext.getApplication()).getTracker();
