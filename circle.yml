@@ -60,9 +60,10 @@ test:
 
     - ./gradlew spoon:
         timeout: 900
-
-    - ./gradlew coveralls:
-        timeout: 900
+    # Will be turned on for coverage reports once this is fixed:
+    # https://github.com/kt3k/coveralls-gradle-plugin/issues/61
+    #- ./gradlew coveralls:
+    #    timeout: 900
     # ==============
 
 
