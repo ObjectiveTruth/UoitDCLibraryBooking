@@ -39,8 +39,28 @@ test:
     #    pwd:
     #      device_farm_receive_server
 
-    - ./scripts/circle_ci_emulator_tests.sh:
+    #- ./scripts/circle_ci_emulator_tests.sh:
+    #    timeout: 900
+
+    # NO DEVICE FARM
+    # ==============
+    - mksdcard -l e 512M mysdcard.img
+
+    # Start the emulator
+    - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img
+        background: true
+
+    # Wait for it to have booted
+    - circle-android wait-for-boot
+
+    # Wait a moment before Unlocking the emulator screen
+    - sleep 15
+    - adb shell input keyevent 82
+
+    - ./gradlew spoon coveralls
         timeout: 900
+
+    # ==============
 
     # Copy the build outputs and spoon to artifacts
     - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
