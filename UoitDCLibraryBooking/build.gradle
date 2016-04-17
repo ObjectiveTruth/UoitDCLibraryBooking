@@ -4,6 +4,7 @@ apply plugin: 'com.github.triplet.play'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'spoon'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'jacoco'
 
 
 def versionMajor = "1"
@@ -47,11 +48,10 @@ spoon {
  * Options for Coveralls test reporting
  */
 coveralls {
-    jacocoReportPath = "${buildDir}/outputs/coverage/report.xml"
+    jacocoReportPath = "${buildDir}/reports/coverage/report.xml"
 }
-
 tasks.coveralls {
-    dependsOn 'spoon'
+    dependsOn 'createDebugCoverageReport'
     onlyIf { System.env.'CI' }
 }
 
@@ -85,13 +85,15 @@ task uninstallTestAppFromAllAttachedDevices(type: Exec) {
 }
 
 /**
- * Ensures the order is respected so uninstalling doens't happen before installing, etc
+ * Ensures the order is respected so uninstalling doens't happen after installing, etc
  */
 tasks.whenTaskAdded { task ->
-    if (task.name.startsWith('spoonDebugAndroidTest')) {
+    if (task.name.startsWith('spoonDebugAndroidTest') ||
+            task.name.equalsIgnoreCase('connectedDebugAndroidTest')) {
         task.dependsOn grantAnimationPermission
     }
-    if (task.name.startsWith('install')) {
+    if (task.name.startsWith('install') ||
+            task.name.equalsIgnoreCase('connectedDebugAndroidTest')) {
         task.dependsOn uninstallDebugAppFromAllAttachedDevices
         task.dependsOn uninstallTestAppFromAllAttachedDevices
     }
