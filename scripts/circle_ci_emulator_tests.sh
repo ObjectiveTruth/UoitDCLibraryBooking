@@ -14,7 +14,8 @@ set -o nounset # Exit if referencing any variable that's not been set
 # then the code was either 1 or 0 which means the tests occured or something went terribly bad earlier in the commands
 # In that case, we just return the code that was returned to us and CircleCI will interpret that as success or fail
 # accordingly
-DEVICE_FARM_EXIT_CODE=`cat device_farm_receive_server_exit_code.txt`
+#DEVICE_FARM_EXIT_CODE=`cat device_farm_receive_server_exit_code.txt`
+DEVICE_FARM_EXIT_CODE=69
 
 if [[ $DEVICE_FARM_EXIT_CODE -ne 69 ]] ; then
     echo "Device Farm already ran tests so, no need to do it again"

@@ -35,9 +35,9 @@ test:
 
     # Run the device_farm_receive_server and write the exit state to $DEVICE_FARM_RECEIVE_SERVER_RESPONSE
     # Needs to be written to a variable because failing any command will fail the build
-    - node server.js:
-        pwd:
-          device_farm_receive_server
+    #- node server.js:
+    #    pwd:
+    #      device_farm_receive_server
 
     - ./scripts/circle_ci_emulator_tests.sh:
         timeout: 900
