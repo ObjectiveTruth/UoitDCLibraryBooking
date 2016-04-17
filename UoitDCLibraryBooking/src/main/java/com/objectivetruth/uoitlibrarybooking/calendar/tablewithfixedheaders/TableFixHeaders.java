@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -10,8 +10,8 @@ import android.util.AttributeSet;
 import android.view.*;
 import android.widget.ImageView;
 import android.widget.Scroller;
-import com.objectivetruth.uoitlibrarybooking.adapters.TableAdapter;
-
+import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.Recycler;
 
 import java.util.ArrayList;
 import java.util.List;
