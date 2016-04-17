@@ -48,7 +48,7 @@ spoon {
  * Options for Coveralls test reporting
  */
 coveralls {
-    jacocoReportPath = "${buildDir}/reports/coverage/report.xml"
+    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
 }
 tasks.coveralls {
     dependsOn 'createDebugCoverageReport'
