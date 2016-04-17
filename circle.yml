@@ -46,7 +46,7 @@ test:
     - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
 
     # copy the test results to the test results directory if any. (dont fail the build if they don't exist)
-    - cp -rv UoitDCLibraryBooking/build/outputs/spoon/junit-reports $CIRCLE_TEST_REPORTS/junit || true
+    - cp -rv UoitDCLibraryBooking/build/outputs/debug/junit-reports $CIRCLE_TEST_REPORTS/junit || true
 
 notify:
   webhooks:
