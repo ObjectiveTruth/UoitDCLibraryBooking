@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.app;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -14,7 +14,11 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.DrawerListAdapter;
+import com.objectivetruth.uoitlibrarybooking.guidelinespolicies.GuidelinesPoliciesActivity;
+import com.objectivetruth.uoitlibrarybooking.MainActivity;
+import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.about.ActivityAboutMe;
 import timber.log.Timber;
 
 public abstract class ActivityBase extends AppCompatActivity {
@@ -48,7 +52,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
-    final void configureAndSetupLayoutAndDrawer(int layoutIdToLoad,
+    protected final void configureAndSetupLayoutAndDrawer(int layoutIdToLoad,
                                                 int drawerLayoutIdToLoad,
                                                 int drawerListIdToLoad) {
         setContentView(layoutIdToLoad);
@@ -112,7 +116,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
-    ActionBarDrawerToggle getActionBarDrawerToggle() {
+    protected ActionBarDrawerToggle getActionBarDrawerToggle() {
         if(_mDrawerToggle != null) {
             return _mDrawerToggle;
         }else {

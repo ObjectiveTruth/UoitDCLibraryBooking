@@ -34,6 +34,7 @@ import android.widget.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView;
 import com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.FixedTableAdapter;
 import com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.TableFixHeaders;
 import timber.log.Timber;
@@ -499,7 +500,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 		 * @param text
 		 */
 		private void setText(View view, String text) {
-			((com.objectivetruth.uoitlibrarybooking.RobotoTextView) view.findViewById(android.R.id.text1)).setText(text);
+			((RobotoTextView) view.findViewById(android.R.id.text1)).setText(text);
 		}
 		@Override
 		public int getRowCount() {

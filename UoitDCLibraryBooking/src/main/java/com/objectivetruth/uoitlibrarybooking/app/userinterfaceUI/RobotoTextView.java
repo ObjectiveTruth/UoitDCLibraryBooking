@@ -1,9 +1,10 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI;
 
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.TextView;
+import com.objectivetruth.uoitlibrarybooking.TypefaceSingleton;
 
 public class RobotoTextView extends TextView {
 

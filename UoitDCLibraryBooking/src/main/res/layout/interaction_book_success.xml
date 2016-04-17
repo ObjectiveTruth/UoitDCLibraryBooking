@@ -23,7 +23,7 @@
     android:layout_marginTop="20dp"
 
     android:orientation="vertical" >
-    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
 
         android:id="@+id/viewleaveorjoin_date"
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
         android:textSize="@dimen/dialog_title_text" />
 
 
-    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
         android:id="@+id/book_success_actual"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

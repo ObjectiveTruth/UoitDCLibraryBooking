@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView;
 
 public class DrawerListAdapter extends ArrayAdapter<String> {
 	String[] stringArr;
@@ -33,8 +34,8 @@ public class DrawerListAdapter extends ArrayAdapter<String> {
 		if(convertView == null){
 			convertView = mInflater.inflate(R.layout.drawer_list_item, null);
 			holder = new ViewHolder();
-			holder.stripe = (com.objectivetruth.uoitlibrarybooking.RobotoTextView) convertView.findViewById(R.id.drawer_stripe_textview);
-			holder.text = (com.objectivetruth.uoitlibrarybooking.RobotoTextView) convertView.findViewById(R.id.drawer_item_textview);
+			holder.stripe = (RobotoTextView) convertView.findViewById(R.id.drawer_stripe_textview);
+			holder.text = (RobotoTextView) convertView.findViewById(R.id.drawer_item_textview);
 			holder.icon = (ImageView) convertView.findViewById(R.id.drawer_item_imageview);
 			convertView.setTag(holder);
 		}
@@ -73,9 +74,9 @@ public class DrawerListAdapter extends ArrayAdapter<String> {
 		return convertView;
 	}
 	static class ViewHolder {
-        com.objectivetruth.uoitlibrarybooking.RobotoTextView text;
+        RobotoTextView text;
 		 ImageView icon;
-        com.objectivetruth.uoitlibrarybooking.RobotoTextView stripe;
+        RobotoTextView stripe;
 		} 
 }
 

@@ -55,7 +55,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 	String leaveSpinnerValue;
 	String durationSpinnerValue = null;
 	AsyncResponse comm;
-	FlakeView flakeView = null;
 	boolean isCorrectlyFilled = false;
 	Button titleButton;
 	EditText groupNameEditText;
@@ -851,43 +850,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		});
 		
 		successMessage.setText(Html.fromHtml(returnMessage));
-		successMessage.setOnClickListener(new OnClickListener(){
-			
-			@Override
-			public void onClick(View view) {
-                int secretTapsRequired = SECRET_TAPS - secretTaps -1;
-                Timber.i("secretTaps = " + secretTaps + " need " + secretTapsRequired);
-				if(flakeView == null && secretTaps > (SECRET_TAPS - 2)){
-                    Toast.makeText(mActivity, R.string.secret_tke_message_success, Toast.LENGTH_LONG).show();
-					HiddenFunny();
-					
-				}
-				else if(flakeView != null){
-                    //Lower FPS is bad
-					if(flakeView.fps < 50){
-						flakeView.subtractFlakes(flakeView.getNumFlakes());
-                        FrameLayout container = (FrameLayout) findViewById(R.id.container);
-						container.removeView(flakeView);
-						flakeView = null;
-						secretTaps = 0;
-
-					}
-					else if(flakeView.fps > 45){
-						
-						flakeView.addFlakes((flakeView.getNumFlakes() + 8)/3);
-					}	
-				}
-				else{
-                    if(secretTapsRequired == 1){
-                        Toast.makeText(mActivity, R.string.secret_tke_message_1_more, Toast.LENGTH_SHORT).show();
-                    }
-					secretTaps++;
-				}
-            }
-			
-		});
-
-
 	}
 
 	@Override
@@ -959,66 +921,11 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
         alpha.setFillAfter(true);
         roomPicture.startAnimation(alpha);
     }
-	@Override
-	protected void onRestart(){
-		super.onRestart();
-		flakeView = null;
-	}
-	@Override
-	protected void onStop() {
-		super.onStop();
-/*		if(mRequestQueue!=null){
-			mRequestQueue.cancelAll(this);
-			mRequestQueue = null;
-		}*/
-		//Timber.i("Stopped");
-        FrameLayout container = (FrameLayout) findViewById(R.id.container);
-		if(container!=null && flakeView !=null){
-			container.removeView(flakeView);
-			flakeView = null;
-		}
-		
-
-	}
 
     @Override
     protected void onDestroy() {
         OttoBusSingleton.getInstance().unregister(this);
         super.onDestroy();
-    }
-
-    public void HiddenFunny(){
-		if(firstHiddenFunny == false){
-			
-			googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-			.setCategory("Calendar Interaction")
-			.setAction("Hidden Funny Used (Once per Success)")
-			.build()
-			);
-			firstHiddenFunny = true;
-		}
-        FrameLayout container = (FrameLayout) findViewById(R.id.container);
-		flakeView = new FlakeView(this);
-		container.addView(flakeView);
-
-	}
-	
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(flakeView!=null){
-        	flakeView.pause();
-        }
-    }
-    
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(flakeView!=null){
-        	flakeView.resume();	
-        }
-    	
-        
     }
 
     public static class CalendarOrganizer {

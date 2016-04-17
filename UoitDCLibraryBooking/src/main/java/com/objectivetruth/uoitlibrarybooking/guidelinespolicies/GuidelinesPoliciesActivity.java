@@ -1,21 +1,23 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.guidelinespolicies;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.ActivityBase;
 
-public class ActivityAboutMe extends ActivityBase {
-    final static private int ACTIVITY_PAGE_NUMBER = 2;
-    final static private String ACTIVITY_TITLE = "About";
+public class GuidelinesPoliciesActivity extends ActivityBase {
+    final static private int ACTIVITY_PAGE_NUMBER = 1;
+    final static private String ACTIVITY_TITLE = "Policies Guidelines";
 
 	@Override
 	protected void onCreate(Bundle bundle) {
-		super.onCreate(bundle);
+        super.onCreate(bundle);
 
         configureAndSetupLayoutAndDrawer(
-                R.layout.activity_about,
-                R.id.drawer_layout_aboutme,
-                R.id.left_drawer_aboutme);
+                R.layout.guidelines_policies,
+                R.id.drawer_layout_guidelines_policies,
+                R.id.left_drawer_guidelinespolicies);
 	}
 
     @Override

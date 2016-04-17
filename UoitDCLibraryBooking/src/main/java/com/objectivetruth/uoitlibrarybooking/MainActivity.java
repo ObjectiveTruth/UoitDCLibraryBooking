@@ -32,7 +32,9 @@ import com.google.android.gms.analytics.Tracker;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment.RoomFragmentDialog;
+import com.objectivetruth.uoitlibrarybooking.app.ActivityBase;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.calendar.whatsnew.WhatsNewDialog;
 import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 

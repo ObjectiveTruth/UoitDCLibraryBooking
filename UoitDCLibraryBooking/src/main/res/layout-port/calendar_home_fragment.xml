@@ -46,7 +46,7 @@
         android:visibility="visible"
         />
 
-    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
         android:id="@+id/admob_frame_pager"
         android:layout_width="match_parent"
         android:layout_height="50dp"
