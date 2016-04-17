@@ -1,24 +1,23 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.app;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
-import android.app.KeyguardManager;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.objectivetruth.uoitlibrarybooking.BuildConfig;
+import com.objectivetruth.uoitlibrarybooking.R;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 import java.util.UUID;
 
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_APPVERSION;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_IS_FIRST_TIME_LAUNCH;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_UUID;
+import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.*;
 
 public class UOITLibraryBookingApp extends Application {
+    private AppComponent mComponent;
 	//initialized the tracker to null so I can check when the app is made
 	Tracker t = null;
     public static boolean IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = false;
@@ -34,10 +33,18 @@ public class UOITLibraryBookingApp extends Application {
         CrashlyticsCore core = new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build();
         Fabric.with(this, new Crashlytics.Builder().core(core).build());
 
+        mComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .build();
+
         _checkIfFirstTimeAppLaunchedSinceInstall();
         _checkIfFirstTimeAppLaunchedSinceVersionUpgradeOrInstall();
         _checkIfIsDebugMode();
 
+    }
+
+    public AppComponent getComponent() {
+        return mComponent;
     }
 
     private void _checkIfFirstTimeAppLaunchedSinceVersionUpgradeOrInstall() {
