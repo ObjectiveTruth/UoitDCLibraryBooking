@@ -5,10 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
-import com.objectivetruth.uoitlibrarybooking.R;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
@@ -18,8 +15,6 @@ import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES
 
 public class UOITLibraryBookingApp extends Application {
     private AppComponent mComponent;
-	//initialized the tracker to null so I can check when the app is made
-	Tracker t = null;
     public static boolean IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = false;
     public static boolean IS_DEBUG_MODE = false;
 
@@ -98,23 +93,6 @@ public class UOITLibraryBookingApp extends Application {
         else{
             Crashlytics.setBool(SHARED_PREF_IS_FIRST_TIME_LAUNCH, false);
         }
-    }
-
-    public Tracker getTracker() {
-        if(t == null){
-            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            if(BuildConfig.DEBUG){
-                analytics.setDryRun(true);
-            }
-            t = analytics.newTracker(R.xml.app_tracker);
-            String mUUID = PreferenceManager.getDefaultSharedPreferences(this).getString(SHARED_PREF_UUID, null);
-
-            if(mUUID == null){
-                mUUID = UUID.randomUUID().toString();
-            }
-            t.set("&cid", mUUID);
-        }
-        return t;
     }
 
     /** A tree which logs important information for crash reporting. */

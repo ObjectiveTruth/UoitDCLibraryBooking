@@ -31,15 +31,14 @@ import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 
+import javax.inject.Inject;
+
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
 import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
 import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_KEY_BOOKINGS_LEFT;
 
 
-/**
- * Created by ObjectiveTruth on 8/12/2014.
- */
 public class DiaFragMyAccount extends DialogFragment {
     public static final String MY_ACCOUNT_LOGIN_FRAGMENT_TAG = "my_account_login_fragment";
     private static final String MY_ACCOUNT_PROGRESS_FRAGMENT_TAG = "my_account_progress_fragment";
@@ -58,13 +57,19 @@ public class DiaFragMyAccount extends DialogFragment {
     String linkString;
     int shareRow;
     int shareColumn;
-    Tracker t;
+    @Inject Tracker googleAnalyticsTracker;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         OttoBusSingleton.getInstance().register(this);
-        t = ((UOITLibraryBookingApp)getActivity().getApplication()).getTracker();
         fragmentOpenTime = System.currentTimeMillis();
         View rootView = inflater.inflate(R.layout.diafrag_myaccount, container, false);
         bookingsLeftTextView = (TextView) rootView.findViewById(R.id.bookings_left);
@@ -79,7 +84,7 @@ public class DiaFragMyAccount extends DialogFragment {
                 shareEditor.remove(SHARED_PREF_KEY_PASSWORD);
                 shareEditor.remove(SHARED_PREF_KEY_BOOKINGS_LEFT);
                 shareEditor.commit();
-                t.send(new HitBuilders.EventBuilder()
+                googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                         .setCategory("MyAccount")
                         .setAction("Logout Event")
                         .build());
@@ -369,7 +374,6 @@ public class DiaFragMyAccount extends DialogFragment {
             View v = inflater.inflate(R.layout.mybookings_viewpager, null);
             mViewPager = (ViewPager) v.findViewById(R.id.viewpager);
             mViewPager.setAdapter(mViewPagerAdapter);
-            t = ((UOITLibraryBookingApp)getActivity().getApplication()).getTracker();
             mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int i, float v, int i2) {
@@ -466,7 +470,14 @@ public class DiaFragMyAccount extends DialogFragment {
         EditText passwordField;
         String errorMessage;
         RadioGroup institutionRadio;
+        @Inject Tracker googleAnalyticsTracker;
 
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
+        }
 
         public static LoginFragment newInstance() {
             LoginFragment fragment = new LoginFragment();
@@ -582,8 +593,7 @@ public class DiaFragMyAccount extends DialogFragment {
                             }
                             loginInput[2] = institutionId;
                             OttoBusSingleton.getInstance().post(new MyAccountLoginTaskStart(loginInput, MY_ACCOUNT_USER_INITIATED));
-                            Tracker t = ((UOITLibraryBookingApp)getActivity().getApplication()).getTracker();
-                            t.send(new HitBuilders.EventBuilder()
+                            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                                     .setCategory("MyAccount")
                                     .setAction("Login Start Event - User Initiated")
                                     .build());
@@ -681,7 +691,7 @@ public class DiaFragMyAccount extends DialogFragment {
     @Override
     public void onStop() {
         long myAccountSessionDuration = fragmentOpenTime - System.currentTimeMillis();
-        t.send(new HitBuilders.EventBuilder()
+        googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                 .setCategory("MyAccount")
                 .setAction("MyAccount Open For")
                 .setValue(myAccountSessionDuration)

@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.squareup.okhttp.*;
 import timber.log.Timber;
 
@@ -88,21 +85,8 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
             sharedPreferencesEditor.putString(SHARED_PREF_KEY_PASSWORD, password);
             sharedPreferencesEditor.putString(SHARED_PREF_INSTITUTION, institution);
             sharedPreferencesEditor.commit();
-            Tracker t = ((UOITLibraryBookingApp)mContext.getApplicationContext()).getTracker();
-            t.send(new HitBuilders.EventBuilder()
-                    .setCategory("MyAccount")
-                    .setAction("Bookings Left")
-                    .setValue(bookingsLeft)
-                    .build());
             if(options == DiaFragMyAccount.MY_ACCOUNT_USER_INITIATED){
                 long loginTaskDuration = loginAsynkTaskStartTime - System.currentTimeMillis();
-
-                t.send(new HitBuilders.EventBuilder()
-                        .setCategory("MyAccount")
-                        .setAction("Login Success - Initiated By User")
-                        .setLabel("AsyncTask Duration")
-                        .setValue(loginTaskDuration)
-                        .build());
             }
             Timber.i("LoginAsynkTask finished with NO Errors");
         }

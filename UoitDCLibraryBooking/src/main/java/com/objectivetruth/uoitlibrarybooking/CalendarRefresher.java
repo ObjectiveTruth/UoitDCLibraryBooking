@@ -7,9 +7,6 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import timber.log.Timber;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -27,7 +24,6 @@ class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth
 	AppCompatActivity mContext;
 	ProgressDialog progDialog;
 	int mProgress;
-	Tracker t;
 	long durationPart1 = -1;
 	long durationTotalParse = -1;
 	long[] durationPerDay = null;
@@ -37,40 +33,7 @@ class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth
 		
 		super.onPostExecute(result);
 		long postExecStartTime = System.currentTimeMillis();
-		try{
-		if(durationPart1 > 0.0){
 
-			t.send(new HitBuilders.TimingBuilder()
-			.setCategory("Refresh")
-			.setVariable("Part 1 of Parse Engine")
-			.setValue(durationPart1)
-			.build()
-			);	
-		}
-		if(durationTotalParse > 0.0){
-			t.send(new HitBuilders.TimingBuilder()
-			.setCategory("Refresh")
-			.setVariable("Parse Engine Total (no post process)")
-			.setValue(durationTotalParse)
-			.build()
-			);
-		}
-		if(durationPerDay != null){
-			for(int i = 0; i < durationPerDay.length; i++){
-				t.send(new HitBuilders.TimingBuilder()
-				.setCategory("Refresh")
-				.setVariable("Per Day Processing Time")
-				.setLabel("Day " + String.valueOf(i + 1))
-				.setValue(durationPerDay[i])
-				.build()
-				);
-			}	
-			
-		}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
 		
 		
 		
@@ -83,12 +46,6 @@ class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth
 	        long duration = System.currentTimeMillis() - postExecStartTime;
 	        Timber.i("PostExecute took: " + duration);
 	        
-			t.send(new HitBuilders.TimingBuilder()
-				.setCategory("Refresh")
-				.setVariable("Post Execute Network Error took:")
-				.setValue(duration)
-				.build()
-				);
 		}
 		else if(result.size() > 0){
 
@@ -98,13 +55,6 @@ class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth
 	        //progDialog.dismiss();
 	        long duration = System.currentTimeMillis() - postExecStartTime;
 	        Timber.i("PostExecute took: " + duration);
-	        
-	        t.send(new HitBuilders.TimingBuilder()
-			.setCategory("Refresh")
-			.setVariable("Post Execute Success took:")
-			.setValue(duration)
-			.build()
-			);
 		}
 		else{
 			
@@ -117,13 +67,6 @@ class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth
 					Toast.LENGTH_SHORT).show();
 	        long duration = System.currentTimeMillis() - postExecStartTime;
 	        Timber.i("PostExecute took: " + duration);
-	        
-			t.send(new HitBuilders.TimingBuilder()
-				.setCategory("Refresh")
-				.setVariable("Post Execute Network Error took:")
-				.setValue(duration)
-				.build()
-				);
 		}
 		//Timber.i("Ignore IllegalStateError: AndroidHttpClient is inside another class, it will get GC'd don't worry");
 		
@@ -161,9 +104,6 @@ class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth
 	public CalendarRefresher(AppCompatActivity comm){
 		this.mContext = comm;
 		this.comm = (AsyncResponse) comm;
-		t = ((UOITLibraryBookingApp) mContext.getApplication()).getTracker();
-		
-
 	}
 	
 	@Override

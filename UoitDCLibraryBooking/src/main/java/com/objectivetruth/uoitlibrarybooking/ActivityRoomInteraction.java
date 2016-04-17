@@ -10,7 +10,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.v4.app.DialogFragment;
@@ -32,6 +31,7 @@ import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.net.CookieManager;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,8 +55,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 	String leaveSpinnerValue;
 	String durationSpinnerValue = null;
 	AsyncResponse comm;
-	static SharedPreferences defaultPreferences;
-	static SharedPreferences.Editor defaultPrefsEditor;
 	FlakeView flakeView = null;
 	boolean isCorrectlyFilled = false;
 	Button titleButton;
@@ -67,7 +65,9 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 	//RequestQueue mRequestQueue = null;
 	ImageView realImageView;
 	int secretTaps = 0;
-	Tracker t;
+	@Inject Tracker googleAnalyticsTracker;
+    @Inject SharedPreferences mDefaultSharedPreferences;
+    @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
 	boolean firstHiddenFunny = false;
 	String calendarGroupName = null;
 	String spinnerJoinString = null;
@@ -86,14 +86,13 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		defaultPrefsEditor = defaultPreferences.edit();
-		//Timber.i("room number"+ roomNumber);
+
+        ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
+
 		Intent intent = getIntent();
 		bundleExtras = intent.getExtras();
 		mActivity = this;
         OttoBusSingleton.getInstance().register(this);
-		t = ((UOITLibraryBookingApp) mActivity.getApplication()).getTracker();
         //TODO added the eventViewstateGenerrator to the main head part, now use it in the book instance
         if (bundleExtras != null){
             eventValidation = bundleExtras.getString("eventValidation");
@@ -171,7 +170,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
             commentImageButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    t.send(new HitBuilders.EventBuilder()
+                    googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Interaction")
                             .setAction("Show Comments Input Dialog")
                             .build());
@@ -199,10 +198,9 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
                 @Override
                 public void onClick(View view) {
                     if(isValidBook()) {
-                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                        String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                        String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
-                        String institutionSpinnerValue = sharedPreferences.getString(SHARED_PREF_INSTITUTION, null);
+                        String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                        String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                        String institutionSpinnerValue = mDefaultSharedPreferences.getString(SHARED_PREF_INSTITUTION, null);
                         //Checks if the sharedPrefs values are valid
                         if(inputPassword != null && inputUsername != null && institutionSpinnerValue != null){
                             String[] fieldData = new String[]{
@@ -268,7 +266,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 				
 			});
 
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Interaction")
                             .setAction("CreateBooking")
                             .setLabel(roomNumber)
@@ -390,9 +388,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 				@Override
 				public void onClick(View view) {
 
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                    String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                    String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] joinGroupInput = new String[]{
@@ -435,9 +432,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 			leaveButton.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View view) {
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                    String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                    String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] leaveGroupInput = new String[]{
@@ -474,7 +470,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
                     }
                 }
 			});
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Interaction")
                             .setAction("JoinOrLeave")
                             .setLabel(roomNumber)
@@ -532,9 +528,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 
 				@Override
 				public void onClick(View view) {
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                    String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                    String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] joinGroupInput = new String[]{
@@ -574,9 +569,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 			leaveButton.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View view) {
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-                    String inputUsername = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+                    String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] leaveGroupInput = new String[]{
@@ -613,7 +607,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 			});
 		}
 
-        t.send(new HitBuilders.EventBuilder()
+        googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                         .setCategory("Calendar Interaction")
                         .setAction("LeaveViewOrJoin")
                         .setLabel(roomNumber)
@@ -707,7 +701,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
         if(!isCalendarable){
         	addToCalendarButton.setVisibility(View.GONE);
             qrCodeActual.setVisibility(View.INVISIBLE);
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Interaction")
                             .setAction("Successfully Left a Booking")
                             .build()
@@ -716,7 +710,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
         }
         //Join/Create booking Success Event
         else{
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Interaction")
                             .setAction("Successfully Created/Joined a Booking")
                             .build()
@@ -731,7 +725,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 
                 @Override
                 public void onClick(View v) {
-                    t.send(new HitBuilders.EventBuilder()
+                    googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Interaction")
                             .setAction("Add to Calendar")
                             .build());
@@ -901,7 +895,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		errorTextView.setText(Html.fromHtml(errorMessage));
         errorTextView.setVisibility(View.VISIBLE);
         decreaseAlphaOnRoomPicture();
-		t.send(new HitBuilders.EventBuilder()
+		googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
 		.setCategory("Calendar Interaction")
 		.setAction("Error Create Room")
 		.setLabel(errorMessage)
@@ -916,7 +910,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
         decreaseAlphaOnRoomPicture();
 
         errorText.setText(Html.fromHtml(returnMessage));
-		t.send(new HitBuilders.EventBuilder()
+		googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
 		.setCategory("Calendar Interaction")
 		.setAction("Error Leave Room")
 		.setLabel(returnMessage)
@@ -950,7 +944,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
         errorText.setVisibility(View.VISIBLE);
         decreaseAlphaOnRoomPicture();
 		errorText.setText(Html.fromHtml(returnMessage));
-		t.send(new HitBuilders.EventBuilder()
+		googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
 		.setCategory("Calendar Interaction")
 		.setAction("Error View Leave or Join")
 		.setLabel(returnMessage)
@@ -996,7 +990,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
     public void HiddenFunny(){
 		if(firstHiddenFunny == false){
 			
-			t.send(new HitBuilders.EventBuilder()
+			googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
 			.setCategory("Calendar Interaction")
 			.setAction("Hidden Funny Used (Once per Success)")
 			.build()
