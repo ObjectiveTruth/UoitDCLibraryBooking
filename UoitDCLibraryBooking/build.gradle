@@ -198,6 +198,10 @@ dependencies {
     compile 'com.daimajia.androidanimations:library:1.1.3@aar'
     // OKHTTP library for making web requests
     compile 'com.squareup.okhttp:okhttp:2.5.0'
+    // RxAndroid for awesome reactive programming style android specific bindings
+    compile 'io.reactivex:rxandroid:1.1.0'
+    // RXJava core version
+    compile 'io.reactivex:rxjava:1.1.3'
     // Crashlytics for logging production logs
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
         transitive = true;
