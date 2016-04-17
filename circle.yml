@@ -29,9 +29,9 @@ dependencies:
 test:
   override:
     # Assemble the AndroidTest Instrumentation build in build/outputs/apk
-    - ./gradlew assembleAndroidTest
+    # - ./gradlew assembleAndroidTest
     # Assemble the debug build in build/outputs/apk
-    - ./gradlew assembleDebug
+    #- ./gradlew assembleDebug
 
     # Run the device_farm_receive_server and write the exit state to $DEVICE_FARM_RECEIVE_SERVER_RESPONSE
     # Needs to be written to a variable because failing any command will fail the build

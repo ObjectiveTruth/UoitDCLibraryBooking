@@ -3,6 +3,8 @@ apply plugin: 'io.fabric'
 apply plugin: 'com.github.triplet.play'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'spoon'
+apply plugin: 'com.github.kt3k.coveralls'
+
 
 def versionMajor = "1"
 
@@ -14,11 +16,16 @@ buildscript {
     dependencies {
         // Main Android gradle plugin allows building of the entire play toolchain
         classpath 'com.android.tools.build:gradle:2.0.0-beta6'
+        // Fabric repository for Crashlytics.
         classpath 'io.fabric.tools:gradle:1.+'
         // Adds tasks to auto publish apks to Google App Store. https://github.com/Triple-T/gradle-play-publisher
         classpath 'com.github.triplet.gradle:play-publisher:1.1.4'
+        // Spoon is a fantastic testing hardness for logging tests easily
         classpath 'com.stanfy.spoon:spoon-gradle-plugin:1.0.4'
+        // Official Google Dagger 2 repository
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+        // Coveralls repository for test coverage reports integration with gradle
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0'
     }
 }
 
@@ -35,6 +42,19 @@ spoon {
     debug = true
     baseOutputDir = file("$buildDir/outputs")
 }
+
+/**
+ * Options for Coveralls test reporting
+ */
+coveralls {
+    jacocoReportPath = "${buildDir}/outputs/coverage/report.xml"
+}
+
+tasks.coveralls {
+    dependsOn 'spoon'
+    onlyIf { System.env.'CI' }
+}
+
 
 /**
  * Gives the system permission on this package to disable the animations during instrumentation testing
@@ -123,6 +143,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+        }
+        debug {
+            testCoverageEnabled true
         }
     }
 }
