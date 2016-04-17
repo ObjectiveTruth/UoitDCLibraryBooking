@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.squareup.okhttp.*;
 import timber.log.Timber;
 

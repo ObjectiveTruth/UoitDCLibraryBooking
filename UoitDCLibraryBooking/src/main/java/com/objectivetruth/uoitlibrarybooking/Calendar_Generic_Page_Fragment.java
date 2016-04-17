@@ -19,7 +19,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -33,6 +32,7 @@ import android.view.Window;
 import android.widget.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import timber.log.Timber;
 
 import java.text.SimpleDateFormat;

@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.google.android.gms.analytics.GoogleAnalytics;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import timber.log.Timber;
 
 public abstract class ActivityBase extends AppCompatActivity {

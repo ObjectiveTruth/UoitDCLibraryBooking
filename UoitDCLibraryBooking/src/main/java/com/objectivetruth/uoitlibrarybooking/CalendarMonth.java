@@ -34,8 +34,9 @@ public class CalendarMonth {
 			String[] namesOfDays =  {"Sat", "Sun", "Mon", "Tue", "Wed","Thur", "Fri"};
 			Date date;
 			try {
-				date = new SimpleDateFormat("MMMM-dd-yyyy", Locale.CANADA)
-                        .parse(monthName + "-" + dayNumber + "-" + c.get(Calendar.YEAR));
+				String parseMe = monthName + "-" + dayNumber + "-" + c.get(Calendar.YEAR);
+				date = new SimpleDateFormat("MMMM-dd-yyyy", Locale.CANADA).parse(parseMe);
+
 
                 c.setTime(date);
                 int IntDayOfTheWeek = c.get(Calendar.DAY_OF_WEEK);

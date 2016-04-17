@@ -33,9 +33,11 @@ import com.google.android.gms.analytics.Tracker;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment.RoomFragmentDialog;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,8 +66,8 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 	public static CookieManager cookieManager;
 	MenuItem refreshItem;
     MenuItem myAccountItem;
-	static SharedPreferences defaultPreferences;
-	static SharedPreferences.Editor defaultPrefsEditor;
+	@Inject SharedPreferences mDefaultSharedPreferences;
+	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
 	View refresh_button;
 	static CalendarRefresher mCalendarRefresher = null;
     static LoginAsynkTask mLoginAsyncTask = null;
@@ -112,6 +114,8 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 		Timber.i("MainActivity: onCreate()");
     	mdbHelper = new DbHelper(this, null, null, 1);
     	super.onCreate(savedInstanceState);
+
+        ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
     	
     	
     	
@@ -123,9 +127,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                 R.layout.activity_main,
                 R.id.drawer_layout,
                 R.id.left_drawer);
-
-		defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		defaultPrefsEditor = defaultPreferences.edit();
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -206,7 +207,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         refreshItem = menu.findItem(R.id.refresh_calendar);
         myAccountItem = menu.findItem(R.id.user_account);
 
-        if(!defaultPreferences.getBoolean(hasLEARNED_REFRESH, false)){
+        if(!mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false)){
 
             LayoutInflater inflater = this.getLayoutInflater();
             ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_refresh_imageview,
@@ -223,7 +224,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             refreshItem.setActionView(iv);
         }
         //Prepare MyAccount Actionview if has learned refresh and has NOT learned myaccount
-        if(defaultPreferences.getBoolean(hasLEARNED_REFRESH, false) && !defaultPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
+        if(mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false) && !mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
             Timber.i("User has not Learned MyAccount");
             LayoutInflater inflater = this.getLayoutInflater();
             ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_myaccount_imageview,
@@ -1102,7 +1103,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         if(myAccountItem != null){
             myAccountItem.setActionView(null);
         }
-        if(!defaultPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
+        if(!mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
             Timber.i("User has learned My Account");
             long firstMyAccountDelay = activityStartTime - System.currentTimeMillis();
             t.send(new HitBuilders.EventBuilder()
@@ -1110,7 +1111,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                     .setAction("First Time My Account Pressed")
                     .setValue(firstMyAccountDelay)
                     .build());
-            defaultPrefsEditor.putBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, true)
+            mDefaultSharedPreferencesEditor.putBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, true)
                     .commit();
         }
 
@@ -1160,7 +1161,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             DoRefresh();
         }
 
-        if(!defaultPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false) && myAccountItem != null){
+        if(!mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false) && myAccountItem != null){
             LayoutInflater inflater = this.getLayoutInflater();
             ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_myaccount_imageview,
                     null);
@@ -1173,7 +1174,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             });
             myAccountItem.setActionView(iv);
         }
-        if(!defaultPreferences.getBoolean(hasLEARNED_REFRESH, false)){
+        if(!mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false)){
             Timber.i("User has learned Refresh");
             long firstRefreshDelay = activityStartTime - System.currentTimeMillis();
             t.send(new HitBuilders.EventBuilder()
@@ -1181,7 +1182,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                     .setAction("First Time Refresh Pressed")
                     .setValue(firstRefreshDelay)
                     .build());
-             defaultPrefsEditor.putBoolean(hasLEARNED_REFRESH, true)
+             mDefaultSharedPreferencesEditor.putBoolean(hasLEARNED_REFRESH, true)
                     .commit();
         }
 

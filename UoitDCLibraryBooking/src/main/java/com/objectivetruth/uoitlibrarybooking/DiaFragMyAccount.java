@@ -27,6 +27,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nineoldandroids.animation.Animator;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 
