@@ -14,6 +14,8 @@
 | master/beta: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master) | ![master_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=master) | [![Coverage Status](https://coveralls.io/repos/github/ObjectiveTruth/UoitDCLibraryBooking/badge.svg?branch=master)](https://coveralls.io/github/ObjectiveTruth/UoitDCLibraryBooking?branch=master) |
 | prod: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/prod.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/prod/beta) | ![prod_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=prod)  | [![Coverage Status](https://coveralls.io/repos/github/ObjectiveTruth/UoitDCLibraryBooking/badge.svg?branch=prod)](https://coveralls.io/github/ObjectiveTruth/UoitDCLibraryBooking?branch=prod) |
 
+[Join Beta(Android)](https://play.google.com/apps/testing/com.objectivetruth.uoitlibrarybooking)
+
 
 [View Current Test Report with ScreenShots](http://testreports.uoitdclibrarybooking.objectivetruth.ca/)
 
