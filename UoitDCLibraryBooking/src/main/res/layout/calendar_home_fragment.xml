@@ -35,7 +35,7 @@
         android:visibility="invisible"
         />
 
-    <com.objectivetruth.uoitlibrarybooking.TableFixHeaders
+    <com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.TableFixHeaders
         android:id="@+id/calendar_table"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -44,7 +44,7 @@
         android:visibility="visible"
         />
 
-    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
         android:id="@+id/admob_frame_pager"
         android:layout_width="match_parent"
         android:layout_height="50dp"

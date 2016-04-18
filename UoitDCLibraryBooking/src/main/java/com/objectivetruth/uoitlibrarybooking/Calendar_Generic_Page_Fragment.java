@@ -16,10 +16,10 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -33,8 +33,13 @@ import android.view.Window;
 import android.widget.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView;
+import com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.FixedTableAdapter;
+import com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.TableFixHeaders;
 import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,47 +65,6 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
     int oldScrollPositionX = -1;
     int oldScrollPositionY = -1;
 	static AsyncRoomInteraction mAsyncRoomInteraction = null;
-	/*final String[] numbers = new String[] { 
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-			"YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY", "YYYYYYYY",
-	};*/
-
-/*    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        OttoBusSingleton.getInstance().post(new PageFragmentViewCreatedEvent(pageNumberInt));
-    }*/
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -176,15 +140,6 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 
 	}
 
-
-/*	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if(mCalendarAdapter == null){
-			mCalendarAdapter = new CalendarAdapter(getActivity());
-		}
-		
-	}*/
 
 	public Calendar_Generic_Page_Fragment newInstance(int pageNumberInt, AppCompatActivity mActivity){
 
@@ -545,7 +500,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 		 * @param text
 		 */
 		private void setText(View view, String text) {
-			((com.objectivetruth.uoitlibrarybooking.RobotoTextView) view.findViewById(android.R.id.text1)).setText(text);
+			((RobotoTextView) view.findViewById(android.R.id.text1)).setText(text);
 		}
 		@Override
 		public int getRowCount() {
@@ -666,6 +621,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 
     
     public static class RoomFragmentDialog extends DialogFragment{
+        @Inject Tracker googleAnalyticsTracker;
     	private final String TAG = "RoomFragment";
     	ListView listView;
     	String roomNameString;
@@ -689,6 +645,13 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 			frag.linkString = linkString;
     		return frag;
     	}
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
+        }
 
         @Override
         public void onStop() {
@@ -775,12 +738,11 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
                     String errorDescript =  "Room: " + diagTitle + " was requested, but not found in the rooms database!";
                     Timber.e(new IllegalStateException(errorDescript), errorDescript);
                 }
-                Tracker t = ((UOITLibraryBookingApp)getActivity().getApplication()).getTracker();
 
 				if(isInfoOnly){
                     negativeButton.setText(android.R.string.ok);
                     positiveButton.setVisibility(View.GONE);
-                    t.send(new HitBuilders.EventBuilder()
+                    googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                                     .setCategory("ActivityRoomInteraction")
                                     .setAction("RoomInfoOnly Opened")
                                     .setLabel(diagTitle)
@@ -789,7 +751,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
                 }
                 else{
 
-                    t.send(new HitBuilders.EventBuilder()
+                    googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                                     .setCategory("ActivityRoomInteraction")
                                     .setAction("RoomDialog Opened")
                                     .setLabel(diagTitle)

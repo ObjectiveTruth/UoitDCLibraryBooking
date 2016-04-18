@@ -21,8 +21,8 @@
 <!-- The screen names that will appear in reports -->
 <screenName name="com.objectivetruth.uoitlibrarybooking.MainActivity">Calendar Home</screenName>
 <screenName name="com.objectivetruth.uoitlibrarybooking.MyBookingsActivity">My Account</screenName>
-<screenName name="com.objectivetruth.uoitlibrarybooking.GuidelinesPoliciesActivity">GuidelinesPolicies</screenName>
-<screenName name="com.objectivetruth.uoitlibrarybooking.ActivityAboutMe">About</screenName>
+<screenName name="com.objectivetruth.uoitlibrarybooking.guidelinespolicies.GuidelinesPoliciesActivity">GuidelinesPolicies</screenName>
+<screenName name="com.objectivetruth.uoitlibrarybooking.about.ActivityAboutMe">About</screenName>
 <screenName name="com.objectivetruth.uoitlibrarybooking.ActivitySettings">Settings</screenName>
 
 

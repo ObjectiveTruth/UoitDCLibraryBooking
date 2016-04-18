@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
 
-    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
         android:id="@+id/drawer_stripe_textview"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
@@ -20,7 +20,7 @@
         android:contentDescription="calendar icon"
         />
 
-    <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
         android:id="@+id/drawer_item_textview"
         android:layout_width="match_parent"
         android:layout_height="60dp"

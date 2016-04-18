@@ -2,16 +2,13 @@ package com.objectivetruth.uoitlibrarybooking;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-import com.crashlytics.android.Crashlytics;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import timber.log.Timber;
 
 import java.io.FileOutputStream;
@@ -19,8 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_APPVERSION;
 
 public class DbHelper extends SQLiteOpenHelper {
 	

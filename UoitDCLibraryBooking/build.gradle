@@ -1,7 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'com.github.triplet.play'
+apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'spoon'
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'jacoco'
+
 
 def versionMajor = "1"
 
@@ -13,10 +17,16 @@ buildscript {
     dependencies {
         // Main Android gradle plugin allows building of the entire play toolchain
         classpath 'com.android.tools.build:gradle:2.0.0-beta6'
+        // Fabric repository for Crashlytics.
         classpath 'io.fabric.tools:gradle:1.+'
         // Adds tasks to auto publish apks to Google App Store. https://github.com/Triple-T/gradle-play-publisher
         classpath 'com.github.triplet.gradle:play-publisher:1.1.4'
+        // Spoon is a fantastic testing hardness for logging tests easily
         classpath 'com.stanfy.spoon:spoon-gradle-plugin:1.0.4'
+        // Official Google Dagger 2 repository
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+        // Coveralls repository for test coverage reports integration with gradle
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
     }
 }
 
@@ -34,30 +44,56 @@ spoon {
     baseOutputDir = file("$buildDir/outputs")
 }
 
-// The following 2 blocks are needed to disable animations during instrumentation testing
-// See http://product.reverb.com/2015/06/06/disabling-animations-in-espresso-for-android-testing/ for steps
+/**
+ * Options for Coveralls test reporting
+ */
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+}
+tasks.coveralls {
+    //dependsOn 'createDebugCoverageReport'
+    onlyIf { System.env.'CI' }
+}
+
+
+/**
+ * Gives the system permission on this package to disable the animations during instrumentation testing
+ * See http://product.reverb.com/2015/06/06/disabling-animations-in-espresso-for-android-testing/ for steps
+ */
 task grantAnimationPermission(type: Exec, dependsOn: 'installDebug') {
     def cmdToGiveSetAnimationScalePermission = "../scripts/adb_all.sh shell pm grant com.objectivetruth.uoitlibrarybooking android.permission.SET_ANIMATION_SCALE"
     commandLine cmdToGiveSetAnimationScalePermission.split(' ')
 }
 
+/**
+ * Uninstalls the Debug version of the app from all attached devices before installing
+ */
 task uninstallDebugAppFromAllAttachedDevices(type: Exec) {
     def cmdToUninstallDebugAppFromAllDevices =
             "../scripts/adb_all.sh shell pm uninstall com.objectivetruth.uoitlibrarybooking".split(' ')
     commandLine cmdToUninstallDebugAppFromAllDevices
 }
 
+/**
+ * Uninstalls the AnroidTest version of the app from all attached devices before installing
+ * AndroidTest is the apk that runs beside the main Debug App and does the fake clicks during testing
+ */
 task uninstallTestAppFromAllAttachedDevices(type: Exec) {
     def cmdToUninstallTestAppFromAllDevices =
             "../scripts/adb_all.sh shell pm uninstall com.objectivetruth.uoitlibrarybooking.test".split(' ')
     commandLine cmdToUninstallTestAppFromAllDevices
 }
 
+/**
+ * Ensures the order is respected so uninstalling doens't happen after installing, etc
+ */
 tasks.whenTaskAdded { task ->
-    if (task.name.startsWith('spoonDebugAndroidTest')) {
+    if (task.name.startsWith('spoonDebugAndroidTest') ||
+            task.name.equalsIgnoreCase('connectedDebugAndroidTest')) {
         task.dependsOn grantAnimationPermission
     }
-    if (task.name.startsWith('install')) {
+    if (task.name.startsWith('install') ||
+            task.name.equalsIgnoreCase('connectedDebugAndroidTest')) {
         task.dependsOn uninstallDebugAppFromAllAttachedDevices
         task.dependsOn uninstallTestAppFromAllAttachedDevices
     }
@@ -70,7 +106,7 @@ repositories {
 
 def getVersionFromContinuousIntegrationEnvironment() {
     // Added to make sure it doesn't conflict with the old way of naming which was arbitrary. Now it follows the
-    // Continious Integration Environment Build Number
+    // Continuous Integration Environment Build Number
     def CONTINUOUS_INTEGRATION_BUILD_NUMBER_ENV_VARIABLE = "TRAVIS_BUILD_NUMBER"
     def buildNumberPrefix = 20020
     def BuildNumberFromCIWithPrefix = buildNumberPrefix +
@@ -110,15 +146,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
+        debug {
+            testCoverageEnabled true
+        }
     }
 }
 
 dependencies {
+    // Unit Test dependancies
     testCompile 'junit:junit:4.12'
     testCompile "org.mockito:mockito-core:1.9.5"
 
 
-    // Testing-only dependencies
+    // InstrumentationTesting-only dependencies
     // Force usage of support annotations in the test app, since it is internally used by the runner module.
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support:support-annotations:23.2.1'
@@ -137,18 +177,34 @@ dependencies {
 
 
     // App dependencies
+    // ================
+    // Include all libraries(*.jar) in the libs folder
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.2.1'
+    // Dagger 2 dependancy injection library using java annotations
+    apt 'com.google.dagger:dagger-compiler:2.0'
+    compile 'com.google.dagger:dagger:2.0'
+    provided 'javax.annotation:jsr250-api:1.0'
+    // Logging library
     compile 'com.jakewharton.timber:timber:3.1.0'
+    // Library for making a standardized flatUI style
     compile 'com.github.eluleci:flatui:3.0.0'
+    // Horizontal Listview used for the Column Headers
     compile 'it.sephiroth.android.library.horizontallistview:hlistview:1.2.2'
-    compile 'com.google.android.gms:play-services:8.4.0'
+    // An Event bus for communicating between fragments
     compile 'com.squareup:otto:1.3.8'
+    // For simple animations anywhere in the app
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.daimajia.easing:library:1.0.1@aar'
     compile 'com.daimajia.androidanimations:library:1.1.3@aar'
+    // OKHTTP library for making web requests
     compile 'com.squareup.okhttp:okhttp:2.5.0'
+    // Crashlytics for logging production logs
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
         transitive = true;
     }
+
+    // Standard Google Play Services Library
+    compile 'com.google.android.gms:play-services:8.4.0'
+    // Standard Google Backwards compatibility(compat) library
+    compile 'com.android.support:appcompat-v7:23.2.1'
 }

@@ -35,7 +35,7 @@
         android:layout_height="match_parent"
 
         >
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
 
             android:id="@+id/book_date_actual"
             android:layout_width="wrap_content"
@@ -61,7 +61,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/unknown_room" />
 
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:id="@+id/textView1"
             android:layout_below="@+id/room_landing_room_picture"
             android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
             android:text="Room: "
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:id="@+id/interaction_book_room_number"
             android:layout_width="wrap_content"
             android:layout_alignTop="@+id/textView1"
@@ -86,7 +86,7 @@
             android:text="LIB999"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:layout_marginTop="20dp"
             android:id="@+id/book_error_message_actual"
             android:visibility="invisible"

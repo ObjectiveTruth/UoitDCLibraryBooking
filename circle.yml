@@ -29,24 +29,49 @@ dependencies:
 test:
   override:
     # Assemble the AndroidTest Instrumentation build in build/outputs/apk
-    - ./gradlew assembleAndroidTest
+    # - ./gradlew assembleAndroidTest
     # Assemble the debug build in build/outputs/apk
-    - ./gradlew assembleDebug
+    #- ./gradlew assembleDebug
 
     # Run the device_farm_receive_server and write the exit state to $DEVICE_FARM_RECEIVE_SERVER_RESPONSE
     # Needs to be written to a variable because failing any command will fail the build
-    - node server.js:
-        pwd:
-          device_farm_receive_server
+    #- node server.js:
+    #    pwd:
+    #      device_farm_receive_server
 
-    - ./scripts/circle_ci_emulator_tests.sh:
+    #- ./scripts/circle_ci_emulator_tests.sh:
+    #    timeout: 900
+
+
+    # NO DEVICE FARM
+    # ==============
+    - mksdcard -l e 512M mysdcard.img
+
+    # Start the emulator
+    - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img:
+        background: true
+
+    # Wait for it to have booted
+    - circle-android wait-for-boot
+
+    # Wait a moment before Unlocking the emulator screen
+    - sleep 15
+    - adb shell input keyevent 82
+
+    - ./gradlew spoon:
         timeout: 900
+    # Will be turned on for coverage reports once this is fixed:
+    # https://github.com/kt3k/coveralls-gradle-plugin/issues/61
+    #- ./gradlew coveralls:
+    #    timeout: 900
+    # ==============
+
 
     # Copy the build outputs and spoon to artifacts
     - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
 
     # copy the test results to the test results directory if any. (dont fail the build if they don't exist)
-    - cp -rv UoitDCLibraryBooking/build/outputs/spoon/junit-reports $CIRCLE_TEST_REPORTS/junit || true
+    - cp -rv UoitDCLibraryBooking/build/outputs/debug/junit-reports $CIRCLE_TEST_REPORTS/junit || true
 
 notify:
   webhooks:

@@ -28,7 +28,7 @@
             android:digits="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&amp;*()"
             android:maxLength="70" />
 
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_marginTop="5dp"

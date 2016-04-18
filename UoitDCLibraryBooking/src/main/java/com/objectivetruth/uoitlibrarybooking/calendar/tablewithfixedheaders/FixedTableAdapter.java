@@ -1,8 +1,7 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import com.objectivetruth.uoitlibrarybooking.adapters.BaseTableAdapter;
 
 /**
  * This class implements the main functionalities of the TableAdapter in

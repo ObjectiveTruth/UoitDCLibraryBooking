@@ -14,7 +14,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -33,9 +32,13 @@ import com.google.android.gms.analytics.Tracker;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment.RoomFragmentDialog;
+import com.objectivetruth.uoitlibrarybooking.app.ActivityBase;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.calendar.whatsnew.WhatsNewDialog;
 import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,13 +67,13 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 	public static CookieManager cookieManager;
 	MenuItem refreshItem;
     MenuItem myAccountItem;
-	static SharedPreferences defaultPreferences;
-	static SharedPreferences.Editor defaultPrefsEditor;
+	@Inject SharedPreferences mDefaultSharedPreferences;
+	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
+    @Inject Tracker googleAnalyticsTracker;
 	View refresh_button;
 	static CalendarRefresher mCalendarRefresher = null;
     static LoginAsynkTask mLoginAsyncTask = null;
 	boolean isFront = false;
-	Tracker t = null;
     public final static String SHARED_PREF_KEY_USERNAME = "username";
     public final static String SHARED_PREF_KEY_PASSWORD = "password";
     boolean hasManuallyRefreshedSinceOpeningActivity = false;
@@ -112,20 +115,13 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 		Timber.i("MainActivity: onCreate()");
     	mdbHelper = new DbHelper(this, null, null, 1);
     	super.onCreate(savedInstanceState);
-    	
-    	
-    	
-		if(t == null){
-    		t = ((UOITLibraryBookingApp) getApplication()).getTracker();
-    	}
+
+        ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
 
         configureAndSetupLayoutAndDrawer(
                 R.layout.activity_main,
                 R.id.drawer_layout,
                 R.id.left_drawer);
-
-		defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		defaultPrefsEditor = defaultPreferences.edit();
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -145,7 +141,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                t.send(new HitBuilders.EventBuilder()
+                googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                                 .setCategory("Calendar Home")
                                 .setAction("Switch Page")
                                 .setLabel(String.valueOf(position))
@@ -206,7 +202,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         refreshItem = menu.findItem(R.id.refresh_calendar);
         myAccountItem = menu.findItem(R.id.user_account);
 
-        if(!defaultPreferences.getBoolean(hasLEARNED_REFRESH, false)){
+        if(!mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false)){
 
             LayoutInflater inflater = this.getLayoutInflater();
             ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_refresh_imageview,
@@ -223,7 +219,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             refreshItem.setActionView(iv);
         }
         //Prepare MyAccount Actionview if has learned refresh and has NOT learned myaccount
-        if(defaultPreferences.getBoolean(hasLEARNED_REFRESH, false) && !defaultPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
+        if(mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false) && !mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
             Timber.i("User has not Learned MyAccount");
             LayoutInflater inflater = this.getLayoutInflater();
             ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_myaccount_imageview,
@@ -265,7 +261,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
         }
         else if(id == R.id.help_calendar){
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Home")
                             .setAction("HelpDialog")
                             .setLabel("Pressed by User")
@@ -275,7 +271,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             return true;
         }
         else if(id == R.id.user_account){
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Home")
                             .setAction("MyAccount")
                             .setLabel("Pressed by User")
@@ -285,7 +281,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             return true;
         }
         else if(id == R.id.refresh_calendar){
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Calendar Home")
                             .setAction("Refresh")
                             .setLabel("Pressed by User")
@@ -946,7 +942,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 		super.onStart();
         hasManuallyRefreshedSinceOpeningActivity = false;
         Timber.i("Main Activity: onStart()");
-        if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
+        if(mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -1036,7 +1032,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         animY.start();
     }
     public static class DiaFragHelp extends DialogFragment {
-        Long helpDialogOpenDuration = 0L;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -1047,7 +1042,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             Timber.i("Help Dialog Created");
-            helpDialogOpenDuration = System.currentTimeMillis();
             View rootView = inflater.inflate(R.layout.diafrag_help, container, false);
             Button okButton = (Button) rootView.findViewById(R.id.help_ok_button);
             okButton.setOnClickListener(new View.OnClickListener() {
@@ -1068,14 +1062,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
         @Override
         public void onStop() {
-            long helpDuration = helpDialogOpenDuration - System.currentTimeMillis();
-            Tracker t = ((UOITLibraryBookingApp)getActivity().getApplication()).getTracker();
-            t.send(new HitBuilders.EventBuilder()
-                    .setCategory("Calendar Home")
-                    .setAction("HelpDialog")
-                    .setLabel("Help Dialog Open For")
-                    .setValue(helpDuration)
-                    .build());
             super.onStop();
         }
 
@@ -1102,15 +1088,15 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         if(myAccountItem != null){
             myAccountItem.setActionView(null);
         }
-        if(!defaultPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
+        if(!mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
             Timber.i("User has learned My Account");
             long firstMyAccountDelay = activityStartTime - System.currentTimeMillis();
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Calendar Home")
                     .setAction("First Time My Account Pressed")
                     .setValue(firstMyAccountDelay)
                     .build());
-            defaultPrefsEditor.putBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, true)
+            mDefaultSharedPreferencesEditor.putBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, true)
                     .commit();
         }
 
@@ -1123,16 +1109,15 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
      */
     private void handleHelpClick(){
         Timber.i("User Clicked Help Dialog");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(!sharedPreferences.getBoolean(SHARED_PREF_HAS_LEARNED_HELP, false)){
+        if(!mDefaultSharedPreferences.getBoolean(SHARED_PREF_HAS_LEARNED_HELP, false)){
             long firstHelpClickDelay = activityStartTime - System.currentTimeMillis();
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Calendar Home")
                     .setAction("HelpDialog")
                     .setLabel("First Time Help Pressed")
                     .setValue(firstHelpClickDelay)
                     .build());
-            sharedPreferences.edit().putBoolean(SHARED_PREF_HAS_LEARNED_HELP, true).commit();
+            mDefaultSharedPreferencesEditor.putBoolean(SHARED_PREF_HAS_LEARNED_HELP, true).commit();
         }
         FragmentManager fragMan = getSupportFragmentManager();
         DiaFragHelp currentFrag = new DiaFragHelp();
@@ -1160,7 +1145,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             DoRefresh();
         }
 
-        if(!defaultPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false) && myAccountItem != null){
+        if(!mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false) && myAccountItem != null){
             LayoutInflater inflater = this.getLayoutInflater();
             ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_myaccount_imageview,
                     null);
@@ -1173,22 +1158,22 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
             });
             myAccountItem.setActionView(iv);
         }
-        if(!defaultPreferences.getBoolean(hasLEARNED_REFRESH, false)){
+        if(!mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false)){
             Timber.i("User has learned Refresh");
             long firstRefreshDelay = activityStartTime - System.currentTimeMillis();
-            t.send(new HitBuilders.EventBuilder()
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Calendar Home")
                     .setAction("First Time Refresh Pressed")
                     .setValue(firstRefreshDelay)
                     .build());
-             defaultPrefsEditor.putBoolean(hasLEARNED_REFRESH, true)
+             mDefaultSharedPreferencesEditor.putBoolean(hasLEARNED_REFRESH, true)
                     .commit();
         }
 
     }
     public void displayMyAccountHint(){
         Timber.i("Displaying My Account Bounce Hint because user didn't log in when trying to book");
-        t.send(new HitBuilders.EventBuilder()
+        googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                 .setCategory("Calendar Home")
                 .setAction("Display My Account Hint, user didn't log in")
                 .build());

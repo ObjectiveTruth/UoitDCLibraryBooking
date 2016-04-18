@@ -16,7 +16,7 @@
         android:layout_marginBottom="10dp"
 
         >
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:layout_width="wrap_content"
             android:id="@+id/titleMyAccount"
             android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
             android:layout_centerHorizontal="true"
             />
 
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -39,7 +39,7 @@
             android:layout_alignLeft="@+id/my_account_movement_frame"
             />
 
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"

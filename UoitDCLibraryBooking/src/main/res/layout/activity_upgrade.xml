@@ -15,14 +15,14 @@ android:layout_height="match_parent"
         android:inAnimation="@anim/custom_fade_in"
         android:outAnimation="@anim/custom_fade_out">
 
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:id="@+id/placeholder_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             
             android:src="@null"/>
 
-        <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
             android:scaleType="centerCrop"
             android:id="@+id/students_background"
             android:layout_width="match_parent"
@@ -53,7 +53,7 @@ android:layout_height="match_parent"
 		    android:background="@drawable/dialog"
 		    android:padding="20dp" >
 
-            <com.objectivetruth.uoitlibrarybooking.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
 			    	    android:id="@+id/thankyou"
 			    	    android:layout_width="wrap_content"
 			    	    android:layout_height="wrap_content"
