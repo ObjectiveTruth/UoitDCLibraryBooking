@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.Utilities;
+package com.objectivetruth.uoitlibrarybooking.statelessutilities;
 
 import android.content.Context;
 import timber.log.Timber;

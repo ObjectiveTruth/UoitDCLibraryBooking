@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.Utilities.ResourceLoadingUtilities;
+import com.objectivetruth.uoitlibrarybooking.statelessutilities.ResourceLoadingUtilities;
 
 public class WhatsNewDialog {
     private static final String WHATS_NEW_DIALOG_TITLE = "What's New";
