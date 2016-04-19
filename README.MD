@@ -62,6 +62,10 @@ View the Milestones [here](https://github.com/ObjectiveTruth/UoitDCLibraryBookin
 To Opt-in to view the beta version on android click [here](https://play.google.com/apps/testing/com.objectivetruth.uoitlibrarybooking)
 
   **Warning:** Beta may be unstable and crash at any time, but you can see latest changes
+  
+## Architectural Design
+
+See the [wiki - architecture](https://github.com/ObjectiveTruth/UoitDCLibraryBooking/wiki/Architecture-%28DI%29)
 
 ## Development Environment Setup
 
