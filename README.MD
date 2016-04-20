@@ -20,7 +20,7 @@
 
 
 Have a question? join our
-[![Slack Status](http://uoitdclibrarybookingslackin.objectivetruth.ca/badge.svg)](http://uoitdclibrarybookingslackin.objectivetruth.ca)
+[![Slack Status](https://uoitlibrarybooking-slackin.herokuapp.com/badge.svg)](https://uoitlibrarybooking-slackin.herokuapp.com/)
 
 ## Description
 
