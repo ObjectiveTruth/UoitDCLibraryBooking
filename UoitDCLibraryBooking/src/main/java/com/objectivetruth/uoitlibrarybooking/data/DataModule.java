@@ -6,14 +6,13 @@ import com.objectivetruth.uoitlibrarybooking.data.Models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.Models.UserModel;
 import dagger.Module;
 import dagger.Provides;
-
 import javax.inject.Singleton;
 
 @Module
 public class DataModule {
     private Application mApplication;
 
-    DataModule(Application application) {
+    public DataModule(Application application) {
         this.mApplication = application;
     }
 

@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
+import com.objectivetruth.uoitlibrarybooking.data.DataModule;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
@@ -30,6 +31,7 @@ public class UOITLibraryBookingApp extends Application {
 
         mComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
+                .dataModule(new DataModule(this))
                 .build();
 
         _checkIfFirstTimeAppLaunchedSinceInstall();
