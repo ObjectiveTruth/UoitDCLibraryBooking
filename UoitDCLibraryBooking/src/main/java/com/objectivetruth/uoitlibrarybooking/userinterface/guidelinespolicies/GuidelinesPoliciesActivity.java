@@ -1,10 +1,10 @@
-package com.objectivetruth.uoitlibrarybooking.guidelinespolicies;
+package com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.app.ActivityBase;
+import com.objectivetruth.uoitlibrarybooking.userinterface.ActivityBase;
 
 public class GuidelinesPoliciesActivity extends ActivityBase {
     final static private int ACTIVITY_PAGE_NUMBER = 1;

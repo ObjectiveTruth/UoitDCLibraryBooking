@@ -4,12 +4,13 @@ import com.objectivetruth.uoitlibrarybooking.ActivityRoomInteraction;
 import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment;
 import com.objectivetruth.uoitlibrarybooking.DiaFragMyAccount;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
+import com.objectivetruth.uoitlibrarybooking.data.DataModule;
 import dagger.Component;
 
 import javax.inject.Singleton;
 
 @Singleton
-@Component(modules = {AppModule.class})
+@Component(modules = {AppModule.class, DataModule.class})
 public interface AppComponent {
     void inject(UOITLibraryBookingApp app);
     void inject(MainActivity mainActivity);

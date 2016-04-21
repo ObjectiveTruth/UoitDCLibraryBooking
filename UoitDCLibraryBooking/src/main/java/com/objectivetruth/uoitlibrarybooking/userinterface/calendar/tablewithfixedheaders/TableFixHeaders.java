@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders;
+package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.tablewithfixedheaders;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;

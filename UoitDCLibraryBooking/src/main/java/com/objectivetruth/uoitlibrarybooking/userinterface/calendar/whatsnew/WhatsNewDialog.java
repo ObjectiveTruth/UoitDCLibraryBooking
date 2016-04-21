@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.calendar.whatsnew;
+package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew;
 
 import android.app.AlertDialog;
 import android.content.Context;

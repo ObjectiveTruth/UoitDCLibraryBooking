@@ -9,7 +9,7 @@
 
     android:layout_margin="20dp"
     android:layout_height="200dp">
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:id="@+id/textView1"
 
         android:layout_width="wrap_content"
@@ -22,7 +22,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="@dimen/dialog_title_text" />
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_marginTop="20dp"
         android:id="@+id/book_cell_example"
         android:layout_width="@dimen/table_width"
@@ -32,7 +32,7 @@
         android:background="@drawable/cell_book_selector"
         android:layout_height="@dimen/table_height" />
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_marginTop="22dp"
         android:id="@+id/book_cell_description"
         android:layout_width="wrap_content"
@@ -45,7 +45,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_height="wrap_content" />
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_marginTop="20dp"
         android:id="@+id/joinorleave_cell_example"
         android:layout_width="@dimen/table_width"
@@ -55,7 +55,7 @@
         android:background="@drawable/cell_joinorleave_selector"
         android:layout_height="@dimen/table_height" />
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_marginTop="20dp"
         android:id="@+id/joinorleave_cell_description"
         android:layout_width="wrap_content"
@@ -68,7 +68,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_height="wrap_content" />
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_marginTop="20dp"
         android:id="@+id/viewleaveorjoin_cell_example"
         android:layout_width="@dimen/table_width"
@@ -78,7 +78,7 @@
         android:background="@drawable/cell_viewleaveorjoin_selector"
         android:layout_height="@dimen/table_height" />
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_marginTop="20dp"
         android:id="@+id/viewleaveorjoin_cell_description"
         android:layout_width="wrap_content"

@@ -44,7 +44,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".guidelinespolicies.GuidelinesPoliciesActivity"
+                android:name=".userinterface.guidelinespolicies.GuidelinesPoliciesActivity"
                 android:configChanges="keyboardHidden|orientation|screenSize"
                 android:launchMode="singleTop" />
         <activity
@@ -57,7 +57,7 @@
                     android:value="com.objectivetruth.uoitlibrarybooking.MainActivity" />
         </activity>
         <activity
-                android:name=".about.ActivityAboutMe"
+                android:name=".userinterface.about.ActivityAboutMe"
                 android:configChanges="keyboardHidden|orientation|screenSize"
                 android:launchMode="singleTop" />
         <meta-data

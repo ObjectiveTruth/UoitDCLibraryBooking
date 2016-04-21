@@ -5,7 +5,7 @@
     
     android:orientation="vertical" >
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:id="@+id/textviewwords"
         android:text="@string/why_upgrade"
         android:layout_width="wrap_content"

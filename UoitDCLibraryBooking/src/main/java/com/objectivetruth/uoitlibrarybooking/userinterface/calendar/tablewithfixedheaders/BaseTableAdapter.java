@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders;
+package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.tablewithfixedheaders;
 
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;

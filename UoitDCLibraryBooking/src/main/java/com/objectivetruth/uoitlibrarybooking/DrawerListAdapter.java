@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView;
+import com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView;
 
 public class DrawerListAdapter extends ArrayAdapter<String> {
 	String[] stringArr;

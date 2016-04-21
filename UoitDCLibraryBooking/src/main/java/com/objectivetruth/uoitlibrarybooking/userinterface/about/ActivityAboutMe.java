@@ -1,9 +1,9 @@
-package com.objectivetruth.uoitlibrarybooking.about;
+package com.objectivetruth.uoitlibrarybooking.userinterface.about;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.objectivetruth.uoitlibrarybooking.app.ActivityBase;
+import com.objectivetruth.uoitlibrarybooking.userinterface.ActivityBase;
 import com.objectivetruth.uoitlibrarybooking.R;
 
 public class ActivityAboutMe extends ActivityBase {

@@ -21,7 +21,7 @@
 
         >
 
-        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
             
             android:id="@+id/room_landing_top_title"
             android:layout_width="wrap_content"
@@ -54,7 +54,7 @@
             android:layout_marginRight="2dp"
             android:layout_height="wrap_content" >
 
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
                 android:id="@+id/room_landing_floor_word"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -63,7 +63,7 @@
                 android:text="Floor:"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
                 android:id="@+id/room_landing_floor_number"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -74,7 +74,7 @@
                 android:text="#"
 
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
                 android:id="@+id/room_landing_seating_cap_word"
                 android:layout_width="0dp"
                 android:gravity="left"
@@ -83,7 +83,7 @@
                 android:text="Seating:"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
                 android:id="@+id/room_landing_seating_capacity"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -103,7 +103,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
                 android:id="@+id/room_landing_min_bookers_word"
                 android:layout_width="0dp"
                 android:gravity="left"
@@ -113,7 +113,7 @@
 
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
                 android:id="@+id/room_landing_min_bookers"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -123,7 +123,7 @@
                 android:text="#"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
                 android:id="@+id/room_landing_max_bookable_word"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -132,7 +132,7 @@
                 android:text="Max:"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
                 android:id="@+id/room_landing_max_time"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -145,7 +145,7 @@
         </LinearLayout>
 
 
-        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
             android:id="@+id/room_landing_comments_word"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -155,7 +155,7 @@
             android:text="Features: "
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
             android:id="@+id/room_landing_comments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

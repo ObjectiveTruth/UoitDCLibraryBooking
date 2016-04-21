@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:id="@+id/my_booking_item_color"
         android:textColor="@color/blue_font"
         android:layout_width="match_parent"

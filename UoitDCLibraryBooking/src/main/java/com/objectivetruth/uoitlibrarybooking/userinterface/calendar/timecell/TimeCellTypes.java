@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.calendar.timecell;
+package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.timecell;
 
 /**
  * Types of cells to show in the calendar, corresponds to the ones found on the website

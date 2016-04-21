@@ -21,7 +21,7 @@ android:layout_height="match_parent"
 		    android:layout_height="match_parent"
 		    android:background="@color/white"
 		    android:padding="20dp" >
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
 
                 android:id="@+id/book_date_actual"
                 android:layout_width="wrap_content"
@@ -35,7 +35,7 @@ android:layout_height="match_parent"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="@dimen/dialog_title_text" />
 
-            <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+            <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
 			    	    android:id="@+id/textView1"
 			    	    android:layout_width="350dp"
 			    	    android:layout_height="wrap_content"

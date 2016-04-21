@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.calendar.timecell;
+package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.timecell;
 
 
 public interface TimeCell {

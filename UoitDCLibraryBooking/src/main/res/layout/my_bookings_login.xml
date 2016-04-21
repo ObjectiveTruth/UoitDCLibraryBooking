@@ -7,7 +7,7 @@
     android:background="@drawable/dialog"
     android:layout_height="match_parent" >
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_centerHorizontal="true"
         android:id="@+id/error_textview"
         android:layout_width="wrap_content"

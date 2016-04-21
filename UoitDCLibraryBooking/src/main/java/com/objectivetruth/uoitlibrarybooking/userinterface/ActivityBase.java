@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.app;
+package com.objectivetruth.uoitlibrarybooking.userinterface;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -15,10 +15,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.objectivetruth.uoitlibrarybooking.DrawerListAdapter;
-import com.objectivetruth.uoitlibrarybooking.guidelinespolicies.GuidelinesPoliciesActivity;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesPoliciesActivity;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.about.ActivityAboutMe;
+import com.objectivetruth.uoitlibrarybooking.userinterface.about.ActivityAboutMe;
 import timber.log.Timber;
 
 public abstract class ActivityBase extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI;
+package com.objectivetruth.uoitlibrarybooking.userinterface.common;
 
 import android.content.Context;
 import android.graphics.Typeface;

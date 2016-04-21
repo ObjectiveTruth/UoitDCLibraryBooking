@@ -34,9 +34,9 @@ import android.widget.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView;
-import com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.FixedTableAdapter;
-import com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.TableFixHeaders;
+import com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView;
+import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.tablewithfixedheaders.FixedTableAdapter;
+import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.tablewithfixedheaders.TableFixHeaders;
 import timber.log.Timber;
 
 import javax.inject.Inject;
