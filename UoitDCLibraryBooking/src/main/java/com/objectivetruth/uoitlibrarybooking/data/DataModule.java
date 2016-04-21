@@ -1,14 +1,12 @@
 package com.objectivetruth.uoitlibrarybooking.data;
 
 import android.app.Application;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.data.Models.CalendarModel;
+import com.objectivetruth.uoitlibrarybooking.data.Models.UserModel;
 import dagger.Module;
 import dagger.Provides;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Module
@@ -21,22 +19,14 @@ public class DataModule {
 
     @Provides
     @Singleton
-    CalendarModel providesCalendarModel() {
-        return new CalendarModel();
+    CalendarModel providesCalendarModel(Gson gson) {
+        return new CalendarModel(mApplication);
     }
 
     @Provides
-    @Named("Calendar")
     @Singleton
-    SharedPreferences providesSharedPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(mApplication);
-    }
-
-    @Provides
-    @Named("Calendar")
-    @Singleton
-    SharedPreferences.Editor providesSharedPreferencesEditor(SharedPreferences sharedPreferences) {
-        return sharedPreferences.edit();
+    UserModel providesUserModel(Gson gson) {
+        return new UserModel(mApplication);
     }
 
     @Provides

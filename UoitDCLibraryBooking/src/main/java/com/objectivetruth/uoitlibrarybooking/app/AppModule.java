@@ -10,11 +10,10 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import dagger.Module;
 import dagger.Provides;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.UUID;
 
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_UUID;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_UUID;
 
 @Module
 class AppModule {
@@ -25,14 +24,12 @@ class AppModule {
     }
 
     @Provides
-    @Named("default")
     @Singleton
     SharedPreferences providesSharedPreferences() {
         return PreferenceManager.getDefaultSharedPreferences(mApplication);
     }
 
     @Provides
-    @Named("default")
     @Singleton
     SharedPreferences.Editor providesSharedPreferencesEditor(SharedPreferences sharedPreferences) {
         return sharedPreferences.edit();

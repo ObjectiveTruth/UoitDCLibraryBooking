@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.constants;
+package com.objectivetruth.uoitlibrarybooking.common.constants;
 
 public class SHARED_PREFERENCES_KEYS {
     public static final String SHARED_PREF_REGISTRATIONID = "shared_pref_gcm_registration_id";

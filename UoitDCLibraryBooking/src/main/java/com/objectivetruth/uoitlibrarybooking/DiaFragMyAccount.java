@@ -35,8 +35,8 @@ import javax.inject.Inject;
 
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_KEY_BOOKINGS_LEFT;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_KEY_BOOKINGS_LEFT;
 
 
 public class DiaFragMyAccount extends DialogFragment {

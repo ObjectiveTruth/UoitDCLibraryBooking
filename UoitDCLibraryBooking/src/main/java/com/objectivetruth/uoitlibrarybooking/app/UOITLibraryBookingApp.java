@@ -11,7 +11,7 @@ import timber.log.Timber;
 
 import java.util.UUID;
 
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.*;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 public class UOITLibraryBookingApp extends Application {
     private AppComponent mComponent;

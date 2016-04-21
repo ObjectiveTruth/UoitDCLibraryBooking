@@ -43,8 +43,8 @@ import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HASLEARNED_MYACCOUNT;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HAS_LEARNED_HELP;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HASLEARNED_MYACCOUNT;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HAS_LEARNED_HELP;
 
 
 public class MainActivity extends ActivityBase implements ActionBar.TabListener, AsyncResponse{
