@@ -77,43 +77,22 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     public final static String SHARED_PREF_KEY_USERNAME = "username";
     public final static String SHARED_PREF_KEY_PASSWORD = "password";
     boolean hasManuallyRefreshedSinceOpeningActivity = false;
-
     //TODO put this in savedinstancestate
     public static String errorMessageFromLogin = "";
-
 	boolean isNewInstance = true;
-
 	int tabNumber = -1;
-
 	int gridViewLastVisiblePosition;
 	boolean isForQRCode = false;
 	ProgressDialog progDialogQRCode = null;
-
 	int shareRow = 0;
 	int shareColumn = 0;
 	int pageNumberInt = 0;
-
-
-	/**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     ViewPager mViewPager;
 	public ArrayList<CalendarMonth> calendarCache = null;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
-		Timber.i("MainActivity: onCreate()");
-    	mdbHelper = new DbHelper(this, null, null, 1);
     	super.onCreate(savedInstanceState);
 
         ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
@@ -123,6 +102,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                 R.id.drawer_layout,
                 R.id.left_drawer);
 
+/*
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -167,6 +147,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
         OttoBusSingleton.getInstance().register(this);
 
+*/
 
     }
 
@@ -190,7 +171,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Timber.i("MainActivity: onCreateOptionsMenu()");
+        super.onCreateOptionsMenu(menu);
         // Inflate the menu; this adds items to the action bar if it is present.
     	if(BuildConfig.DEBUG){
         	getMenuInflater().inflate(R.menu.debugmenu, menu);
@@ -245,7 +226,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -315,12 +295,13 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
     	//Log.i(TAG, "tab selected: " + tab.getPosition());
-        mViewPager.setCurrentItem(tab.getPosition());
+        //mViewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
+
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {

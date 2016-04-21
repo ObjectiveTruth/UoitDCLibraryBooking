@@ -3,23 +3,21 @@ package com.objectivetruth.uoitlibrarybooking.userinterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.objectivetruth.uoitlibrarybooking.DrawerListAdapter;
-import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesPoliciesActivity;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.userinterface.about.ActivityAboutMe;
+import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesPoliciesActivity;
 import timber.log.Timber;
 
 public abstract class ActivityBase extends AppCompatActivity {
@@ -58,10 +56,54 @@ public abstract class ActivityBase extends AppCompatActivity {
                                                 int drawerListIdToLoad) {
         setContentView(layoutIdToLoad);
         _isDrawerRequestedInThisActivity = true;
-        _configureAndSetupDrawer(drawerLayoutIdToLoad, drawerListIdToLoad);
+        _configureAndSetupDrawer(drawerLayoutIdToLoad);
+        //_configureAndSetupDrawer(drawerLayoutIdToLoad, drawerListIdToLoad);
     }
 
-    private void _configureAndSetupDrawer(int drawerLayoutIdToLoad, int drawerListIdToLoad) {
+    private void _configureAndSetupDrawer(int drawerLayoutIdToLoad) {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        _mDrawerLayout = (DrawerLayout) findViewById(drawerLayoutIdToLoad);
+
+        if(getSupportActionBar() != null) {
+            // enable ActionBar app icon to behave as action to toggle nav drawer
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            //getActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setTitle(getActivityTitle());
+        }
+        if (navigationView != null) {
+            navigationView.
+                    setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                // This method will trigger on item Click of navigation menu
+                @Override
+                public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    _mDrawerLayout.closeDrawers();
+                    return true;
+                }
+            });
+        }
+        _mDrawerToggle = new ActionBarDrawerToggle(
+                this,                               // Host Activity
+                _mDrawerLayout,                     // DrawerLayout object
+                R.string.navigation_drawer_open,    // Description for accessibility
+                R.string.navigation_drawer_close    // Description for accessibility
+        ) {
+            @Override
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                //getSupportActionBar().setTitle(getActivityTitle());
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                //getSupportActionBar().setTitle(_getAppTitle());
+            }
+
+        };
+        _mDrawerLayout.addDrawerListener(_mDrawerToggle);
+    }
+
+    private void _configureAndSetupDrawer2(int drawerLayoutIdToLoad, int drawerListIdToLoad) {
         _menuItemsArray = getResources().getStringArray(R.array.menuItems);
         _mDrawerLayout = (DrawerLayout) findViewById(drawerLayoutIdToLoad);
         _mDrawerList = (ListView) findViewById(drawerListIdToLoad);
@@ -140,8 +182,8 @@ public abstract class ActivityBase extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
         if(_isDrawerRequestedInThisActivity) {
-            boolean drawerOpen = _mDrawerLayout.isDrawerOpen(_mDrawerList);
-            if(drawerOpen) { return false; }
+            //boolean drawerOpen = _mDrawerLayout.isDrawerOpen(_mDrawerList);
+            //if(drawerOpen) { return false; }
         }
         return super.onPrepareOptionsMenu(menu);
     }
