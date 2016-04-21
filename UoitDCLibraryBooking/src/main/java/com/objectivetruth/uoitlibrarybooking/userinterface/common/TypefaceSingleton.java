@@ -1,11 +1,8 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.userinterface.common;
 
 import android.content.Context;
 import android.graphics.Typeface;
 
-/**
- * Created by ObjectiveTruth on 8/21/2014.
- */
 public class TypefaceSingleton {
     private static TypefaceSingleton instance = new TypefaceSingleton();
     private TypefaceSingleton() {}
