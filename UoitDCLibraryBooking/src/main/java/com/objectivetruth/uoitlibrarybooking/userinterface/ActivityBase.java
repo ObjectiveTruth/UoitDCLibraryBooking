@@ -255,4 +255,23 @@ public abstract class ActivityBase extends AppCompatActivity {
             startActivity(intentToOpenActivity);
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        if (_isDrawerRequestedInThisActivity && _isNavDrawerOpen()) {
+            _closeNavDrawer();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean _isNavDrawerOpen() {
+        return _mDrawerLayout != null && _mDrawerLayout.isDrawerOpen(GravityCompat.START);
+    }
+
+    private void _closeNavDrawer() {
+        if (_mDrawerLayout != null) {
+            _mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+    }
 }
