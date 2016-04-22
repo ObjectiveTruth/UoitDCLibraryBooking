@@ -8,15 +8,16 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.google.android.gms.analytics.GoogleAnalytics;
-import com.objectivetruth.uoitlibrarybooking.DrawerListAdapter;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.userinterface.about.ActivityAboutMe;
+import com.objectivetruth.uoitlibrarybooking.userinterface.drawer.DrawerListAdapter;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesPoliciesActivity;
 import timber.log.Timber;
 
@@ -53,16 +54,20 @@ public abstract class ActivityBase extends AppCompatActivity {
 
     protected final void configureAndSetupLayoutAndDrawer(int layoutIdToLoad,
                                                 int drawerLayoutIdToLoad,
-                                                int drawerListIdToLoad) {
-        setContentView(layoutIdToLoad);
+                                                int drawerListIdToLoad,
+                                                int toolbarLayoutIdToLoad) {
         _isDrawerRequestedInThisActivity = true;
-        _configureAndSetupDrawer(drawerLayoutIdToLoad);
-        //_configureAndSetupDrawer(drawerLayoutIdToLoad, drawerListIdToLoad);
+
+        setContentView(layoutIdToLoad);
+        _configureAndSetupDrawer(drawerLayoutIdToLoad, toolbarLayoutIdToLoad);
     }
 
-    private void _configureAndSetupDrawer(int drawerLayoutIdToLoad) {
+    private void _configureAndSetupDrawer(int drawerLayoutIdToLoad, int toolbarLayoutIdToLoad) {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         _mDrawerLayout = (DrawerLayout) findViewById(drawerLayoutIdToLoad);
+
+        Toolbar toolbar = (Toolbar) findViewById(toolbarLayoutIdToLoad);
+        setSupportActionBar(toolbar);
 
         if(getSupportActionBar() != null) {
             // enable ActionBar app icon to behave as action to toggle nav drawer
@@ -101,6 +106,13 @@ public abstract class ActivityBase extends AppCompatActivity {
 
         };
         _mDrawerLayout.addDrawerListener(_mDrawerToggle);
+        // set up the drawer's list view with items and click listener
+        if(_mDrawerList != null) {
+            _mDrawerList.setAdapter(new DrawerListAdapter(this,
+                    R.layout.drawer_list_item, _menuItemsArray, getActivityPageNumber(), this));
+            _mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        }
+
     }
 
     private void _configureAndSetupDrawer2(int drawerLayoutIdToLoad, int drawerListIdToLoad) {
@@ -142,13 +154,6 @@ public abstract class ActivityBase extends AppCompatActivity {
 
             };
             _mDrawerLayout.addDrawerListener(_mDrawerToggle);
-        }
-
-        // set up the drawer's list view with items and click listener
-        if(_mDrawerList != null) {
-            _mDrawerList.setAdapter(new DrawerListAdapter(this,
-                    R.layout.drawer_list_item, _menuItemsArray, getActivityPageNumber(), this));
-            _mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         }
 
         if(getSupportActionBar() != null) {

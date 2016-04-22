@@ -32,8 +32,8 @@ import com.google.android.gms.analytics.Tracker;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment.RoomFragmentDialog;
-import com.objectivetruth.uoitlibrarybooking.userinterface.ActivityBase;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.userinterface.ActivityBase;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.squareup.otto.Subscribe;
 import timber.log.Timber;
@@ -100,7 +100,8 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         configureAndSetupLayoutAndDrawer(
                 R.layout.activity_main,
                 R.id.drawer_layout,
-                R.id.left_drawer);
+                R.id.left_drawer,
+                R.id.toolbar);
 
 /*
         // Set up the action bar.
@@ -221,9 +222,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
                 refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
             }
         }
-
-
-
         return true;
     }
 

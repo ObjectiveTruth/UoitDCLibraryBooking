@@ -17,7 +17,7 @@ public class GuidelinesPoliciesActivity extends ActivityBase {
         configureAndSetupLayoutAndDrawer(
                 R.layout.guidelines_policies,
                 R.id.drawer_layout_guidelines_policies,
-                R.id.left_drawer_guidelinespolicies);
+                R.id.left_drawer_guidelinespolicies, 0);
 	}
 
     @Override

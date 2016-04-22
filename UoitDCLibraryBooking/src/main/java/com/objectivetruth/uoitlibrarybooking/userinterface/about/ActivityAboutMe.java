@@ -17,7 +17,7 @@ public class ActivityAboutMe extends ActivityBase {
         configureAndSetupLayoutAndDrawer(
                 R.layout.activity_about,
                 R.id.drawer_layout_aboutme,
-                R.id.left_drawer_aboutme);
+                R.id.left_drawer_aboutme, 0);
 	}
 
     @Override
