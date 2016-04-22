@@ -121,7 +121,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         _mDrawerList = (ListView) findViewById(drawerListIdToLoad);
 
         if(_mDrawerLayout != null) {
-            // set a custom shadow that overlays the main content when the drawer opens
+            // set a custom shadow that overlays the calendar_action_icons_menu content when the drawer opens
             _mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
             // ActionBarDrawerToggle ties together the the proper interactions

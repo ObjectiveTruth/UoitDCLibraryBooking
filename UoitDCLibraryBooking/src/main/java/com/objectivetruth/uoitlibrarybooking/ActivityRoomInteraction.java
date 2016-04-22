@@ -92,7 +92,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		bundleExtras = intent.getExtras();
 		mActivity = this;
         OttoBusSingleton.getInstance().register(this);
-        //TODO added the eventViewstateGenerrator to the main head part, now use it in the book instance
+        //TODO added the eventViewstateGenerrator to the calendar_action_icons_menu head part, now use it in the book instance
         if (bundleExtras != null){
             eventValidation = bundleExtras.getString("eventValidation");
             viewState = bundleExtras.getString("viewState");

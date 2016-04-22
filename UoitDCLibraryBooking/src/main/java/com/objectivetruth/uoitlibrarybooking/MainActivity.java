@@ -175,12 +175,12 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         super.onCreateOptionsMenu(menu);
         // Inflate the menu; this adds items to the action bar if it is present.
     	if(BuildConfig.DEBUG){
-        	getMenuInflater().inflate(R.menu.debugmenu, menu);
+        	getMenuInflater().inflate(R.menu.calendar_action_icons_menu_debug, menu);
         }
         else{
-        	getMenuInflater().inflate(R.menu.main, menu);
+        	getMenuInflater().inflate(R.menu.calendar_action_icons_menu, menu);
         }
-    	//getMenuInflater().inflate(R.menu.debugmenu, menu);
+    	//getMenuInflater().inflate(R.menu.calendar_action_icons_menu_debug, menu);
         refreshItem = menu.findItem(R.id.refresh_calendar);
         myAccountItem = menu.findItem(R.id.user_account);
 

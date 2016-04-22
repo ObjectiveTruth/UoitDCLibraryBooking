@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 
 /**
- * This class implements the main functionalities of the TableAdapter in
+ * This class implements the calendar_action_icons_menu functionalities of the TableAdapter in
  * Mutuactivos.
  * 
  * 
