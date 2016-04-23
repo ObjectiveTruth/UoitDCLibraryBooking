@@ -16,7 +16,9 @@ import android.view.WindowManager;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.userinterface.about.About;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
+import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesAndPolicies;
 import timber.log.Timber;
 
 public abstract class ActivityBase extends AppCompatActivity {
@@ -105,12 +107,12 @@ public abstract class ActivityBase extends AppCompatActivity {
                 Timber.i("Calendar Selected from Drawer");
                 fragmentClass = Calendar.class;
                 break;
-/*            case R.id.drawer_menu_item_guidelines_and_policies:
+            case R.id.drawer_menu_item_guidelines_and_policies:
                 fragmentClass = GuidelinesAndPolicies.class;
                 break;
             case R.id.drawer_menu_item_about:
                 fragmentClass = About.class;
-                break;*/
+                break;
             default:
                 fragmentClass = Calendar.class;
         }

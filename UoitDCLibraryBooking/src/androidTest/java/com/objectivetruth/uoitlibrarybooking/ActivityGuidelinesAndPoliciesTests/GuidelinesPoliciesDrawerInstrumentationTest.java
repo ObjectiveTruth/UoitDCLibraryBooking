@@ -4,7 +4,6 @@ import android.support.test.espresso.contrib.DrawerActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
-import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesPoliciesActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.squareup.spoon.Spoon;
 import org.junit.After;
