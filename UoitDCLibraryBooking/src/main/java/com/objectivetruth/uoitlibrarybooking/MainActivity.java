@@ -9,20 +9,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.*;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
@@ -31,6 +31,7 @@ import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment.RoomFragmentDialog;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
 import com.squareup.otto.Subscribe;
@@ -474,21 +475,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
         }
     }
 
-/*    @Subscribe
-    public void PageFragmentViewCreated(PageFragmentViewCreatedEvent event){
-        //Checks if the call came from the last page to be created, then do the action
-        //we dont want to set the tab before the last view has been created
-        Timber.i("tabNUmber "+ tabNumber + " event.pageNumber " +  event.pageNumber);
-        if(event.pageNumber == mSectionsPagerAdapter.getCount() - 1){
-            if(tabNumber > -1 && tabNumber < mSectionsPagerAdapter.getCount()){
-                getSupportActionBar().selectTab(getSupportActionBar().getTabAt(1));
-                //mViewPager.setCurrentItem(tabNumber);
-                Timber.i("testing");
-            }
-        }
-
-    }*/
-
     @Override
     public void SendMessageToAllGridViews(ArrayList<CalendarMonth> originalCalendarCache){
         Timber.i("SendMessageToAllGridViews() Called");
@@ -864,16 +850,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
 	}
     
     @Subscribe
-    public void toggleActionBarVisibility(ToggleActionBarVisibilityEvent event){
-        if(event.hideTheActionBar){
-            getSupportActionBar().setNavigationMode((ActionBar.NAVIGATION_MODE_STANDARD));
-        }
-        else{
-            getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        }
-    }
-
-    @Subscribe
     public void LoginResults(MyAccountLoginResultEvent event) {
         this.errorMessageFromLogin = event.errorMessage;
     }
@@ -932,46 +908,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
         animY.setRepeatMode(ObjectAnimator.REVERSE);
         animY.start();
     }
-    public static class DiaFragHelp extends DialogFragment {
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            Timber.i("Help Dialog Created");
-            View rootView = inflater.inflate(R.layout.diafrag_help, container, false);
-            Button okButton = (Button) rootView.findViewById(R.id.help_ok_button);
-            okButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    getDialog().dismiss();
-
-                }
-            });
-            getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-            getDialog().setTitle("Help");
-            getDialog().getWindow()
-                    .getAttributes().windowAnimations = R.style.ActionBarIconDialogAnimation;
-
-            return rootView;
-        }
-
-        @Override
-        public void onStop() {
-            super.onStop();
-        }
-
-        @Override
-        public void onDestroy() {
-            Timber.i("Help Dialog Destroyed");
-            super.onDestroy();
-        }
-    }
     /**
      * Takes care of creating the MyAccount Fragment, disabling the actionview if required, and
      * setting the correct sharedPref values
@@ -1020,9 +956,8 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
                     .build());
             mDefaultSharedPreferencesEditor.putBoolean(SHARED_PREF_HAS_LEARNED_HELP, true).commit();
         }
-        FragmentManager fragMan = getSupportFragmentManager();
-        DiaFragHelp currentFrag = new DiaFragHelp();
-        currentFrag.show(fragMan, HELP_DIALOGFRAGMENT_TAG);
+        new HelpDialogFragment()
+                .show(getSupportFragmentManager(), HELP_DIALOGFRAGMENT_TAG);
     }
 
     /**
