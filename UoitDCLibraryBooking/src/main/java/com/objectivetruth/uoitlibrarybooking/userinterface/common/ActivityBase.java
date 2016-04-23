@@ -151,7 +151,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        // Insert the defacult fragment once the view has been created
+        // Insert the default fragment once the view has been created
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.mainactivity_content_frame, new Calendar()).commit();
         _mDrawerToggle.syncState();

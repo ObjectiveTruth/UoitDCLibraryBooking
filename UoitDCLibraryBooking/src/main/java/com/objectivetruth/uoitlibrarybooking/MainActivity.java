@@ -25,16 +25,14 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-import com.daimajia.androidanimations.library.Techniques;
-import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment.RoomFragmentDialog;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
+import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
 import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 
@@ -47,7 +45,7 @@ import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREF
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HAS_LEARNED_HELP;
 
 
-public class MainActivity extends ActivityBase implements ActionBar.TabListener, AsyncResponse{
+public class MainActivity extends ActivityBase implements AsyncResponse{
     final static private String ACTIVITY_TITLE = "Calendar";
     final static private int ACTIVITYPAGENUMBER = 0;
 
@@ -287,23 +285,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // When the given tab is selected, switch to the corresponding page in
-        // the ViewPager.
-    	//Log.i(TAG, "tab selected: " + tab.getPosition());
-        //mViewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -521,27 +502,7 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     	else if(originalCalendarCache.size() > 0 && isFront && !isDialogShowing){
             Timber.i("isFront: " + isFront + " and isDialogShowing: " + isDialogShowing + " will Refresh Layout");
     		this.calendarCache = originalCalendarCache;
-/*    		for(int i = 0; i < originalCalendarCache.size(); i++){
-    			Calendar_Generic_Page_Fragment pageFrag = (Calendar_Generic_Page_Fragment) mSectionsPagerAdapter.getItem(i);
-    			pageFrag.calendarCache = originalCalendarCache;
-    		}*/
-    		ActionBar actionBar = getSupportActionBar();
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-    		tabNumber = actionBar.getSelectedTab().getPosition();
-		    Timber.i("Saving Currently Selected Tab : " + String.valueOf(tabNumber));
-    		mSectionsPagerAdapter.notifyDataSetChanged();
-        	actionBar.removeAllTabs();
-            for (int i = 0; i < calendarCache.size(); i++) {
-                // Create a tab with text corresponding to the page title defined by
-                // the adapter. Also specify this Activity object, which implements
-                // the TabListener interface, as the callback (listener) for when
-                // this tab is selected.
-                actionBar.addTab(
-                        actionBar.newTab()
-                                .setText(mSectionsPagerAdapter.getPageTitle(i))
-                                .setTabListener(this));
-            }
-            YoYo.with(Techniques.FadeIn).duration(1000).playOn(mViewPager);
+            //YoYo.with(Techniques.FadeIn).duration(1000).playOn(mViewPager);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -629,41 +590,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
     	}
     }
 
-    @Subscribe
-    public void LinkedCalendarDialogsClosed(LinkedCalendarDialogsClosedEvent event){
-        Timber.i("Dialog has been closed");
-        if(isRefreshWaiting){
-            Timber.i("isRefreshWaiting is true, doing a delayed Refresh");
-            ActionBar actionBar = getSupportActionBar();
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            tabNumber = actionBar.getSelectedTab().getPosition();
-            Timber.i("Saving Currently Selected Tab : " + String.valueOf(tabNumber));
-            mSectionsPagerAdapter.notifyDataSetChanged();
-            actionBar.removeAllTabs();
-            for (int i = 0; i < calendarCache.size(); i++) {
-                // Create a tab with text corresponding to the page title defined by
-                // the adapter. Also specify this Activity object, which implements
-                // the TabListener interface, as the callback (listener) for when
-                // this tab is selected.
-                actionBar.addTab(
-                        actionBar.newTab()
-                                .setText(mSectionsPagerAdapter.getPageTitle(i))
-                                .setTabListener(this));
-            }
-            YoYo.with(Techniques.FadeIn).duration(1000).playOn(mViewPager);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(tabNumber > -1 && tabNumber < calendarCache.size()){
-                        Timber.i("Setting the tab to " + tabNumber);
-                        mViewPager.setCurrentItem(tabNumber, false);
-                    }
-                }
-            }, 100);
-            isRefreshWaiting = false;
-        }
-
-    }
     @Override
     public void ClearResetIcon(){
     	if(refreshItem !=null){
@@ -673,9 +599,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         Timber.i("RefreshIcon Cleared");
 
     }
-    
-
-
 
 	@Override
 	public void ChangeScrollPosition(int firstVisibleItem, int scrollTarget, float ycoord) {

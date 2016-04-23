@@ -28,7 +28,9 @@ public class Calendar extends Fragment {
         getFragmentManager().beginTransaction()
                 .add(R.id.mainactivity_content_frame, new Loading()).commit();
 
-        Observable.timer(3000L, MILLISECONDS)
+        Timber.i("Calendar loading starting...");
+
+        Observable.timer(1000L, MILLISECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Long>() {
@@ -44,7 +46,7 @@ public class Calendar extends Fragment {
 
                     @Override
                     public void onNext(Long aLong) {
-                        Timber.i("Calendar Loading Complete");
+                        Timber.i("Calendar loading complete");
                         // Place the loading fragment into the view while we wait for loading
                         getFragmentManager().beginTransaction()
                                 .replace(R.id.mainactivity_content_frame, new CalendarLoaded()).commit();
