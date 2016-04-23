@@ -4,16 +4,13 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowAnimationStyle">@null</item>
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="AppTheme.Toolbar" parent="AppTheme">
         <item name="colorPrimary">@color/PrimaryColor</item>
         <item name="colorPrimaryDark">@color/PrimaryDarkColor</item>
         <item name="android:textColorSecondary">@color/TextColorSecondary</item>
         <item name="android:textColorPrimary">@color/TextColorPrimary</item>
-    </style>
-
-    <!-- Used by the tool_bar.xml to make sure JUST that action menu gets a blue background, otherwise
-    it'll use a white background like the rest of the app which doesn't look good.
-    Action menu is the 3 dots in the top right of the toolbar -->
-    <style name="AppThemeActionMenuPopupToolbar" parent="AppTheme">
         <item name="android:background">@color/PrimaryColor</item>
     </style>
 

@@ -1,29 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="190dp"
-                android:background="@color/grass_primary"
-                android:orientation="vertical"
->
+                android:layout_height="170dp"
+                android:background="@drawable/library_image3">
 
-    <TextView
+    <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Akash Bangad"
-            android:textSize="14sp"
-            android:textColor="#FFF"
-            android:textStyle="bold"
-            android:paddingBottom="4dp"
-            android:id="@+id/username" />
+            android:layout_centerInParent="true"
+            android:id="@+id/drawer_header_app_icon" android:src="@drawable/ic_launch"/>
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Akash.bangad93@gmail.com"
-            android:id="@+id/email"
-            android:gravity="left"
-            android:layout_marginBottom="8dp"
-            android:textSize="14sp"
-            android:textColor="#fff"/>
-
-</LinearLayout>
+</RelativeLayout>

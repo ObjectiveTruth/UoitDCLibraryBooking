@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.userinterface.ActivityBase;
+import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
 
 public class GuidelinesPoliciesActivity extends ActivityBase {
     final static private int ACTIVITY_PAGE_NUMBER = 1;

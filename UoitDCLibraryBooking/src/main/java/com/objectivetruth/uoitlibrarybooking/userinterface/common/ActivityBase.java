@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.userinterface;
+package com.objectivetruth.uoitlibrarybooking.userinterface.common;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -76,6 +76,9 @@ public abstract class ActivityBase extends AppCompatActivity {
             getSupportActionBar().setTitle(getActivityTitle());
         }
         if (navigationView != null) {
+            // In Android support 23.2.1, there is a bug where you can't inflate the view in XML, must be done manually
+            navigationView.inflateMenu(R.menu.drawer_menu_items);
+            navigationView.inflateHeaderView(R.layout.drawer_header);
             navigationView.
                     setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 // This method will trigger on item Click of navigation menu

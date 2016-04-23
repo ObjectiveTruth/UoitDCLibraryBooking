@@ -5,6 +5,7 @@
 
         <item
                 android:id="@+id/inbox"
+                android:icon="@android:drawable/ic_dialog_alert"
                 android:checked="false"
                 android:title="fooooooo" />
 
