@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
+        <item android:id="@+id/drawer_menu_item_calendar"
+              android:icon="@drawable/ic_action_calendar_year_zoom"
+              android:checked="false"
+              android:title="Calendar"
+              tools:ignore="HardcodedText"/>
 
-        <item
-                android:id="@+id/inbox"
-                android:icon="@android:drawable/ic_dialog_alert"
-                android:checked="false"
-                android:title="fooooooo" />
+        <item android:id="@+id/drawer_menu_item_guidelines_and_policies"
+              android:icon="@drawable/ic_action_list_info"
+              android:checked="false"
+              android:title="Library Booking Policies"
+              tools:ignore="HardcodedText"/>
 
-        <item
-                android:id="@+id/starred"
-                android:checked="false"
-                android:title="something" />
+    </group>
 
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/drawer_menu_item_about"
+              android:icon="@drawable/ic_action_mobile_zoom"
+              android:checked="false"
+              android:title="About"
+              tools:ignore="HardcodedText"/>
     </group>
 </menu>
