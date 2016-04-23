@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/drawer_menu_group_first"
+            android:checkableBehavior="single">
         <item android:id="@+id/drawer_menu_item_calendar"
               android:icon="@drawable/ic_action_calendar_year_zoom"
               android:checked="false"
@@ -16,7 +17,8 @@
 
     </group>
 
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/drawer_menu_group_second"
+            android:checkableBehavior="single">
         <item android:id="@+id/drawer_menu_item_about"
               android:icon="@drawable/ic_action_mobile_zoom"
               android:checked="false"

@@ -1,7 +1,6 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies;
 
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
@@ -16,7 +15,6 @@ public class GuidelinesPoliciesActivity extends ActivityBase {
 
         configureAndSetupLayoutAndDrawer(
                 R.layout.guidelines_policies,
-                R.id.drawer_layout_guidelines_policies,
                 R.id.left_drawer_guidelinespolicies, 0);
 	}
 
@@ -28,13 +26,6 @@ public class GuidelinesPoliciesActivity extends ActivityBase {
     @Override
     protected String getActivityTitle() {
         return ACTIVITY_TITLE;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.global, menu);
-        return true;
     }
 
     @Override

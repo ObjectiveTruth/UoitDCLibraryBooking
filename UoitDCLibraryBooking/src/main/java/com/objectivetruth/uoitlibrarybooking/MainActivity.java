@@ -100,7 +100,6 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
         configureAndSetupLayoutAndDrawer(
                 R.layout.activity_main,
                 R.id.drawer_layout,
-                R.id.left_drawer,
                 R.id.toolbar);
 
 /*
@@ -681,9 +680,9 @@ public class MainActivity extends ActivityBase implements ActionBar.TabListener,
 	@Override
 	public void ChangeScrollPosition(int firstVisibleItem, int scrollTarget, float ycoord) {
 			//Log.i(TAG, "i'm here");
-    		Calendar_Generic_Page_Fragment fragmentPage = (Calendar_Generic_Page_Fragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.pager + ":" + String.valueOf(scrollTarget));
+/*    		Calendar_Generic_Page_Fragment fragmentPage = (Calendar_Generic_Page_Fragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.pager + ":" + String.valueOf(scrollTarget));
     		Calendar_Generic_ListView_Fragment currentListView = (Calendar_Generic_ListView_Fragment) fragmentPage.getChildFragmentManager().findFragmentByTag("calendar" + String.valueOf(scrollTarget) + "listview");
-    		currentListView.changeTheScroll(firstVisibleItem, ycoord);
+    		currentListView.changeTheScroll(firstVisibleItem, ycoord);*/
 
 		
 	}
