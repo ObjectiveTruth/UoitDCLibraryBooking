@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.tablewithfixedheaders;
+package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -37,7 +37,7 @@
 
         />
 
-    <com.objectivetruth.uoitlibrarybooking.userinterface.calendar.tablewithfixedheaders.TableFixHeaders
+    <com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.TableFixHeaders
         android:id="@+id/calendar_table"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

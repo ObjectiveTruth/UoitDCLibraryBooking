@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/holo_purple"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.design.widget.TabLayout
+            style="@style/AppTheme.Toolbar"
+            android:id="@+id/calendar_tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <!-- Individual Tabs are Programmatically added -->
+    </android.support.design.widget.TabLayout>
+
+    <com.objectivetruth.uoitlibrarybooking.NonSwipeableViewPager
+        android:id="@+id/calendar_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        tools:context="com.objectivetruth.uoitlibrarybooking.MainActivity" />
+
+</android.support.v7.widget.LinearLayoutCompat>

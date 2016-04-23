@@ -104,16 +104,19 @@ public abstract class ActivityBase extends AppCompatActivity {
         Class fragmentClass;
         switch(menuItem.getItemId()) {
             case R.id.drawer_menu_item_calendar:
-                Timber.i("Calendar Selected from Drawer");
+                Timber.i("Calendar selected from Drawer");
                 fragmentClass = Calendar.class;
                 break;
             case R.id.drawer_menu_item_guidelines_and_policies:
+                Timber.i("Guidelines And Policies selected from Drawer");
                 fragmentClass = GuidelinesAndPolicies.class;
                 break;
             case R.id.drawer_menu_item_about:
+                Timber.i("About selected from Drawer");
                 fragmentClass = About.class;
                 break;
             default:
+                Timber.w("No layout mapped to the menu item requested, moving to the default, Calendar");
                 fragmentClass = Calendar.class;
         }
         try {
@@ -148,6 +151,9 @@ public abstract class ActivityBase extends AppCompatActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        // Insert the defacult fragment once the view has been created
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.mainactivity_content_frame, new Calendar()).commit();
         _mDrawerToggle.syncState();
     }
 
