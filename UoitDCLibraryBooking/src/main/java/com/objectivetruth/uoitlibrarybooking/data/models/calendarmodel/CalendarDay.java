@@ -6,4 +6,15 @@ public class CalendarDay {
     public String extEventArgument;
     public String extEventMonth;
 
+    @Override
+    public String toString() {
+        try {
+            return "extDayOfMonthNumber: " + extDayOfMonthNumber +
+                    ", extMonthWord: " + extMonthWord +
+                    ", extEventArgument: " + extEventArgument +
+                    ", extEventMonth" + extEventMonth;
+        }catch(Exception e) {
+            return "";
+        }
+    }
 }
