@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel;
 
 import android.app.ProgressDialog;
 import android.database.Cursor;
@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
+import com.objectivetruth.uoitlibrarybooking.*;
 import timber.log.Timber;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -18,7 +19,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth>> {
+public class CalendarRefresher extends AsyncTask<Void, Integer, ArrayList<CalendarMonth>> {
 	
 	AsyncResponse comm;
 	AppCompatActivity mContext;

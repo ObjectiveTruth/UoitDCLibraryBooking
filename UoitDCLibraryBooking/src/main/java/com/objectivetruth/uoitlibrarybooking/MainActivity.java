@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -24,13 +23,12 @@ import android.util.SparseArray;
 import android.view.*;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.Toast;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
-import com.objectivetruth.uoitlibrarybooking.Calendar_Generic_Page_Fragment.RoomFragmentDialog;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarRefresher;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
@@ -81,7 +79,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
 	boolean isNewInstance = true;
 	int tabNumber = -1;
 	int gridViewLastVisiblePosition;
-	boolean isForQRCode = false;
 	ProgressDialog progDialogQRCode = null;
 	int shareRow = 0;
 	int shareColumn = 0;
@@ -526,54 +523,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
         	}
             isRefreshWaiting = false;
     	}
-    	
-    	//Checks if the QRCode thing has been called
-    	if(isForQRCode){
-    		isForQRCode = false;
-			try {
-
-		    	int numberOfItems = calendarCache.get(pageNumberInt).dataLength;
-				int columnCount = calendarCache.get(pageNumberInt).columnCount;
-				String[][] correspondingArr = new String[numberOfItems/columnCount][columnCount];
-				for(int i = 0; i < calendarCache.get(pageNumberInt).data.length; i ++){
-					correspondingArr[(i/columnCount)][(i%columnCount)] = calendarCache.get(pageNumberInt).source[i];
-				}
-		    	String linkString = correspondingArr[shareRow][shareColumn];
-		    	
-		    	int stateStart = linkString.indexOf("starttime=");
-				int stateEnd = linkString.indexOf("&", stateStart+1);
-				
-				
-				String timeDiag = linkString.substring(stateStart+10, stateEnd).replace("%20", " ");
-				
-				stateStart = linkString.indexOf("room=");
-				stateEnd = linkString.indexOf("&", stateStart+1);
-				String roomDiag = linkString.substring(stateStart+5, stateEnd);
-				
-				
-				
-				//confirmationTextView.setText("Room: " + roomDiag + " at " + timeDiag);
-				
-				/*LinearLayout ll=new LinearLayout(mActivity);
-			        ll.setOrientation(LinearLayout.VERTICAL);
-			        ll.addView(roomPic);*/
-				String diagTitle = "Room: " + roomDiag + " at " + timeDiag + "?";
-				RoomFragmentDialog roomFragDia = RoomFragmentDialog.newInstance(roomDiag, diagTitle 
-						, pageNumberInt
-						, linkString
-						, shareRow
-						, shareColumn
-						);
-				FragmentManager fragMan = mActivity.getSupportFragmentManager();
-				roomFragDia.show(fragMan, null);
-			} catch (Exception e) {
-				e.printStackTrace();
-				Toast.makeText(mActivity, "Invalid QR Code Information", Toast.LENGTH_LONG).show();;
-			}
-			if(progDialogQRCode != null && progDialogQRCode.isShowing()){
-				progDialogQRCode.dismiss();
-			}
-    	}
     }
 
     @Override
@@ -699,8 +648,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
 
         }
         else{
-            //Need this for QRCode event
-            isForQRCode = false;
             new AlertDialog.Builder(this)
                     .setTitle("Connectivity Issue")
                     .setMessage(R.string.networkerrordialogue)
@@ -732,37 +679,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
 		Bundle intentExtras = getIntent().getExtras();
         if(intentExtras == null){
         	
-        }
-        else if(intentExtras.getIntArray("qrCode") != null){
-        	int[] qrInfo = intentExtras.getIntArray("qrCode");
-        	//qrInfo [null, row, column, page]
-        	shareRow = qrInfo[0];
-        	shareColumn = qrInfo[1];
-        	pageNumberInt = qrInfo[2];
-        	getIntent().removeExtra("qrCode");
-        	isForQRCode = true;
-        	progDialogQRCode = new ProgressDialog(this);
-        	progDialogQRCode.setTitle("QR Receive");
-        	progDialogQRCode.setMessage("Performing Refresh");
-        	progDialogQRCode.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        	progDialogQRCode.setCancelable(true);
-        	progDialogQRCode.setOnCancelListener(new OnCancelListener(){
-
-				@Override
-				public void onCancel(DialogInterface diag) {
-					if(mCalendarRefresher != null){
-						mCalendarRefresher.cancel(true);
-						if(isFront){
-							ClearResetIcon();
-						}
-						mCalendarRefresher = null;
-					
-					}
-					isForQRCode = false;
-				}
-        	});
-        	progDialogQRCode.show();
-            DoRefresh();
         }
         else if(intentExtras.getString("bookURL") != null){
         	
@@ -834,7 +750,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
                 @Override
                 public void run() {
                     if(!isDialogShowing && isFront && !hasManuallyRefreshedSinceOpeningActivity){
-                        DoRefresh();
+                        //DoRefresh();
                     }
 
                 }

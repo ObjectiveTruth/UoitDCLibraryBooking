@@ -3,10 +3,13 @@ package com.objectivetruth.uoitlibrarybooking.app;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.networking.OkHttp3Stack;
 import dagger.Module;
 import dagger.Provides;
 
@@ -54,4 +57,9 @@ class AppModule {
         return googleAnalyticsTracker;
     }
 
+    @Provides
+    @Singleton
+    RequestQueue providesRequestQueue() {
+        return Volley.newRequestQueue(mApplication, new OkHttp3Stack());
+    }
 }

@@ -2,8 +2,8 @@ package com.objectivetruth.uoitlibrarybooking.data;
 
 import android.app.Application;
 import com.google.gson.Gson;
-import com.objectivetruth.uoitlibrarybooking.data.Models.CalendarModel;
-import com.objectivetruth.uoitlibrarybooking.data.Models.UserModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;

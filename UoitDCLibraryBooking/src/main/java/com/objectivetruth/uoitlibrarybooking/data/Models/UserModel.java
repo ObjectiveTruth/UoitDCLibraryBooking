@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.data.Models;
+package com.objectivetruth.uoitlibrarybooking.data.models;
 
 import android.annotation.SuppressLint;
 import android.app.Application;

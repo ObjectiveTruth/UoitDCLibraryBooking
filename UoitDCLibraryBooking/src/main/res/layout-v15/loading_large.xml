@@ -1,4 +1,16 @@
 <!-- see https://github.com/glomadrian/RoadRunner for more info -->
+<FrameLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/progressBar" android:layout_gravity="center"/>
+</FrameLayout>
+<!--
 <com.github.glomadrian.roadrunner.IndeterminateRoadRunner
         android:layout_centerInParent="true"
         android:layout_height="match_parent"
@@ -35,4 +47,4 @@ C337.393,140.457,337.393,90.0591,306.314,58.98 Z"
         lib:path_original_width="316"
         lib:path_original_height="512"
         lib:path_animation_type="twoWay"
-        xmlns:android="http://schemas.android.com/apk/res/android"/>
+        xmlns:android="http://schemas.android.com/apk/res/android"/>-->

@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import com.squareup.okhttp.*;
+import okhttp3.*;
 import timber.log.Timber;
 
 import java.io.IOException;

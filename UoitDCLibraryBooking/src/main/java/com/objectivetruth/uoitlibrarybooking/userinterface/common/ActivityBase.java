@@ -35,10 +35,10 @@ public abstract class ActivityBase extends AppCompatActivity {
         // Pass any configuration change to the drawer toggles so it stays in the same configuration
         getActionBarDrawerToggle().onConfigurationChanged(newConfig);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            Timber.i("Configuration Changed to LANDSCAPE");
+            Timber.d("Configuration Changed to LANDSCAPE");
         }
         else{
-            Timber.i("Configuration Changed to PORTRAIT");
+            Timber.d("Configuration Changed to PORTRAIT");
         }
     }
 
@@ -171,9 +171,12 @@ public abstract class ActivityBase extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        Timber.d("Back button has been pressed, checking if the drawer is open");
         if (_isNavDrawerOpen()) {
+            Timber.d("Drawer is Open, closing.");
             _closeNavDrawer();
         } else {
+            Timber.d("Drawer is closed, not doing anything.");
             super.onBackPressed();
         }
     }
