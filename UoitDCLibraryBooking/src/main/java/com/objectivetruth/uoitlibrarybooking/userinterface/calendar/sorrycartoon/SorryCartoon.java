@@ -17,4 +17,8 @@ public class SorryCartoon extends Fragment{
 
         return inflater.inflate(R.layout.sorry_cartoon, container, false);
     }
+
+    public static SorryCartoon newInstance() {
+        return new SorryCartoon();
+    }
 }

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.common.CalendarPagerAdapter;
 
 public class CalendarLoaded extends Fragment {
@@ -33,4 +34,9 @@ public class CalendarLoaded extends Fragment {
 
         return calendarLoadedView;
     }
+
+    public static CalendarLoaded newInstance(CalendarData calendarData) {
+        return new CalendarLoaded();
+    }
+
 }

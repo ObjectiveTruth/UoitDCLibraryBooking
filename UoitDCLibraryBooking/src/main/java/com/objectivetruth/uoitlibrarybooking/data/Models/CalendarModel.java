@@ -34,6 +34,7 @@ public class CalendarModel {
                     @Override
                     public Observable<CalendarData> call(String rawWebPage) {
                         Timber.i("Raw webpage received, passing to the Parser...");
+                        Timber.v(rawWebPage);
                         return CalendarParser.parseData(rawWebPage);
                     }
                 })

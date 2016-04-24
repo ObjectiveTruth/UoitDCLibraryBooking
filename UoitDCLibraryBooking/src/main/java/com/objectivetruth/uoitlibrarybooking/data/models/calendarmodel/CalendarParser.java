@@ -18,22 +18,20 @@ public class CalendarParser {
         int stateStart = rawWebPage.indexOf("__VIEWSTATE\" value=");
         int stateEnd = rawWebPage.indexOf("/>", stateStart);
         calendarData.viewstatemain = rawWebPage.substring(stateStart+20, stateEnd-2);
-        Timber.v("VIEWSTATEMAIN =" + calendarData.viewstatemain);
 
         stateStart = rawWebPage.indexOf("__EVENTVALIDATION\" value=");
         stateEnd = rawWebPage.indexOf("/>", stateStart);
         calendarData.eventvalidation = rawWebPage.substring(stateStart+26, stateEnd-2);
-        Timber.v("EVENTVALIDATION =" + calendarData.eventvalidation);
 
         stateStart = rawWebPage.indexOf("__VIEWSTATEGENERATOR\" value=");
         stateEnd = rawWebPage.indexOf("/>", stateStart);
         calendarData.viewstategenerator = rawWebPage.substring(stateStart+29, stateEnd-2);
-        Timber.v("VIEWSTATEGENERATOR =" + calendarData.viewstategenerator);
 
         // Find the first clickable date on the calendar (identified by the doPostBack string)
         int foundAt = rawWebPage.indexOf("href=\"javascript:__doPostBack");
         if (_isStringNotFound(foundAt)) {
-            Timber.i("No clickable days found");
+            Timber.v("No clickable days found");
+            Timber.i("Parsing Completed.");
             return null;
         }
 
@@ -56,7 +54,7 @@ public class CalendarParser {
             foundAt = rawWebPage.indexOf("href=\"javascript:__doPostBack", foundAt+1);
 
             if(_stringIsFound(foundAt)){
-                Timber.v("Found another day, saving, it and continuing search for more...",
+                Timber.v("Found another clickable day, saving it and continuing search for more...",
                         rawWebPage.substring(foundAt+31, foundAt+66));
                 CalendarDay addMeToCalendarData = new CalendarDay();
 
@@ -68,6 +66,12 @@ public class CalendarParser {
                 calendarData.days.add(addMeToCalendarData);
             }
         }
+
+        Timber.v("No more clickable days found. Total number of clickable days to be saved is: " +
+                calendarData.days.size());
+        Timber.v(calendarData.toString());
+
+        Timber.i("Parsing Completed.");
 
         return calendarData;
 

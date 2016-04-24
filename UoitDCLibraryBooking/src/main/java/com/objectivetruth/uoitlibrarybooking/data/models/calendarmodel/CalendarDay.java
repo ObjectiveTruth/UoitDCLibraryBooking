@@ -9,10 +9,10 @@ public class CalendarDay {
     @Override
     public String toString() {
         try {
-            return "extDayOfMonthNumber: " + extDayOfMonthNumber +
-                    ", extMonthWord: " + extMonthWord +
-                    ", extEventArgument: " + extEventArgument +
-                    ", extEventMonth" + extEventMonth;
+            return "extDayOfMonthNumber: " + extDayOfMonthNumber + " (example: 25)" +
+                    ", extMonthWord: " + extMonthWord + " (example: April)" +
+                    ", extEventArgument: " + extEventArgument + " (example: ctl00$ContentPlaceHolder1$Calendar1)" +
+                    ", extEventMonth: " + extEventMonth + " (example: 5959)";
         }catch(Exception e) {
             return "";
         }

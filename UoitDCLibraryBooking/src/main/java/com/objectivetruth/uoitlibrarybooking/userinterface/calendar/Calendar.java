@@ -13,16 +13,12 @@ import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarD
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarloaded.CalendarLoaded;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.sorrycartoon.SorryCartoon;
 import com.objectivetruth.uoitlibrarybooking.userinterface.loading.Loading;
-import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 import javax.inject.Inject;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class Calendar extends Fragment {
     @Inject CalendarModel calendarModel;
@@ -35,26 +31,25 @@ public class Calendar extends Fragment {
 
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
 
-        // Place the loading fragment into the view while we wait for loading
+        // Place the loading fragment into the view while we wait for loading in the next step
         getFragmentManager().beginTransaction()
                 .add(R.id.mainactivity_content_frame, new Loading()).commit();
 
+        getLatestDataAndCreateOrRefreshCalendarUI();
+
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    public void getLatestDataAndCreateOrRefreshCalendarUI() {
         Timber.i("Calendar loading starting...");
 
-        Observable.combineLatest(Observable.timer(1000L, MILLISECONDS),
-                calendarModel.getCalendarDataObs(),
-                new Func2<Long, CalendarData, CalendarData>() {
-                    @Override
-                    public CalendarData call(Long timeLeft, CalendarData calendarData) {
-                        return calendarData;
-                    }
-                })
+        calendarModel.getCalendarDataObs()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<CalendarData>() {
                     @Override
                     public void onCompleted() {
-
+                        // Will auto-complete itself when onNext is called Once
                     }
 
                     @Override
@@ -62,7 +57,7 @@ public class Calendar extends Fragment {
                         Timber.e(e, "Error getting the data required to show the calendar");
                         // Replace it with the sorry cartoon since something went wrong
                         getFragmentManager().beginTransaction()
-                                .replace(R.id.mainactivity_content_frame, new SorryCartoon()).commit();
+                                .replace(R.id.mainactivity_content_frame, SorryCartoon.newInstance()).commit();
                     }
 
                     @Override
@@ -72,14 +67,14 @@ public class Calendar extends Fragment {
                         if (calendarData == null) {
                             Timber.v("Calendar Data request is empty, showing sorry cartoon");
                             getFragmentManager().beginTransaction()
-                                    .replace(R.id.mainactivity_content_frame, new SorryCartoon()).commit();
+                                    .replace(R.id.mainactivity_content_frame, SorryCartoon.newInstance()).commit();
                         }else {
                             Timber.v("Calendar Data has data, showing calendar");
                             getFragmentManager().beginTransaction()
-                                    .replace(R.id.mainactivity_content_frame, new CalendarLoaded()).commit();
+                                    .replace(R.id.mainactivity_content_frame,
+                                            CalendarLoaded.newInstance(calendarData)).commit();
                         }
                     }
                 });
-        return super.onCreateView(inflater, container, savedInstanceState);
     }
 }

@@ -97,54 +97,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
                 R.layout.activity_main,
                 R.id.drawer_layout,
                 R.id.toolbar);
-
-/*
-        // Set up the action bar.
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        // When swiping between different sections, select the corresponding
-        // tab. We can also use ActionBar.Tab#select() to do this if we have
-        // a reference to the Tab.
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                                .setCategory("Calendar Home")
-                                .setAction("Switch Page")
-                                .setLabel(String.valueOf(position))
-                                .build());
-                Timber.i("Main Activity View Pager switching page to " + position);
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
-
-        // For each of the sections in the app, add a tab to the action bar.
-        int initialViewPagerPageCount = mSectionsPagerAdapter.getCount();
-        Timber.i("Adding initial ViewPager Page Count (this is not from a Refresh event). Count = " + initialViewPagerPageCount);
-        for (int i = 0; i < initialViewPagerPageCount; i++) {
-            // Create a tab with text corresponding to the page title defined by
-            // the adapter. Also specify this Activity object, which implements
-            // the TabListener interface, as the callback (listener) for when
-            // this tab is selected.
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(mSectionsPagerAdapter.getPageTitle(i))
-                            .setTabListener(this));
-        }
-
-        OttoBusSingleton.getInstance().register(this);
-
-*/
-
     }
 
     @Override
@@ -542,8 +494,9 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
     		Calendar_Generic_ListView_Fragment currentListView = (Calendar_Generic_ListView_Fragment) fragmentPage.getChildFragmentManager().findFragmentByTag("calendar" + String.valueOf(scrollTarget) + "listview");
     		currentListView.changeTheScroll(firstVisibleItem, ycoord);*/
 
-		
+
 	}
+
 	@Override
 	public void LaunchRoomInteraction(CookieManager cookieManager, String roomNumber, String date, String viewState, String eventValidation,
 			int shareRow, int shareColumn, int pageNumberInt, String viewStateGenerator){

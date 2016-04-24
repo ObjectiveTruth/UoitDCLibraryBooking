@@ -17,4 +17,8 @@ public class Loading extends Fragment{
 
         return inflater.inflate(R.layout.loading_large, container, false);
     }
+
+    public static Loading newInstance() {
+        return new Loading();
+    }
 }
