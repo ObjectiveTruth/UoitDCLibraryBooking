@@ -15,6 +15,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarD
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.common.CalendarPagerAdapter;
 
 public class CalendarLoaded extends Fragment {
+    private CalendarData calendarData;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -26,7 +27,7 @@ public class CalendarLoaded extends Fragment {
         TabLayout _mTabLayout = (TabLayout) calendarLoadedView.findViewById(R.id.calendar_tab_layout);
 
         // Will supply the ViewPager with what should be displayed
-        PagerAdapter _mPagerAdapter = new CalendarPagerAdapter(getFragmentManager());
+        PagerAdapter _mPagerAdapter = new CalendarPagerAdapter(getFragmentManager(), calendarData);
         _mViewPager.setAdapter(_mPagerAdapter);
 
         // Bind the TabLayout and ViewPager together
@@ -36,7 +37,10 @@ public class CalendarLoaded extends Fragment {
     }
 
     public static CalendarLoaded newInstance(CalendarData calendarData) {
-        return new CalendarLoaded();
+        CalendarLoaded calendarLoadedToReturn = new CalendarLoaded();
+        calendarLoadedToReturn.calendarData = calendarData;
+
+        return calendarLoadedToReturn;
     }
 
 }

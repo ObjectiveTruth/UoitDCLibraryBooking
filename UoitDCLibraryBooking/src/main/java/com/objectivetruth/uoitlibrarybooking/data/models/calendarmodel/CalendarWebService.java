@@ -9,9 +9,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import rx.Observable;
 import rx.functions.Func0;
+import rx.functions.FuncN;
 import timber.log.Timber;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -25,12 +27,12 @@ public class CalendarWebService {
         ((UOITLibraryBookingApp) mApplication).getComponent().inject(this);
     }
 
-    public Observable<String> getRawWebPageObs() {
+    public Observable<String> getRawInitialWebPageObs() {
         return Observable.defer(new Func0<Observable<String>>() {
             @Override
             public Observable<String> call() {
                 try {
-                    return Observable.just(_getRawWebpage());
+                    return Observable.just(_getRawInitialWebpage());
                 } catch (InterruptedException | ExecutionException e) {
                     Timber.e(e, "Error while trying to load main uoitlibrary webpage");
                     return Observable.error(e);
@@ -39,6 +41,53 @@ public class CalendarWebService {
         });
     }
 
+    /**
+     * Returns an {@code Observable<String[]>} which is guaranteed to be in the order of the {@code calendarData.days}
+     * array. All webcalls are done in parallel
+     * @param calendarData
+     * @return
+     */
+    public Observable<String[]> getRawClickableDatesWebPagesObs(final CalendarData calendarData) {
+        return Observable.defer(new Func0<Observable<String[]>>() {
+            @Override
+            public Observable<String[]> call() {
+                // Create an ArrayList of Observables that will go and get the info for each date.
+                // This is done for parallelism
+                ArrayList<Observable<String>> observablesArrayForEachDay = new ArrayList<Observable<String>>();
+                for (CalendarDay calendarDay : calendarData.days) {
+                    observablesArrayForEachDay.add(_getRawClickableDatesWebPageObs(calendarDay, calendarData));
+                }
+
+                return Observable.zip(observablesArrayForEachDay, new FuncN<String[]>() {
+                    @Override
+                    public String[] call(Object... args) {
+                        return _convertArrayOfObjectsToArrayOfStrings(args);
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Returns an observable that gets the raw Webpage for 1 clickable calendarday
+     * @param calendarDay
+     * @return
+     */
+    private Observable<String> _getRawClickableDatesWebPageObs(final CalendarDay calendarDay,
+                                                               final CalendarData calendarData) {
+        return Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                try {
+                    return Observable.just(_getRawClickableDateWebPage(calendarDay, calendarData));
+                } catch (InterruptedException | ExecutionException e) {
+                    Timber.e(e, "Error while trying to load a clickable date here was the contents: " +
+                            calendarDay.toString());
+                    return Observable.error(e);
+                }
+            }
+        });
+    }
 
     /**
      * Blocking HTTP call from the Asynchronous Volley Request Queue, intended to be used with RxJava
@@ -46,8 +95,43 @@ public class CalendarWebService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    private String _getRawWebpage() throws ExecutionException, InterruptedException{
-        Timber.i("Starting the GET request to the uoitlibrary webpage...");
+    private String _getRawClickableDateWebPage(final CalendarDay calendarDay, final CalendarData calendarData)
+            throws ExecutionException, InterruptedException{
+        Timber.i("Starting the POST request to the clickable date " + calendarDay.extDayOfMonthNumber + "...");
+        RequestFuture<String> future = RequestFuture.newFuture();
+        StringRequest stringRequest =
+                new StringRequest(Request.Method.POST, UOIT_LIBRARY_MAIN_CALENDAR_URL, future, future) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String>  headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/x-www-form-urlencoded");
+                        return headers;
+                    }
+
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String>  params = new HashMap<String, String>();
+                        params.put("__EVENTTARGET", calendarDay.extEventTarget);
+                        params.put("__EVENTARGUMENT", calendarDay.extEventArgument);
+                        params.put("__VIEWSTATE", calendarData.viewstatemain);
+                        params.put("__EVENTVALIDATION", calendarData.eventvalidation);
+                        params.put("__VIEWSTATEGENERATOR", calendarData.viewstategenerator);
+                        return params;
+                    }
+                };
+        requestQueue.add(stringRequest);
+        Timber.i("POST request finished for clickable date " + calendarDay.extDayOfMonthNumber);
+        return future.get();
+    }
+
+    /**
+     * Blocking HTTP call from the Asynchronous Volley Request Queue, intended to be used with RxJava
+     * @return String
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    private String _getRawInitialWebpage() throws ExecutionException, InterruptedException{
+        Timber.i("Starting the GET request to the initial uoitlibrary webpage...");
         RequestFuture<String> future = RequestFuture.newFuture();
         StringRequest stringRequest =
                 new StringRequest(Request.Method.GET, UOIT_LIBRARY_MAIN_CALENDAR_URL, future, future) {
@@ -60,7 +144,25 @@ public class CalendarWebService {
         };
 
         requestQueue.add(stringRequest);
-        Timber.i("GET request finished");
+        Timber.i("GET request to the initial uoitlibrary webpage finished");
         return future.get();
     }
+
+    /**
+     * Returns an Array of Strings from an Array of Objects. This is because {@code Observables.zip()} requires a lambda
+     * that takes an array of Objects. This is because of invariance if you want to learn more about this concept.
+     * In general Java sucks for it. Thanks Obama...
+     * @param args
+     * @return
+     */
+    private String[] _convertArrayOfObjectsToArrayOfStrings(Object[] args) {
+        String[] returnStringArr = new String[args.length];
+        int i = 0;
+        for(Object object: args) {
+            returnStringArr[i] = (String) object;
+            i++;
+        }
+        return returnStringArr;
+    }
+
 }

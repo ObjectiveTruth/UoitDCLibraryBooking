@@ -4,7 +4,7 @@ public class CalendarDay {
     public String extDayOfMonthNumber;
     public String extMonthWord;
     public String extEventArgument;
-    public String extEventMonth;
+    public String extEventTarget;
 
     @Override
     public String toString() {
@@ -12,7 +12,7 @@ public class CalendarDay {
             return "extDayOfMonthNumber: " + extDayOfMonthNumber + " (example: 25)" +
                     ", extMonthWord: " + extMonthWord + " (example: April)" +
                     ", extEventArgument: " + extEventArgument + " (example: ctl00$ContentPlaceHolder1$Calendar1)" +
-                    ", extEventMonth: " + extEventMonth + " (example: 5959)";
+                    ", extEventMonth: " + extEventTarget + " (example: 5959)";
         }catch(Exception e) {
             return "";
         }
