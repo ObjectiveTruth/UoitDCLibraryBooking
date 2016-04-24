@@ -22,18 +22,23 @@ public class About extends Fragment{
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        HashMap<String, String> librariesList = new HashMap<>();
+
+
         Element versionElement = _makeElement("Version " + BuildConfig.VERSION_NAME);
 
-        Element joinBetaElement = _makeElement("Join Open Beta To See New Updates",
+        Element joinBetaElement = _makeElement("Join Open Beta",
                 "https://play.google.com/apps/testing/com.objectivetruth.uoitlibrarybooking");
 
-        Element openSourceElement = _makeElement("View Open Source Project Page",
+        Element openSourceElement = _makeElement("Visit Open Source Project Page",
                 "https://github.com/ObjectiveTruth/UoitDCLibraryBooking");
 
         Element feedbackElement = _makeElement("Make a suggestion/Submit a bug",
                 "https://github.com/ObjectiveTruth/UoitDCLibraryBooking/issues");
 
         AboutPage aboutPage = new AboutPage(getActivity())
+                .setDescription(getResources().getString(R.string.about_description))
+
                 .isRTL(false)
                 .setImage(R.drawable.ic_launch)
                 .addItem(versionElement)
@@ -45,11 +50,19 @@ public class About extends Fragment{
                 .addEmail("uoitdclibrarybooking@objectivetruth.ca")
 
                 .addGroup("Libraries Used");
-        HashMap<String, String> librariesList = new HashMap<>();
-
-        librariesList.put("Fancy Buttons",              "https://github.com/medyo/Fancybuttons");
-        librariesList.put("Once",                       "https://github.com/jonfinerty/Once");
-        librariesList.put("Android Iconics",            "https://github.com/mikepenz/Android-Iconics");
+        librariesList.put("Dagger 2",                       "http://google.github.io/dagger/");
+        librariesList.put("RxJava",                         "https://github.com/ReactiveX/RxJava");
+        librariesList.put("RxAndroid",                      "https://github.com/ReactiveX/RxAndroid");
+        librariesList.put("OKHttp",                         "https://github.com/square/okhttp");
+        librariesList.put("GSON",                           "https://github.com/google/gson");
+        librariesList.put("Otto",                           "https://github.com/square/otto");
+        librariesList.put("RoadRunner",                     "https://github.com/glomadrian/RoadRunner");
+        librariesList.put("Timber",                         "https://github.com/JakeWharton/timber");
+        librariesList.put("Horizontal Variable ListView",   "https://github.com/sephiroth74/HorizontalVariableListView");
+        librariesList.put("FlatUI",                         "https://github.com/eluleci/FlatUI");
+        librariesList.put("NineoldAndroid",                 "https://github.com/JakeWharton/NineOldAndroids");
+        librariesList.put("Anroid Animations",              "https://github.com/daimajia/AndroidViewAnimations");
+        librariesList.put("Android About Page",             "https://github.com/medyo/android-about-page");
 
         _addItemsInHashMapToEndOfAboutPage(librariesList, aboutPage);
 

@@ -44,7 +44,7 @@
 			        android:textColor="@android:color/black"
                 android:gravity="center_horizontal"
 			        android:layout_centerHorizontal="true"
-			        android:text="@string/about_me_monologue"
+			        android:text="@string/about_description"
          			android:layout_below="@+id/textView1"
 			        android:autoLink="web|email"
 			        android:layout_marginBottom="20dp"
