@@ -17,8 +17,8 @@ public class CalendarDay {
             String returnString =
                     "extDayOfMonthNumber: " + extDayOfMonthNumber + " (example: 25)" +
                     ", extMonthWord: " + extMonthWord + " (example: April)" +
-                    ", extEventArgument: " + extEventArgument + " (example: ctl00$ContentPlaceHolder1$Calendar1)" +
-                    ", extEventMonth: " + extEventTarget + " (example: 5959)";
+                    ", extEventArgument: " + extEventArgument + " (example: 5959)" +
+                    ", extEventTarget: " + extEventTarget + " (example: ctl01$ContentPlaceHolder1$Calendar1)";
             if(_notEmptyOrNull(timeCells)) {
                 returnString += ", TimeCells: |";
                 for(TimeCell timeCell: timeCells) {

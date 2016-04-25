@@ -13,6 +13,8 @@ import rx.functions.FuncN;
 import timber.log.Timber;
 
 import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,14 +111,8 @@ public class CalendarWebService {
                     }
 
                     @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String>  params = new HashMap<String, String>();
-                        params.put("__EVENTTARGET", calendarDay.extEventTarget);
-                        params.put("__EVENTARGUMENT", calendarDay.extEventArgument);
-                        params.put("__VIEWSTATE", calendarData.viewstatemain);
-                        params.put("__EVENTVALIDATION", calendarData.eventvalidation);
-                        params.put("__VIEWSTATEGENERATOR", calendarData.viewstategenerator);
-                        return params;
+                    public byte[] getBody() throws AuthFailureError {
+                        return _getBodyInBytesForCalendarDayData(calendarDay, calendarData);
                     }
                 };
         requestQueue.add(stringRequest);
@@ -145,9 +141,7 @@ public class CalendarWebService {
 
         requestQueue.add(stringRequest);
         Timber.i("GET request to the initial uoitlibrary webpage finished");
-        String s = future.get();
-        longLog(s);
-        return s;
+        return future.get();
     }
 
     /**
@@ -167,11 +161,21 @@ public class CalendarWebService {
         return returnStringArr;
     }
 
-    static private void longLog(String message) {
-        int maxLogSize = 2000;
-        int chunks = message / maxLogSize;
-        for(int i = 0; i < chunks; i++ ) {
-
+    private byte[] _getBodyInBytesForCalendarDayData(CalendarDay calendarDay, CalendarData calendarData) {
+        try{
+            String content =
+                    "__EVENTTARGET=" + URLEncoder.encode(calendarDay.extEventTarget, "UTF-8")
+                    + "&__EVENTARGUMENT=" + URLEncoder.encode(calendarDay.extEventArgument, "UTF-8")
+                    + "&__VIEWSTATE=" + URLEncoder.encode(calendarData.viewstatemain, "UTF-8")
+                    + "&__EVENTVALIDATION=" + URLEncoder.encode(calendarData.eventvalidation, "UTF-8")
+                    + "&__VIEWSTATEGENERATOR=" + URLEncoder.encode(calendarData.viewstategenerator, "UTF-8");
+            Timber.v(content);
+            return content.getBytes();
+        }catch (UnsupportedEncodingException e) {
+            Timber.e(e, "UTF-8 Not supported by URLEncoder");
+            return null;
         }
+
     }
+
 }

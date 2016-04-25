@@ -59,9 +59,9 @@ public class CalendarParser {
         CalendarDay calendarDay = new CalendarDay();
         // Each day you can click on in the calendar has parameters that uniquely identify it to the server.
         // Found here:
-        calendarDay.extEventArgument = rawWebPage.substring(foundAt+31, foundAt+66);
+        calendarDay.extEventTarget = rawWebPage.substring(foundAt+31, foundAt+66);
         calendarDay.extDayOfMonthNumber = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[1];
-        calendarDay.extEventTarget = rawWebPage.substring(foundAt+69, foundAt+73);
+        calendarDay.extEventArgument = rawWebPage.substring(foundAt+69, foundAt+73);
         calendarDay.extMonthWord = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[0];
 
         calendarData.days = new ArrayList<CalendarDay>();
@@ -127,8 +127,6 @@ public class CalendarParser {
         // Throw away the first element in tdStore because it is just the end of the table declaration
 
         Timber.v("The number of <td> elements found is " + tdStore.length);
-        ArrayList<String> temporaryForTrim = new ArrayList<String>();
-        ArrayList<String> sourceTemporaryForTrim = new ArrayList<String>();
         int hrefStart;
         int beginningWord;
         int endWord;
@@ -240,14 +238,5 @@ public class CalendarParser {
 
     static private boolean _stringIsFound(int resultOfIndexOf) {
         return (resultOfIndexOf >= 0);
-    }
-    static private void longLog(String message) {
-        int maxLogSize = 2000;
-        for(int i = 0; i <= message.length() / maxLogSize; i++) {
-            int start = i * maxLogSize;
-            int end = (i+1) * maxLogSize;
-            end = end > message.length() ? message.length() : end;
-            Timber.d(message.substring(start, end));
-        }
     }
 }

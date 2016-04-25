@@ -24,14 +24,9 @@ package com.objectivetruth.uoitlibrarybooking.app.networking;
  * THE SOFTWARE.
  */
 
-import android.content.Context;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.toolbox.HttpStack;
-import com.franmontiel.persistentcookiejar.ClearableCookieJar;
-import com.franmontiel.persistentcookiejar.PersistentCookieJar;
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import okhttp3.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -41,6 +36,7 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
+import timber.log.Timber;
 
 import java.io.IOException;
 import java.util.Map;
@@ -51,10 +47,10 @@ import java.util.concurrent.TimeUnit;
  * use okhttp-urlconnection
  */
 public class OkHttp3Stack implements HttpStack {
-    ClearableCookieJar cookieJar;
+    private CustomCookieJar customCookieJar;
 
-    public OkHttp3Stack(Context context) {
-        cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context));
+    public OkHttp3Stack() {
+        customCookieJar = new CustomCookieJar();
     }
 
     @Override
@@ -63,12 +59,12 @@ public class OkHttp3Stack implements HttpStack {
 
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+        clientBuilder.cookieJar(customCookieJar);
         int timeoutMs = request.getTimeoutMs();
 
         clientBuilder.connectTimeout(timeoutMs, TimeUnit.MILLISECONDS);
         clientBuilder.readTimeout(timeoutMs, TimeUnit.MILLISECONDS);
         clientBuilder.writeTimeout(timeoutMs, TimeUnit.MILLISECONDS);
-        clientBuilder.cookieJar(cookieJar);
 
         okhttp3.Request.Builder okHttpRequestBuilder = new okhttp3.Request.Builder();
         okHttpRequestBuilder.url(request.getUrl());
@@ -96,6 +92,7 @@ public class OkHttp3Stack implements HttpStack {
         for(int i = 0, len = responseHeaders.size(); i < len; i++) {
             final String name = responseHeaders.name(i), value = responseHeaders.value(i);
             if (name != null) {
+                Timber.v("header:" + name + ": " + value);
                 response.addHeader(new BasicHeader(name, value));
             }
         }
