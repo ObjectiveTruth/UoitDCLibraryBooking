@@ -105,7 +105,10 @@ tasks.whenTaskAdded { task ->
 repositories {
     jcenter()
     maven { url 'https://maven.fabric.io/public' }
+    // Repository for com.github.glomadrian:roadrunner:1.0@aar
     maven { url 'http://dl.bintray.com/glomadrian/maven' }
+    // Repository for com.github.franmontiel:PersistentCookieJar:v0.9.3
+    maven { url 'https://jitpack.io' }
 }
 
 def getVersionFromContinuousIntegrationEnvironment() {
@@ -215,6 +218,8 @@ dependencies {
     compile 'org.immutables:gson:2.1.16'
     // For quickly generating about pages
     compile 'com.github.medyo:android-about-page:1.0'
+    // For usage with OKHTTP3 to pesist the cookies
+    compile 'com.github.franmontiel:PersistentCookieJar:v0.9.3'
     // Crashlytics for logging production logs
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
         transitive = true;

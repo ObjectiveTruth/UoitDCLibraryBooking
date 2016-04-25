@@ -145,7 +145,9 @@ public class CalendarWebService {
 
         requestQueue.add(stringRequest);
         Timber.i("GET request to the initial uoitlibrary webpage finished");
-        return future.get();
+        String s = future.get();
+        longLog(s);
+        return s;
     }
 
     /**
@@ -165,4 +167,11 @@ public class CalendarWebService {
         return returnStringArr;
     }
 
+    static private void longLog(String message) {
+        int maxLogSize = 2000;
+        int chunks = message / maxLogSize;
+        for(int i = 0; i < chunks; i++ ) {
+
+        }
+    }
 }

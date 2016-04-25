@@ -24,9 +24,14 @@ package com.objectivetruth.uoitlibrarybooking.app.networking;
  * THE SOFTWARE.
  */
 
+import android.content.Context;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.toolbox.HttpStack;
+import com.franmontiel.persistentcookiejar.ClearableCookieJar;
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import okhttp3.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -46,13 +51,16 @@ import java.util.concurrent.TimeUnit;
  * use okhttp-urlconnection
  */
 public class OkHttp3Stack implements HttpStack {
+    ClearableCookieJar cookieJar;
 
-    public OkHttp3Stack() {
+    public OkHttp3Stack(Context context) {
+        cookieJar = new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(context));
     }
 
     @Override
     public HttpResponse performRequest(com.android.volley.Request<?> request, Map<String, String> additionalHeaders)
             throws IOException, AuthFailureError {
+
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
         int timeoutMs = request.getTimeoutMs();
@@ -60,6 +68,7 @@ public class OkHttp3Stack implements HttpStack {
         clientBuilder.connectTimeout(timeoutMs, TimeUnit.MILLISECONDS);
         clientBuilder.readTimeout(timeoutMs, TimeUnit.MILLISECONDS);
         clientBuilder.writeTimeout(timeoutMs, TimeUnit.MILLISECONDS);
+        clientBuilder.cookieJar(cookieJar);
 
         okhttp3.Request.Builder okHttpRequestBuilder = new okhttp3.Request.Builder();
         okHttpRequestBuilder.url(request.getUrl());

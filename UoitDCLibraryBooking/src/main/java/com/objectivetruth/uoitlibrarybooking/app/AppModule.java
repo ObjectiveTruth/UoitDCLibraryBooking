@@ -60,6 +60,6 @@ class AppModule {
     @Provides
     @Singleton
     RequestQueue providesRequestQueue() {
-        return Volley.newRequestQueue(mApplication, new OkHttp3Stack());
+        return Volley.newRequestQueue(mApplication, new OkHttp3Stack(mApplication));
     }
 }

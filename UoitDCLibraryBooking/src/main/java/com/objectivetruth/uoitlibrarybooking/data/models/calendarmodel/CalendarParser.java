@@ -4,6 +4,7 @@ import android.support.v4.util.Pair;
 import rx.Observable;
 import timber.log.Timber;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
 public class CalendarParser {
@@ -13,7 +14,12 @@ public class CalendarParser {
 
     static public Observable<CalendarData> parseDataToGetClickableDateDetailsObs(Pair<CalendarData, String[]>
                                                                                        calendarDataStringPair) {
-        return Observable.just(_parseDataToGetClickableDateDetails(calendarDataStringPair));
+        try {
+            return Observable.just(_parseDataToGetClickableDateDetails(calendarDataStringPair));
+        } catch (ParseException e) {
+            Timber.e(e, "Error parsing the Clickable Date pages for Grid info");
+            return Observable.error(e);
+        }
     }
 
     /**
@@ -25,7 +31,7 @@ public class CalendarParser {
     static private CalendarData _parseDataToFindNumberOfDaysInfo(String rawWebPage) {
         // Will hold all the informatio we parse;
         CalendarData calendarData = new CalendarData();
-        Timber.i("Starting the parsing of the webpage...");
+        Timber.i("Starting the parsing of the uoitlibrary main webpage...");
 
         int stateStart = rawWebPage.indexOf("__VIEWSTATE\" value=");
         int stateEnd = rawWebPage.indexOf("/>", stateStart);
@@ -83,28 +89,44 @@ public class CalendarParser {
                 calendarData.days.size());
         Timber.v(calendarData.toString());
 
-        Timber.i("Parsing Completed.");
+        Timber.i("Parsing Completed for the uoitlibrary main webpage.");
 
         return calendarData;
     }
 
     static private CalendarData _parseDataToGetClickableDateDetails(Pair<CalendarData, String[]>
-                                                                            calendarDataStringPair) {
-        for(String s: calendarDataStringPair.second) {
-            Timber.i("//////////////////////////////////////");
-            Timber.i(s);
-        }
-        return calendarDataStringPair.first;
-/*        Timber.i("New Parse starting...");
-        int startCalendar = responseString.indexOf("ContentPlaceHolder1_Table1");
-        //Log.i(TAG, "Table 1 is: " +responseString.subSequence(startCalendar, startCalendar+10 ));
+                                                                            calendarDataStringPair)
+            throws ParseException {
+        Timber.i("Starting the parsing of the clickable uoitlibrary webpages to get grid info...");
+        CalendarData calendarData = calendarDataStringPair.first;
+        String[] rawWebPages = calendarDataStringPair.second;
 
-        String[] tdStore = responseString.substring(startCalendar+5).split("<td");
-        //first element throw away REMEMBER THAT it is just the end of the table declaration
-        for(int k = 0; k < tdStore.length; k ++){
-            Log.i(TAG, "Element " + k + " is " + tdStore[k]);
+        if(calendarData.days.size() != rawWebPages.length) {
+            throw new ParseException("Number of clickable days found from the original webpage " +
+                    "don't match the number of raw webapges downloaded. They need to be the same", 0);
         }
-        Timber.i("The number of <td> elements is " + tdStore.length);
+
+        int i = 0;
+        for (String rawWebpage : rawWebPages) {
+            calendarData.days.set(i,
+                    _getMoreDayDataByParsingRawClickableDayData(calendarData.days.get(i), rawWebpage));
+            i++;
+        }
+        Timber.i("Parsing of clickable uoitlibrary webpages completed.");
+        return calendarData;
+    }
+
+    static private CalendarDay _getMoreDayDataByParsingRawClickableDayData(CalendarDay calendarDay, String rawWebPage)
+            throws ParseException{
+        Timber.v("Parsing Day " + calendarDay.extDayOfMonthNumber);
+
+        calendarDay.timeCells = new ArrayList<TimeCell>();
+        int startCalendar = rawWebPage.indexOf("ContentPlaceHolder1_Table1");
+
+        String[] tdStore = rawWebPage.substring(startCalendar+5).split("<td");
+        // Throw away the first element in tdStore because it is just the end of the table declaration
+
+        Timber.v("The number of <td> elements found is " + tdStore.length);
         ArrayList<String> temporaryForTrim = new ArrayList<String>();
         ArrayList<String> sourceTemporaryForTrim = new ArrayList<String>();
         int hrefStart;
@@ -112,63 +134,87 @@ public class CalendarParser {
         int endWord;
         String dayStart = null;
 
-        columnCount = -1;
+        int columnCount = -1;
         for(int j = 1; j < tdStore.length; j ++){
 
+            // Keeps track of the number of columns
             if(columnCount == -1){
                 if(tdStore[j].contains(":")){
                     columnCount = j;
                 }
             }
+
+
+            // Finds partially booked time slots
             if(tdStore[j].contains("Incomplete reservation")){
-                //Finds partially booked time slots
-                hrefStart = tdStore[j].indexOf("href=");
-                //Log.i(TAG, "Incomplete Test: " + tdStore[j].substring(hrefStart).split("\"")[1]);
-                sourceTemporaryForTrim.add(tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&"));
+                TimeCell timeCellToBeAdded = new TimeCell();
 
-                temporaryForTrim.add("Open");
+                hrefStart = tdStore[j].indexOf("href=");
+                timeCellToBeAdded.hrefSource =
+                        tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_COMPETING;
+
+                calendarDay.timeCells.add(timeCellToBeAdded);
             }
+            // Finds Completely OPEN time slots
             else if(tdStore[j].contains("book.aspx")){
-                //finds OPEN time slots
+                TimeCell timeCellToBeAdded = new TimeCell();
+
                 hrefStart = tdStore[j].indexOf("href=");
-                //Log.i(TAG, "Open test: " + tdStore[j].substring(hrefStart).split("\"")[1]);
-                sourceTemporaryForTrim.add(tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&"));
+                timeCellToBeAdded.hrefSource =
+                        tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_OPEN;
 
-                temporaryForTrim.add("Open");
+                calendarDay.timeCells.add(timeCellToBeAdded);
             }
-
+            // Finds the Closed Rooms (the library is closed, nothing can be done)
             else if(tdStore[j].contains("color=\"#C0C000\"")){
-                //finds the Closed Time slots
-                sourceTemporaryForTrim.add("");
-                temporaryForTrim.add("Closed");
-            }
-            else if(tdStore[j].contains(">\"<")){
-                //Finds next time slots for alreaydy booked rooms " <== double quotes symbol
-                sourceTemporaryForTrim.add("");
-                temporaryForTrim.add("\"");
-            }
-            else if(tdStore[j].contains("viewleaveorjoin.aspx")){
-                //finds fully booked rooms
-                hrefStart = tdStore[j].indexOf("href=");
-                //Log.i(TAG, "viewleaveorjoin: " + tdStore[j].substring(hrefStart).split("\"")[1]);
+                TimeCell timeCellToBeAdded = new TimeCell();
 
-                sourceTemporaryForTrim.add(tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&"));
+                timeCellToBeAdded.hrefSource = "";
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_LIBRARY_CLOSED;
+
+                calendarDay.timeCells.add(timeCellToBeAdded);
+            }
+            // Finds next time slots for alreaydy booked rooms " <== double quotes symbol The pad lock symbol
+            else if(tdStore[j].contains(">\"<")){
+                TimeCell timeCellToBeAdded = new TimeCell();
+
+                timeCellToBeAdded.hrefSource = "";
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_LOCKED;
+
+                calendarDay.timeCells.add(timeCellToBeAdded);
+            }
+            // Finds fully booked rooms. Can still join or leave if you're in that booking but can't start a new one
+            else if(tdStore[j].contains("viewleaveorjoin.aspx")){
+                TimeCell timeCellToBeAdded = new TimeCell();
+
+                hrefStart = tdStore[j].indexOf("href=");
+                timeCellToBeAdded.hrefSource =
+                        tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
                 beginningWord = tdStore[j].indexOf("color=\"Black\">");
                 endWord = tdStore[j].lastIndexOf("</font>");
-                //Timber.v("view leave or join word: " + tdStore[j].subSequence(beginningWord+14, endWord));
-                temporaryForTrim.add((String) tdStore[j].subSequence(beginningWord+14, endWord));
+                timeCellToBeAdded.groupNameForWhenFullyBookedRoom =
+                        (String) tdStore[j].subSequence(beginningWord+14, endWord);
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_CONFIRMED;
+
+                calendarDay.timeCells.add(timeCellToBeAdded);
             }
+            // Everything else, mostly date and room number
             else{
-                //Everything else, mostly date and room number
-                sourceTemporaryForTrim.add("");
+                TimeCell timeCellToBeAdded = new TimeCell();
+
+                timeCellToBeAdded.hrefSource = "";
                 beginningWord = tdStore[j].indexOf("color=\"White\" size=\"1\">");
                 endWord = tdStore[j].lastIndexOf("</td>");
-                //Log.i(TAG, "else word: " + tdStore[j].subSequence(beginningWord+23, endWord-7));
+                // The Top Left Corner?
                 if(j==1){
-                    temporaryForTrim.add("");
+                    timeCellToBeAdded.timeCellType = TimeCellType.TABLE_TOP_LEFT_CELL;
                 }
                 else{
-                    temporaryForTrim.add((String) tdStore[j].subSequence(beginningWord+23, endWord-7));
+                    timeCellToBeAdded.timeCellType = TimeCellType.TABLE_ROW_HEADER;
+                    timeCellToBeAdded.timeStringOrRoomName =
+                            (String) tdStore[j].subSequence(beginningWord+23, endWord-7);
                 }
                 if((j%11) == 1 && dayStart == null){
                     dayStart = (String) tdStore[j].subSequence(beginningWord+23, endWord-7);
@@ -178,29 +224,14 @@ public class CalendarParser {
 
         }
 
-        String[] month_space_day = new String[]{calendarDayPairs.get(i).monthName, calendarDayPairs.get(i).dayNumber};
-
-        calendarCache.add(new CalendarMonth(month_space_day[0],
-                month_space_day[1],
-                temporaryForTrim.toArray(new String[temporaryForTrim.size()])));
-
-        calendarCache.get(i).startTime = null;
+/*        calendarCache.get(i).startTime = null;
         calendarCache.get(i).source = sourceTemporaryForTrim.toArray(new String[sourceTemporaryForTrim.size()]);
         calendarCache.get(i).eventTarget = calendarDayPairs.get(i).eventTarget;
         calendarCache.get(i).eventArgument = calendarDayPairs.get(i).eventArgument;
-        calendarCache.get(i).viewState = VIEWSTATEMAIN;
         calendarCache.get(i).columnCount = columnCount-1;
-        calendarCache.get(i).eventValidation = EVENTVALIDATION;
-        calendarCache.get(i).dataLength = temporaryForTrim.size();
-        long durationPart2 = System.currentTimeMillis() - durationPart2Start;
-        Timber.i("RefreshPass 2 took :" + durationPart2);
-        durationPerDay[i] = durationPart2;
-    }
-
-    durationTotalParse = System.currentTimeMillis() - startTime;
-    Timber.i("Refresh Engine took: " + durationTotalParse);
-    return calendarCache;*/
-
+        calendarCache.get(i).dataLength = temporaryForTrim.size();*/
+        Timber.v("Parsing Complete for day " + calendarDay.extDayOfMonthNumber);
+        return calendarDay;
     }
 
     static private boolean _isStringNotFound(int resultOfIndexOf) {
@@ -209,5 +240,14 @@ public class CalendarParser {
 
     static private boolean _stringIsFound(int resultOfIndexOf) {
         return (resultOfIndexOf >= 0);
+    }
+    static private void longLog(String message) {
+        int maxLogSize = 2000;
+        for(int i = 0; i <= message.length() / maxLogSize; i++) {
+            int start = i * maxLogSize;
+            int end = (i+1) * maxLogSize;
+            end = end > message.length() ? message.length() : end;
+            Timber.d(message.substring(start, end));
+        }
     }
 }

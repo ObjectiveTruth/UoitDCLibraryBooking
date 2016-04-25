@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ParseException;
 import android.support.v4.util.Pair;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
@@ -65,7 +66,7 @@ public class CalendarModel {
                 // Store the results of those webcalls into the CalendarData before returning it
                 .flatMap(new Func1<Pair<CalendarData, String[]>, Observable<CalendarData>>() {
                     @Override
-                    public Observable<CalendarData> call(Pair<CalendarData, String[]> calendarDataPair) {
+                    public Observable<CalendarData> call(Pair<CalendarData, String[]> calendarDataPair){
                         return CalendarParser.parseDataToGetClickableDateDetailsObs(calendarDataPair);
                     }
                 })
