@@ -92,6 +92,8 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
     * Android Support Library
 
     * Google Play Services
+    
+    * Google Repository
 
     * Intel x86 Emulator Accelerator (HAXM)
 
