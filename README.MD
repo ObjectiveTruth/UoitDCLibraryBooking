@@ -107,6 +107,8 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
 
     Select Gradle project:
 
+    >If you don't see Gradle, you may need to [install the IntelliJ Gradle Plugin](https://github.com/ObjectiveTruth/UoitDCLibraryBooking/wiki/Installing-IntelliJ-Gradle-Plugin)
+
     ![gradle_model_import](readme_pictures/gradle_import.png)
 
     Select the following Gradle import settings (default Global Gradle Settings):
