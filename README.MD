@@ -107,7 +107,7 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
 
     ![import_project_pic](readme_pictures/import_project.png)
 
-    Select the directory where you closed the project:
+    Select the directory where you cloned the project:
 
     ![select_project_pic](readme_pictures/select_project.png)
 
