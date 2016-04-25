@@ -1,7 +1,5 @@
 package com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel;
 
-import timber.log.Timber;
-
 import java.util.ArrayList;
 
 public class CalendarDay {
@@ -13,26 +11,46 @@ public class CalendarDay {
 
     @Override
     public String toString() {
-        try {
-            String returnString =
-                    "extDayOfMonthNumber: " + extDayOfMonthNumber + " (example: 25)" +
-                    ", extMonthWord: " + extMonthWord + " (example: April)" +
-                    ", extEventArgument: " + extEventArgument + " (example: 5959)" +
-                    ", extEventTarget: " + extEventTarget + " (example: ctl01$ContentPlaceHolder1$Calendar1)";
-            if(_notEmptyOrNull(timeCells)) {
-                returnString += ", TimeCells: |";
-                for(TimeCell timeCell: timeCells) {
-                    returnString += timeCell.toString() + "|";
-                }
-            }
+        String returnString = "";
+        returnString += "extDayOfMonthNumber(example: 25): ";
+        if(notNull(extDayOfMonthNumber)) {returnString += extDayOfMonthNumber + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "extMonthWord(example: April): ";
+        if(notNull(extMonthWord)) {returnString += extMonthWord + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "extEventArgument(example: 5959): ";
+        if(notNull(extEventArgument)) {returnString += extEventArgument + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "extEventTarget(example: ctl01$ContentPlaceHolder1$Calendar1): ";
+        if(notNull(extEventTarget)) {returnString += extEventTarget + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "timeCells:";
+        if(timeCells == null) {
+            returnString += " NULL";
             return returnString;
-        }catch(Exception e) {
-            Timber.w(e, "Exception when calling toString");
-            return "";
         }
+
+        if(_notEmpty(timeCells)) {
+            int i = 0;
+            for(TimeCell timeCell: timeCells) {
+                if(notNull(timeCell)){
+                    returnString += " (" + i + ")" + timeCell.toString();
+                }else{
+                    returnString += " (" + i + ")NULL";
+                }
+                i++;
+            }
+        }else{
+            returnString += " EMPTY";
+        }
+        return returnString;
     }
 
-    private boolean _notEmptyOrNull(ArrayList<TimeCell> timeCells) {
-        return (timeCells != null && timeCells.size() > 0);
+    private boolean _notEmpty(ArrayList<TimeCell> timeCells) {
+        return !timeCells.isEmpty();
+    }
+
+    private boolean notNull(Object object) {
+        return (object != null);
     }
 }

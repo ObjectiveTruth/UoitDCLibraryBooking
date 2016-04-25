@@ -69,7 +69,7 @@ public class Calendar extends Fragment {
                             getFragmentManager().beginTransaction()
                                     .replace(R.id.mainactivity_content_frame, SorryCartoon.newInstance()).commit();
                         }else {
-                            Timber.v("Calendar Data has data, showing calendar");
+                            Timber.v("CalendarData has data, showing calendar");
                             getFragmentManager().beginTransaction()
                                     .replace(R.id.mainactivity_content_frame,
                                             CalendarLoaded.newInstance(calendarData)).commit();

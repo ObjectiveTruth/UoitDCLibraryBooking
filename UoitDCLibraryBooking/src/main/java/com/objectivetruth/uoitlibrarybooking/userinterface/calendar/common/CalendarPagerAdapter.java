@@ -23,7 +23,8 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
 
     @Override
     public Fragment getItem(int position) {
-        return new Grid();
+        CalendarDay calendarDayAtThisPosition = calendarData.days.get(position);
+        return Grid.newInstance(calendarDayAtThisPosition);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
     }
 
     /**
-     * Quick Util for readability
+     * Quick Util for readability that checks, suprise suprise, if a String isn't empty
      * @param subject
      * @return
      */

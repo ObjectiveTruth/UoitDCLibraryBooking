@@ -4,16 +4,19 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
 
 public class GridAdapter extends FixedTableAdapter {
     private int _width_of_cell_in_pixels;
     private int _height_of_cell_in_pixels;
+    private CalendarDay calendarDay;
 
-    public GridAdapter(Context context) {
+    public GridAdapter(Context context, CalendarDay calendarDay) {
         super(context);
         _width_of_cell_in_pixels = context.getResources().getDimensionPixelSize(R.dimen.table_width);
         _height_of_cell_in_pixels = context.getResources().getDimensionPixelSize(R.dimen.table_height);
+        this.calendarDay = calendarDay;
     }
 
     @Override
