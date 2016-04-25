@@ -89,6 +89,8 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
 
         >All Components
 
+    * Local Maven repositories for Support Libraries
+    
     * Android Support Library
 
     * Google Play Services
@@ -96,6 +98,8 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
     * Google Repository
 
     * Intel x86 Emulator Accelerator (HAXM)
+    
+        >If your OS supports it
 
 3. Import the project to IntelliJ
 
