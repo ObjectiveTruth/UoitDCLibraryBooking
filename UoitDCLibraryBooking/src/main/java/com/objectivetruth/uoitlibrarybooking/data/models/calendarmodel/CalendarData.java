@@ -20,9 +20,9 @@ public class CalendarData {
         returnString += "viewstategenerator: ";
         if(notNull(viewstategenerator)) {returnString += viewstategenerator + ", ";} else {returnString += "NULL, ";}
 
-        returnString += "days: ";
+        returnString += "days:";
         if(days == null) {
-            returnString += "NULL";
+            returnString += " NULL";
             return returnString;
         }
 

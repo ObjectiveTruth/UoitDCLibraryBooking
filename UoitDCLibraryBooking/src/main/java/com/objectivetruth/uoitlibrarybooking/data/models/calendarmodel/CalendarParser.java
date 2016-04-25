@@ -67,30 +67,26 @@ public class CalendarParser {
         calendarData.days = new ArrayList<CalendarDay>();
         calendarData.days.add(calendarDay);
 
+        foundAt = rawWebPage.indexOf("href=\"javascript:__doPostBack", foundAt+1);
+
         // Keep doing this until foundAt returns -1 which means it didnt find it
         while(_stringIsFound(foundAt)) {
+            Timber.v("Found another clickable day saving it and continuing search for more...");
+            CalendarDay addMeToCalendarData = new CalendarDay();
+
+            addMeToCalendarData.extEventArgument = rawWebPage.substring(foundAt+31, foundAt+66);
+            addMeToCalendarData.extDayOfMonthNumber = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[1];
+            addMeToCalendarData.extEventTarget = rawWebPage.substring(foundAt+69, foundAt+73);
+            addMeToCalendarData.extMonthWord = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[0];
+
+            calendarData.days.add(addMeToCalendarData);
             foundAt = rawWebPage.indexOf("href=\"javascript:__doPostBack", foundAt+1);
-
-            if(_stringIsFound(foundAt)){
-                Timber.v("Found another clickable day, saving it and continuing search for more...",
-                        rawWebPage.substring(foundAt+31, foundAt+66));
-                CalendarDay addMeToCalendarData = new CalendarDay();
-
-                calendarDay.extEventArgument = rawWebPage.substring(foundAt+31, foundAt+66);
-                calendarDay.extDayOfMonthNumber = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[1];
-                calendarDay.extEventTarget = rawWebPage.substring(foundAt+69, foundAt+73);
-                calendarDay.extMonthWord = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[0];
-
-                calendarData.days.add(addMeToCalendarData);
-            }
         }
 
-        Timber.v("No more clickable days found. Total number of clickable days to be saved is: " +
-                calendarData.days.size());
+        Timber.v("No more clickable days found. Results:");
         Timber.v(calendarData.toString());
 
-        Timber.i("Parsing Completed for the uoitlibrary main webpage.");
-
+        Timber.i("Parsing Completed for the uoitlibrary main webpage. Found " + calendarData.days.size() + " days");
         return calendarData;
     }
 
