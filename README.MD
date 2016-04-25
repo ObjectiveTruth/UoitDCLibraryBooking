@@ -108,6 +108,8 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
     ![import_project_pic](readme_pictures/import_project.png)
 
     Select the directory where you cloned the project:
+    
+    >Learn how to [clone a git project](https://help.github.com/articles/cloning-a-repository/)
 
     ![select_project_pic](readme_pictures/select_project.png)
 
