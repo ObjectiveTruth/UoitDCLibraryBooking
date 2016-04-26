@@ -44,3 +44,14 @@ branches:
 
 notifications:
   slack: ${SLACK_CHANNEL_AND_API_TOKEN}
+
+deploy:
+  provider: releases
+  api_key:
+    secure: goZT2pPYFPu2+vYafTqPwXeTd6TDOd2TzRv4c5zdh8Z6hS2G45Fr0ACAOApLNeB0eCur9qthbWQPNF1rQRGg0ghlRHJCkruFi0wg0CwzSFBkdXAEYjptbcpP7hYcVWq4bRb9v53ISA0+cbhOIAWvexhHuJq/d1s68aA1llLLWWJhdVXo8i1VWMBSbAHMBmzyIKmoiX1QYKBgMNP8tpG1cxpG6MdEwHKVd+KFsSYYECv25Ak5pJCe2zcORej+PeuXs3FT6+jp/zc86qrx/LiiAdKJS7o7ZBoFYKtP6w2qq56CUDW3EdzdwBMwTFZalP3zQHR04cwatBgDscAzsEqapRiOXv6KL9yh6vB65T7uwyVMrX7BvXdG1vcCDzSAaFjBkSGcXcTOoDscvSuz7+q68XgFU9m2zZQZMjydArY6mxXV5rgdgDtyOvvBwu1kqswH4qJgiOyUbIpt9Tuvki2LcZYaEN67LriYx7QYf1Bqt6bg9ACuuzY5MRxX772abBMlrdJZwmg8aGMrb/Rr19VSsymxwX08fe5YvMCjSoDmZ//kFdPkEmw7milFlO0WkCLHW34z3W5XgcpkIlSK1oFBmtO0sHxeys8cXpUKtR8Nnf70Vgh4Qr5EUd6bAnq/zdDwtLkf5R6KjZN0VZjRgWKbwv3KE1sFT40YRQkYvlGctR8=
+  file: "UoitDCLibraryBooking/build/outputs/apk/*.apk"
+  file_glob: true
+  skip_cleanup: true
+  on:
+    branch: master
+    repo: ObjectiveTruth/UoitDCLibraryBooking
