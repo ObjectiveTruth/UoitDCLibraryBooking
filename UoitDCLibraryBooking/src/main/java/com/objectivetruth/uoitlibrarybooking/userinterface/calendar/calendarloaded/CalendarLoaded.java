@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.common.CalendarPagerAdapter;
-import timber.log.Timber;
 
 public class CalendarLoaded extends Fragment {
     private CalendarData calendarData;
@@ -38,8 +37,6 @@ public class CalendarLoaded extends Fragment {
     }
 
     public static CalendarLoaded newInstance(CalendarData calendarData) {
-        Timber.i("The Prize!");
-        Timber.i(calendarData.toString());
         CalendarLoaded calendarLoadedToReturn = new CalendarLoaded();
         calendarLoadedToReturn.calendarData = calendarData;
 

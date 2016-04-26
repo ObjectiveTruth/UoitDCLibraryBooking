@@ -4,23 +4,11 @@ import java.util.List;
 
 public class CalendarData {
     public List<CalendarDay> days;
-    public String viewstatemain;
-    public String eventvalidation;
-    public String viewstategenerator;
 
     @Override
     public String toString() {
-        String returnString = "";
-        returnString += "viewstatemain: ";
-        if(notNull(viewstatemain)) {returnString += viewstatemain + ", ";} else {returnString += "NULL, ";}
+        String returnString = "days:";
 
-        returnString += "eventvalidation: ";
-        if(notNull(eventvalidation)) {returnString += eventvalidation + ", ";} else {returnString += "NULL, ";}
-
-        returnString += "viewstategenerator: ";
-        if(notNull(viewstategenerator)) {returnString += viewstategenerator + ", ";} else {returnString += "NULL, ";}
-
-        returnString += "days:";
         if(days == null) {
             returnString += " NULL";
             return returnString;

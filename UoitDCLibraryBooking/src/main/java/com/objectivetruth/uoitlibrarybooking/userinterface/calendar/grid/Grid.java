@@ -10,6 +10,7 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.common.GridAdapter;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.TableFixHeaders;
+import timber.log.Timber;
 
 public class Grid extends Fragment {
     private CalendarDay calendarDay;
@@ -19,6 +20,8 @@ public class Grid extends Fragment {
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Timber.i("Starting creation of the grid and all required information");
+        Timber.v(calendarDay.toString());
         View gridView = inflater.inflate(R.layout.calendar_page_grid, container, false);
 
         TableFixHeaders _mTableFixheaders = (TableFixHeaders) gridView.findViewById(R.id.calendar_page_grid);

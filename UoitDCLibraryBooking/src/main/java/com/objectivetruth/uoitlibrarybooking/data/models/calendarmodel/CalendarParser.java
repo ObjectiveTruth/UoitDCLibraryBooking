@@ -12,6 +12,11 @@ public class CalendarParser {
         return Observable.just(_parseDataToFindNumberOfDaysInfo(rawWebPage));
     }
 
+    static public Observable<CalendarData> parseDataToFindAdditionalNumberOfDaysInfoObs(CalendarData calendarData,
+                                                                                        String[] rawWebPages) {
+        return Observable.just(_parseDataToFindAdditionalNumberOfDaysInfo(calendarData, rawWebPages));
+    }
+
     static public Observable<CalendarData> parseDataToGetClickableDateDetailsObs(Pair<CalendarData, String[]>
                                                                                        calendarDataStringPair) {
         try {
@@ -22,6 +27,36 @@ public class CalendarParser {
         }
     }
 
+    static private CalendarData _parseDataToFindAdditionalNumberOfDaysInfo(CalendarData calendarData,
+                                                                           String[] rawWebPages){
+        int i = 1; //Start at 1 since this is for all pages past the first one, see CalendarModel
+        for(String webpage: rawWebPages) {
+            calendarData.days.set(i,
+                    _parsePageAndReplaceViewStateAndEventValidationOfCalendarDay(webpage,
+                            calendarData.days.get(i)));
+        }
+        return calendarData;
+    }
+
+    static private CalendarDay _parsePageAndReplaceViewStateAndEventValidationOfCalendarDay(String rawWebPage,
+                                                                                            CalendarDay day) {
+        Timber.i("Starting the parsing of the uoitlibrary main webpage for ViewState, ViewStateGenerator, " +
+                "and EvenValidation values...");
+        int stateStart = rawWebPage.indexOf("__VIEWSTATE\" value=");
+        int stateEnd = rawWebPage.indexOf("/>", stateStart);
+        day.extViewStateMain = rawWebPage.substring(stateStart+20, stateEnd-2);
+
+        stateStart = rawWebPage.indexOf("__EVENTVALIDATION\" value=");
+        stateEnd = rawWebPage.indexOf("/>", stateStart);
+        day.extEventValidation = rawWebPage.substring(stateStart+26, stateEnd-2);
+
+        stateStart = rawWebPage.indexOf("__VIEWSTATEGENERATOR\" value=");
+        stateEnd = rawWebPage.indexOf("/>", stateStart);
+        day.extViewStateGenerator = rawWebPage.substring(stateStart+29, stateEnd-2);
+
+        return day;
+    }
+
     /**
      * Parses the main webpage of the Uoitlibrary site and returns the parsed data as partially filled CalendarData
      * Should contain, viewstate, eventvalidation, viewstategenerator, and basic day information in the .days field
@@ -29,23 +64,10 @@ public class CalendarParser {
      * @return
      */
     static private CalendarData _parseDataToFindNumberOfDaysInfo(String rawWebPage) {
-        // Will hold all the informatio we parse;
-        CalendarData calendarData = new CalendarData();
         Timber.i("Starting the parsing of the uoitlibrary main webpage...");
 
-        int stateStart = rawWebPage.indexOf("__VIEWSTATE\" value=");
-        int stateEnd = rawWebPage.indexOf("/>", stateStart);
-        calendarData.viewstatemain = rawWebPage.substring(stateStart+20, stateEnd-2);
-
-        stateStart = rawWebPage.indexOf("__EVENTVALIDATION\" value=");
-        stateEnd = rawWebPage.indexOf("/>", stateStart);
-        calendarData.eventvalidation = rawWebPage.substring(stateStart+26, stateEnd-2);
-
-        stateStart = rawWebPage.indexOf("__VIEWSTATEGENERATOR\" value=");
-        stateEnd = rawWebPage.indexOf("/>", stateStart);
-        calendarData.viewstategenerator = rawWebPage.substring(stateStart+29, stateEnd-2);
-
         // Find the first clickable date on the calendar (identified by the doPostBack string)
+        // Quit early if we don't find anything
         int foundAt = rawWebPage.indexOf("href=\"javascript:__doPostBack");
         if (_isStringNotFound(foundAt)) {
             Timber.v("No clickable days found");
@@ -53,10 +75,27 @@ public class CalendarParser {
             return null;
         }
 
-        Timber.v("Found at least 1 clickable day from the webpage, saving it and continuing to search for more...",
-                rawWebPage.substring(foundAt+31, foundAt+66));
 
+        // Will hold all the informatio we parse;
+        CalendarData calendarData = new CalendarData();
+        calendarData.days = new ArrayList<CalendarDay>(1);
         CalendarDay calendarDay = new CalendarDay();
+
+        Timber.v("Found at least 1 clickable day from the webpage, saving it and continuing to search for more...");
+
+        int stateStart = rawWebPage.indexOf("__VIEWSTATE\" value=");
+        int stateEnd = rawWebPage.indexOf("/>", stateStart);
+        calendarDay.extViewStateMain = rawWebPage.substring(stateStart+20, stateEnd-2);
+
+        stateStart = rawWebPage.indexOf("__EVENTVALIDATION\" value=");
+        stateEnd = rawWebPage.indexOf("/>", stateStart);
+        calendarDay.extEventValidation = rawWebPage.substring(stateStart+26, stateEnd-2);
+
+        stateStart = rawWebPage.indexOf("__VIEWSTATEGENERATOR\" value=");
+        stateEnd = rawWebPage.indexOf("/>", stateStart);
+        calendarDay.extViewStateGenerator = rawWebPage.substring(stateStart+29, stateEnd-2);
+
+
         // Each day you can click on in the calendar has parameters that uniquely identify it to the server.
         // Found here:
         calendarDay.extEventTarget = rawWebPage.substring(foundAt+31, foundAt+66);
@@ -64,7 +103,6 @@ public class CalendarParser {
         calendarDay.extEventArgument = rawWebPage.substring(foundAt+69, foundAt+73);
         calendarDay.extMonthWord = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[0];
 
-        calendarData.days = new ArrayList<CalendarDay>();
         calendarData.days.add(calendarDay);
 
         foundAt = rawWebPage.indexOf("href=\"javascript:__doPostBack", foundAt+1);
@@ -74,9 +112,9 @@ public class CalendarParser {
             Timber.v("Found another clickable day saving it and continuing search for more...");
             CalendarDay addMeToCalendarData = new CalendarDay();
 
-            addMeToCalendarData.extEventArgument = rawWebPage.substring(foundAt+31, foundAt+66);
+            addMeToCalendarData.extEventTarget = rawWebPage.substring(foundAt+31, foundAt+66);
             addMeToCalendarData.extDayOfMonthNumber = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[1];
-            addMeToCalendarData.extEventTarget = rawWebPage.substring(foundAt+69, foundAt+73);
+            addMeToCalendarData.extEventArgument = rawWebPage.substring(foundAt+69, foundAt+73);
             addMeToCalendarData.extMonthWord = rawWebPage.substring(foundAt+103, foundAt+123).split("\"")[1].split(" ")[0];
 
             calendarData.days.add(addMeToCalendarData);

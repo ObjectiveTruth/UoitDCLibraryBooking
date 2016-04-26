@@ -7,6 +7,9 @@ public class CalendarDay {
     public String extMonthWord;
     public String extEventArgument;
     public String extEventTarget;
+    public String extViewStateMain;
+    public String extEventValidation;
+    public String extViewStateGenerator;
     public ArrayList<TimeCell> timeCells;
 
     @Override
@@ -23,6 +26,15 @@ public class CalendarDay {
 
         returnString += "extEventTarget(example: ctl01$ContentPlaceHolder1$Calendar1): ";
         if(notNull(extEventTarget)) {returnString += extEventTarget + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "extViewStateGenerator: ";
+        if(notNull(extViewStateGenerator)) {returnString += extViewStateGenerator + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "extEventvalidation: ";
+        if(notNull(extEventValidation)) {returnString += extEventValidation + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "extViewStateMain: ";
+        if(notNull(extViewStateMain)) {returnString += extViewStateMain + ", ";} else {returnString += "NULL, ";}
 
         returnString += "timeCells:";
         if(timeCells == null) {

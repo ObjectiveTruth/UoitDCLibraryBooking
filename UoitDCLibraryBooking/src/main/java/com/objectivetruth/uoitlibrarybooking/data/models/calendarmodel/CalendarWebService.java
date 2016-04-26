@@ -112,7 +112,7 @@ public class CalendarWebService {
 
                     @Override
                     public byte[] getBody() throws AuthFailureError {
-                        return _getBodyInBytesForCalendarDayData(calendarDay, calendarData);
+                        return _getBodyInBytesForCalendarDayData(calendarDay);
                     }
                 };
         requestQueue.add(stringRequest);
@@ -151,7 +151,7 @@ public class CalendarWebService {
      * @param args
      * @return
      */
-    private String[] _convertArrayOfObjectsToArrayOfStrings(Object[] args) {
+    public static String[] _convertArrayOfObjectsToArrayOfStrings(Object[] args) {
         String[] returnStringArr = new String[args.length];
         int i = 0;
         for(Object object: args) {
@@ -161,14 +161,14 @@ public class CalendarWebService {
         return returnStringArr;
     }
 
-    private byte[] _getBodyInBytesForCalendarDayData(CalendarDay calendarDay, CalendarData calendarData) {
+    private byte[] _getBodyInBytesForCalendarDayData(CalendarDay calendarDay) {
         try{
             String content =
                     "__EVENTTARGET=" + URLEncoder.encode(calendarDay.extEventTarget, "UTF-8")
                     + "&__EVENTARGUMENT=" + URLEncoder.encode(calendarDay.extEventArgument, "UTF-8")
-                    + "&__VIEWSTATE=" + URLEncoder.encode(calendarData.viewstatemain, "UTF-8")
-                    + "&__EVENTVALIDATION=" + URLEncoder.encode(calendarData.eventvalidation, "UTF-8")
-                    + "&__VIEWSTATEGENERATOR=" + URLEncoder.encode(calendarData.viewstategenerator, "UTF-8");
+                    + "&__VIEWSTATE=" + URLEncoder.encode(calendarDay.extViewStateMain, "UTF-8")
+                    + "&__EVENTVALIDATION=" + URLEncoder.encode(calendarDay.extEventValidation, "UTF-8")
+                    + "&__VIEWSTATEGENERATOR=" + URLEncoder.encode(calendarDay.extViewStateGenerator, "UTF-8");
             Timber.v(content);
             return content.getBytes();
         }catch (UnsupportedEncodingException e) {
