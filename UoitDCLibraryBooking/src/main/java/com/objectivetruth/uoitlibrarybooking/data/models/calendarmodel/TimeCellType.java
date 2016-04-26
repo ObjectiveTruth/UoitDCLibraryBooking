@@ -4,7 +4,7 @@ package com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel;
  * Types of cells to show in the calendar, corresponds to the ones found on the website
  * https://rooms.library.dc-uoit.ca/uoit_studyrooms/calendar.aspx
  */
-enum TimeCellType {
+public enum TimeCellType {
 
     /**
     * Column header in the table view. Usually the room number example: LIB302
