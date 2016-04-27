@@ -16,7 +16,7 @@ buildscript {
     }
     dependencies {
         // Main Android gradle plugin allows building of the entire play toolchain
-        classpath 'com.android.tools.build:gradle:2.0.0-beta6'
+        classpath 'com.android.tools.build:gradle:2.1.0'
         // Fabric repository for Crashlytics.
         classpath 'io.fabric.tools:gradle:1.+'
         // Adds tasks to auto publish apks to Google App Store. https://github.com/Triple-T/gradle-play-publisher
