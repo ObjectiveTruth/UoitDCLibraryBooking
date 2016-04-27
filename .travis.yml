@@ -44,6 +44,15 @@ branches:
 
 notifications:
   slack: ${SLACK_CHANNEL_AND_API_TOKEN}
+after_success:
+  # Create Git Tag
+  - git config --global user.email "uoitdclibrarybooking@objectivetruth.ca"
+  - git config --global user.name "Travis CI"
+  - echo -n $GIT_TAG > version.txt
+  - git commit -m "Set build VERSION number" version.txt
+  - export GIT_TAG=build-$TRAVIS_BRANCH-$(date -u "+%Y-%m-%d-%H-%M-%S")-$TRAVIS_BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI build $TRAVIS_BUILD_NUMBER"
+  - git push --quiet https://$GH_TOKEN@github.com/ObjectiveTruth/UoitDCLibraryBooking.git $GIT_TAG > /dev/null 2>&1
 
 deploy:
   provider: releases
@@ -55,3 +64,7 @@ deploy:
   on:
     branch: master
     repo: ObjectiveTruth/UoitDCLibraryBooking
+env:
+  global:
+    secure: YtrKwhb5BnhRujck9BVjUQwd8Y/++BIKDITCOPdnzrvK18Luw/S9BOKSlI2pqVpepN6prkpPLKKkuSsyi+p5lA05fvQwCE9StuwXK2sKX9RjV9q2foK6eYddU2/OWbg8AUwKOzl+uRC7W3y/ncSmofouonkK+EopC7u0HRfPSpoAkKW6c0bW2kdp1epsvSCqnQ4ZTmTFYw850tEM51CuPfnc0VIr1pmFq9x9jJhNj5HB7b3QdkLatcwJcacEwFlkOdElPBgiBuK/CfC+/hy2gtdXgiOXIQ/3U4047UC2gfNtV28luFANocgdjp9idpUU6gT+DfQ59KqgPLjSxmMd6VgUMKmvRcRujv8Jd9Y4yBF3dkpdCISCAdSbPEk3CyV65BBKU6dQa5jh07tEyr0ucHwuxKz699atAj9b9KVE4DXpQjwMCJDW+xapz99D7ZpjwkzlGoTuns7+6Qvd1IQAsMmY+EipIT1TUMvoDOHinBilJZ4lsDSK2GiYls/JgHyfMXL00YSjVIHRdU6d/dYfJK+tCPoQBhj46ezeZ7awBcQG1AAoLMBWKKLobrk5ez510Chp0KCuZ+rzKeroPbzbJDclSrrd/09zakFPLpP9SS0Pm4M8oMT18pvl4y2pWnlHhx/LfG9akQ/3wTbvJjrZdSqekJZS4ETDrQWnNWB5lc0=
+
