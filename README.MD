@@ -39,7 +39,7 @@ https://rooms.library.dc-uoit.ca/uoit_studyrooms/calendar.aspx
 
 It now has **350+ Installs** with an average **4.9** :star: review score.
 
-I decided to **Open Source** the project to help students learn Android Development and make a contribution to something used everyday by their peers.
+I decided to **Open Source** the project to see if anyone wants to contribute and learn some Android Development while they're at it
 
 If you're interested in reading the frustrations/adventures of getting the project completed you can check out all the old articles on my blog :neckbeard:
 
