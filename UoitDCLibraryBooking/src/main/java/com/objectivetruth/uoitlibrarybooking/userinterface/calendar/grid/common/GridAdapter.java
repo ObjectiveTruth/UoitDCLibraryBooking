@@ -55,12 +55,12 @@ public class GridAdapter extends FixedTableAdapter {
 
     @Override
     public int getRowCount() {
-        return 25;
+        return calendarDay.rowCountIncludingRowHeadersColumn -1; //account for the inclusion of the row header column
     }
 
     @Override
     public int getColumnCount() {
-        return 10;
+        return calendarDay.columnCountIncludingRowHeadersColumn -1; //account for the inclusion of the column header row
     }
 
     @Override
@@ -75,7 +75,7 @@ public class GridAdapter extends FixedTableAdapter {
         else{
             holder = (ViewHolder) convertView.getTag();
         }
-        if(row < 0) {
+/*        if(row < 0) {
             holder.textViewOnly.setText("ROOM");
             return convertView;
         }
@@ -83,7 +83,7 @@ public class GridAdapter extends FixedTableAdapter {
         if(column < 0) {
             holder.textViewOnly.setText("TIME");
             return convertView;
-        }
+        }*/
 
         TimeCell timeCellForThisViewCall =
                 calendarDay.timeCells.get(_convertRowColumnToTimeCellIndex(row, column));
@@ -98,6 +98,6 @@ public class GridAdapter extends FixedTableAdapter {
     }
 
     private int _convertRowColumnToTimeCellIndex(int row, int column) {
-        return column + (10 * row);
+        return column + (getColumnCount() * row);
     }
 }

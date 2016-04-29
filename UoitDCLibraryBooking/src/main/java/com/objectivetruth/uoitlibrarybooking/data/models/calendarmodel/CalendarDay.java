@@ -10,6 +10,8 @@ public class CalendarDay {
     public String extViewStateMain;
     public String extEventValidation;
     public String extViewStateGenerator;
+    public int rowCountIncludingRowHeadersColumn = -1;
+    public int columnCountIncludingRowHeadersColumn = -1;
     public ArrayList<TimeCell> timeCells;
 
     @Override
@@ -35,6 +37,10 @@ public class CalendarDay {
 
         returnString += "extViewStateMain: ";
         if(notNull(extViewStateMain)) {returnString += extViewStateMain + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "rowCountIncludingRowHeadersColumn: " + rowCountIncludingRowHeadersColumn;
+
+        returnString += "columnCountIncludingRowHeadersColumn: " + columnCountIncludingRowHeadersColumn;
 
         returnString += "timeCells:";
         if(timeCells == null) {

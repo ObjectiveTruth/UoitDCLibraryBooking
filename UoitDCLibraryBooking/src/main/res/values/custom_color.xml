@@ -12,6 +12,7 @@
     <color name="shadow_start">#80000000</color>
     <color name="shadow_end">#00000000</color>
 
+    <!-- material -->
     <color name="PrimaryColor">#2196F3</color>
     <color name="PrimaryDarkColor">#1976D2</color>
     <color name="TextColorPrimary">#FFFFFF</color>

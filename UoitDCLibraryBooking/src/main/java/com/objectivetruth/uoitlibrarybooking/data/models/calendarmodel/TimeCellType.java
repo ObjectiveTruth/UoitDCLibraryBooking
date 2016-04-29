@@ -46,5 +46,11 @@ public enum TimeCellType {
     * enter the booking and either add themselves to the already confirmed booking
     * Or remove themselves from the booking if they were part of it previously
     */
-    BOOKING_CONFIRMED
+    BOOKING_CONFIRMED,
+
+    /**
+     * Catch all timecell where it grabbed info that was not processed correctly but may still
+     * be useful information (ie, new room opened up)
+     */
+    UNKNOWN
 }

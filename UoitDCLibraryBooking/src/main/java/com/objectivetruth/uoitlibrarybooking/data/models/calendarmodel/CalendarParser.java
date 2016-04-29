@@ -6,6 +6,7 @@ import timber.log.Timber;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class CalendarParser {
     static public Observable<CalendarData> parseDataToFindNumberOfDaysInfoObs(String rawWebPage) {
@@ -155,113 +156,99 @@ public class CalendarParser {
         Timber.v("Parsing Day " + calendarDay.extDayOfMonthNumber);
 
         calendarDay.timeCells = new ArrayList<TimeCell>();
-        int startCalendar = rawWebPage.indexOf("ContentPlaceHolder1_Table1");
-
-        String[] tdStore = rawWebPage.substring(startCalendar+5).split("<td");
-        // Throw away the first element in tdStore because it is just the end of the table declaration
+        String[] tdStore = _getArrayOfAllTableDataElementsInPage(rawWebPage);
 
         Timber.v("The number of <td> elements found is " + tdStore.length);
-        int hrefStart;
-        int beginningWord;
-        int endWord;
-        String dayStart = null;
-
-        int columnCount = -1;
-        for(int j = 1; j < tdStore.length; j ++){
-
-            // Keeps track of the number of columns
-            if(columnCount == -1){
-                if(tdStore[j].contains(":")){
-                    columnCount = j;
-                }
-            }
-
-
-            // Finds partially booked time slots
-            if(tdStore[j].contains("Incomplete reservation")){
-                TimeCell timeCellToBeAdded = new TimeCell();
-
-                hrefStart = tdStore[j].indexOf("href=");
-                timeCellToBeAdded.hrefSource =
-                        tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
-                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_COMPETING;
-
-                calendarDay.timeCells.add(timeCellToBeAdded);
-            }
-            // Finds Completely OPEN time slots
-            else if(tdStore[j].contains("book.aspx")){
-                TimeCell timeCellToBeAdded = new TimeCell();
-
-                hrefStart = tdStore[j].indexOf("href=");
-                timeCellToBeAdded.hrefSource =
-                        tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
-                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_OPEN;
-
-                calendarDay.timeCells.add(timeCellToBeAdded);
-            }
-            // Finds the Closed Rooms (the library is closed, nothing can be done)
-            else if(tdStore[j].contains("color=\"#C0C000\"")){
-                TimeCell timeCellToBeAdded = new TimeCell();
-
-                timeCellToBeAdded.hrefSource = "";
-                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_LIBRARY_CLOSED;
-
-                calendarDay.timeCells.add(timeCellToBeAdded);
-            }
-            // Finds next time slots for alreaydy booked rooms " <== double quotes symbol The pad lock symbol
-            else if(tdStore[j].contains(">\"<")){
-                TimeCell timeCellToBeAdded = new TimeCell();
-
-                timeCellToBeAdded.hrefSource = "";
-                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_LOCKED;
-
-                calendarDay.timeCells.add(timeCellToBeAdded);
-            }
-            // Finds fully booked rooms. Can still join or leave if you're in that booking but can't start a new one
-            else if(tdStore[j].contains("viewleaveorjoin.aspx")){
-                TimeCell timeCellToBeAdded = new TimeCell();
-
-                hrefStart = tdStore[j].indexOf("href=");
-                timeCellToBeAdded.hrefSource =
-                        tdStore[j].substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
-                beginningWord = tdStore[j].indexOf("color=\"Black\">");
-                endWord = tdStore[j].lastIndexOf("</font>");
-                timeCellToBeAdded.groupNameForWhenFullyBookedRoom =
-                        (String) tdStore[j].subSequence(beginningWord+14, endWord);
-                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_CONFIRMED;
-
-                calendarDay.timeCells.add(timeCellToBeAdded);
-            }
-            // Everything else, mostly date and room number
-            else{
-                TimeCell timeCellToBeAdded = new TimeCell();
-
-                timeCellToBeAdded.hrefSource = "";
-                beginningWord = tdStore[j].indexOf("color=\"White\" size=\"1\">");
-                endWord = tdStore[j].lastIndexOf("</td>");
-                // The Top Left Corner?
-                if(j==1){
-                    timeCellToBeAdded.timeCellType = TimeCellType.TABLE_TOP_LEFT_CELL;
-                }
-                else{
-                    timeCellToBeAdded.timeCellType = TimeCellType.TABLE_ROW_HEADER;
-                    timeCellToBeAdded.timeStringOrRoomName =
-                            (String) tdStore[j].subSequence(beginningWord+23, endWord-7);
-                }
-                if((j%11) == 1 && dayStart == null){
-                    dayStart = (String) tdStore[j].subSequence(beginningWord+23, endWord-7);
-                }
-
-            }
-
+        if (tdStore.length < 2) {
+            Timber.w("Suspiciously low number of <td> elements found in page. This may be an error");
         }
 
-/*        calendarCache.get(i).startTime = null;
-        calendarCache.get(i).source = sourceTemporaryForTrim.toArray(new String[sourceTemporaryForTrim.size()]);
-        calendarCache.get(i).eventTarget = calendarDayPairs.get(i).eventTarget;
-        calendarCache.get(i).eventArgument = calendarDayPairs.get(i).eventArgument;
-        calendarCache.get(i).columnCount = columnCount-1;
-        calendarCache.get(i).dataLength = temporaryForTrim.size();*/
+        int beginningWord;
+        int endWord;
+        String currentTableDataElement = null;
+        String dayStart = null;
+
+        //will keep track of the number of rows/columns in the loop
+        int columnCountIncludingRowHeadersColumn = 1;
+        int rowCountIncludingColumnHeadersRow = 1;
+
+
+        // Start at 1 to ignore the first element in tdStore because it is just the end of the table declaration
+        for(int iterationIndex = 1; iterationIndex < tdStore.length; iterationIndex ++){
+
+            currentTableDataElement = tdStore[iterationIndex];
+            TimeCell timeCellToBeAdded = new TimeCell();
+
+            // Finds partially booked time slots
+            if(currentTableDataElement.contains("Incomplete reservation")){
+                int hrefStart = currentTableDataElement.indexOf("href=");
+                timeCellToBeAdded.hrefSource =
+                        currentTableDataElement.substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_COMPETING;
+            }
+
+            // Finds Completely OPEN time slots
+            else if(currentTableDataElement.contains("book.aspx")){
+                int hrefStart = currentTableDataElement.indexOf("href=");
+                timeCellToBeAdded.hrefSource =
+                        currentTableDataElement.substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_OPEN;
+            }
+
+            // Finds the Closed Rooms (the library is closed, nothing can be done by user)
+            else if(currentTableDataElement.contains("color=\"#C0C000\"")){
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_LIBRARY_CLOSED;
+            }
+
+            // Finds next time slots for alreaydy booked rooms " <== double quotes symbol The pad lock symbol
+            else if(currentTableDataElement.contains(">\"<")){
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_LOCKED;
+            }
+
+            // Finds fully booked rooms. Can still join or leave if you're in that booking but can't start a new one
+            else if(currentTableDataElement.contains("viewleaveorjoin.aspx")){
+                int hrefStart = currentTableDataElement.indexOf("href=");
+                timeCellToBeAdded.hrefSource =
+                        currentTableDataElement.substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
+                beginningWord = currentTableDataElement.indexOf("color=\"Black\">");
+                endWord = currentTableDataElement.lastIndexOf("</font>");
+                timeCellToBeAdded.groupNameForWhenFullyBookedRoom =
+                        (String) currentTableDataElement.subSequence(beginningWord+14, endWord);
+                timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_CONFIRMED;
+            }
+
+            // Row header cell or Column header cell
+            else if(currentTableDataElement.contains("font-size:8pt;\">")){
+                // Must be row header
+                if(_doesContainTimeInfo(currentTableDataElement)) {
+                    timeCellToBeAdded.timeCellType = TimeCellType.TABLE_ROW_HEADER;
+                    timeCellToBeAdded.timeStringOrRoomName =
+                            _findStringFromStringBetweenSearchTerms(currentTableDataElement,
+                                    "color=\"White\" size=\"1\">", "</td>");
+                    rowCountIncludingColumnHeadersRow++;
+                // Must be column header
+                }else{
+                    timeCellToBeAdded.timeCellType = TimeCellType.TABLE_COLUMN_HEADER;
+                    timeCellToBeAdded.timeStringOrRoomName =
+                            _findStringFromStringBetweenSearchTerms(currentTableDataElement,
+                                    "color=\"White\" size=\"1\">", "</td>");
+                    columnCountIncludingRowHeadersColumn++;
+                }
+            }
+
+            // Is the very first cell thats being parsed means its the top left cell
+            else if(iterationIndex == 1) { timeCellToBeAdded.timeCellType = TimeCellType.TABLE_TOP_LEFT_CELL;}
+
+            // Anything that's not caught should be pulled but put in unknown
+            else{ timeCellToBeAdded.timeCellType = TimeCellType.UNKNOWN; }
+
+            calendarDay.timeCells.add(timeCellToBeAdded);
+        }
+
+        calendarDay.columnCountIncludingRowHeadersColumn = columnCountIncludingRowHeadersColumn;
+        calendarDay.rowCountIncludingRowHeadersColumn = rowCountIncludingColumnHeadersRow;
+
+        Timber.i("DayStart is" + dayStart);
         Timber.v("Parsing Complete for day " + calendarDay.extDayOfMonthNumber);
         return calendarDay;
     }
@@ -272,5 +259,44 @@ public class CalendarParser {
 
     static private boolean _stringIsFound(int resultOfIndexOf) {
         return (resultOfIndexOf >= 0);
+    }
+
+    /**
+     * Takes {@code original} String and returns the string between the 2 search terms, {@code beginningSearchTerm}
+     * and {@code endSearchTerm}. Will story searching at the first occurance. Example:
+     * original: aaaHELLOacWORLDccc
+     * beginningSearchTerm: aaa
+     * endSearchTerm: ccc
+     * returns: HELLOacWORLD
+     * @param original
+     * @param beginingSearchTerm
+     * @param endSearchTerm
+     * @return
+     */
+    static private String _findStringFromStringBetweenSearchTerms(String original,
+                                                          String beginingSearchTerm,
+                                                          String endSearchTerm) {
+        int offsetOfBeginningSearchTerm = beginingSearchTerm.length();
+
+        int startSearchResult = original.indexOf(beginingSearchTerm);
+        int endSearchResult = original.indexOf(endSearchTerm);
+
+        int startOfResultString = startSearchResult + offsetOfBeginningSearchTerm;
+
+        return (String) original.subSequence(startOfResultString, endSearchResult);
+    }
+
+    static private boolean _isFirstRow(int iterationIndex) {
+        return (iterationIndex % 11) == 0;
+    }
+
+    static private boolean _doesContainTimeInfo(String subject) {
+        String TIME_REGEX = "\\d?\\d:\\d\\d [PA]M"; //finds all in the form of "10:30 PM" or "5:39 AM"
+        return Pattern.matches(TIME_REGEX, subject);
+    }
+
+    static private String[] _getArrayOfAllTableDataElementsInPage(String rawWebPage) {
+        int startOfCalendar = rawWebPage.indexOf("ContentPlaceHolder1_Table1");
+        return rawWebPage.substring(startOfCalendar + 5).split("<td");
     }
 }
