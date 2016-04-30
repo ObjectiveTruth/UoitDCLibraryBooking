@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.util.Pair;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -66,7 +67,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         if(getSupportActionBar() != null) {
-            // enable ActionBar app icon to behave as any actio nmenu item to toggle nav drawer
+            // enable ActionBar app icon to behave as any action menu item to toggle nav drawer
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(getActivityTitle());
         }
@@ -98,37 +99,63 @@ public abstract class ActivityBase extends AppCompatActivity {
         _mDrawerLayout.addDrawerListener(_mDrawerToggle);
     }
 
+    private Pair<Fragment, String> _findFragmentByTagOrReturnNewInstance(String fragmentTag, Class fragmentClass) {
+        Fragment returnFragment = getSupportFragmentManager().findFragmentByTag(fragmentTag);
+        if (returnFragment == null) {
+            try {
+                Timber.d("Fragment with tag: " + fragmentTag + " not found, instantiating a new one");
+                returnFragment = (Fragment) fragmentClass.newInstance();
+                return new Pair<Fragment, String>(returnFragment, fragmentTag);
+            } catch (Exception e) {
+                Timber.e("Could not instantiate the Fragment for the menu", e);
+                return null;
+            }
+        }else {
+            Timber.d("Fragment with tag: " + fragmentTag + " found. retrieving it without creating a new one");
+            return new Pair<Fragment, String>(returnFragment, fragmentTag);
+        }
+    }
+
+    /**
+     * Create a new fragment and specify the fragment to show based on nav item clicked
+     * @param menuItem
+     * @param mDrawerLayout
+     * @return
+     */
     private boolean _selectDrawerItem(MenuItem menuItem, DrawerLayout mDrawerLayout) {
-        // Create a new fragment and specify the fragment to show based on nav item clicked
-        Fragment fragment = null;
-        Class fragmentClass;
+        String CALENDAR_FRAGMENT_TAG = "SINGLETON_CALENDAR_FRAGMENT_TAG";
+        String GUIDELINES_POLICIES_FRAGMENT_TAG = "SINGLETON_GUIDELINES_POLICIES_FRAGMENT_TAG";
+        String ABOUT_FRAGMENT_TAG = "SINGLETON_ABOUT_FRAGMENT_TAG";
+
+        Pair<Fragment, String> fragmentTagPair = null;
+
         switch(menuItem.getItemId()) {
             case R.id.drawer_menu_item_calendar:
                 Timber.i("Calendar selected from Drawer");
-                fragmentClass = Calendar.class;
+                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(CALENDAR_FRAGMENT_TAG, Calendar.class);
                 break;
             case R.id.drawer_menu_item_guidelines_and_policies:
                 Timber.i("Guidelines And Policies selected from Drawer");
-                fragmentClass = GuidelinesAndPolicies.class;
+                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(GUIDELINES_POLICIES_FRAGMENT_TAG,
+                        GuidelinesAndPolicies.class);
                 break;
             case R.id.drawer_menu_item_about:
                 Timber.i("About selected from Drawer");
-                fragmentClass = About.class;
+                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(ABOUT_FRAGMENT_TAG, About.class);
                 break;
             default:
                 Timber.w("No layout mapped to the menu item requested, moving to the default, Calendar");
-                fragmentClass = Calendar.class;
+                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(CALENDAR_FRAGMENT_TAG, Calendar.class);
         }
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            Timber.e("Could not instantiate the Fragment for the menu", e);
-            return false;
-        }
+        if(fragmentTagPair == null) {return false;}
 
-        // Insert the fragment by replacing any existing fragment
+        // Insert the fragment by replacing any existing fragment.
+        // Don't forget to tag it so it can be retrieved later without loading it again
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.mainactivity_content_frame, fragment).commit();
+        fragmentManager.beginTransaction()
+                .replace(R.id.mainactivity_content_frame, fragmentTagPair.first, fragmentTagPair.second)
+                .addToBackStack(null)
+                .commit();
 
         // Highlight the selected item
         menuItem.setChecked(true);

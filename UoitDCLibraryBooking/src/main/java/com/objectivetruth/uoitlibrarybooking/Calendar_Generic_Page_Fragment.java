@@ -34,9 +34,9 @@ import android.widget.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.TableFixHeaders;
+import com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.INSTITUTION;
 
 
 public class Calendar_Generic_Page_Fragment extends Fragment {
@@ -766,7 +766,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
                                 //If there's a valid username/password combo
                                 if(sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_USERNAME, null) != null &&
                                         sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null) != null &&
-                                        sharedPreferences.getString(SHARED_PREF_INSTITUTION, null) != null){
+                                        sharedPreferences.getString(INSTITUTION, null) != null){
                                     getDialog().dismiss();
                                     isMovingForward = true;
                                     new AsyncRoomInteraction(getActivity(), pageNumberInt, shareRow, shareColumn).execute(linkString);

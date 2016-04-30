@@ -14,8 +14,7 @@ import java.util.ArrayList;
 
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_KEY_BOOKINGS_LEFT;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[]>> {
 	final String TAG = "LoginAsyncTask";
@@ -80,10 +79,10 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
             int bookingsLeft = MainActivity.MAX_BOOKINGS_ALLOWED - bookingsUsed;
             Timber.i("New update shows that " + bookingsUsed + " bookings have been used out of " + MainActivity.MAX_BOOKINGS_ALLOWED);
             Timber.v("Storing to sharedPrefs. bookingsLeft: " + bookingsLeft + ", studentID, password, institution: " + institution);
-            sharedPreferencesEditor.putInt(SHARED_PREF_KEY_BOOKINGS_LEFT, bookingsLeft);
+            sharedPreferencesEditor.putInt(BOOKINGS_LEFT, bookingsLeft);
             sharedPreferencesEditor.putString(SHARED_PREF_KEY_USERNAME, studentID);
             sharedPreferencesEditor.putString(SHARED_PREF_KEY_PASSWORD, password);
-            sharedPreferencesEditor.putString(SHARED_PREF_INSTITUTION, institution);
+            sharedPreferencesEditor.putString(INSTITUTION, institution);
             sharedPreferencesEditor.commit();
             if(options == DiaFragMyAccount.MY_ACCOUNT_USER_INITIATED){
                 long loginTaskDuration = loginAsynkTaskStartTime - System.currentTimeMillis();
@@ -102,8 +101,8 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
                 SharedPreferences.Editor sharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
                 sharedPreferencesEditor.remove(SHARED_PREF_KEY_USERNAME);
                 sharedPreferencesEditor.remove(SHARED_PREF_KEY_PASSWORD);
-                sharedPreferencesEditor.remove(SHARED_PREF_KEY_BOOKINGS_LEFT);
-                sharedPreferencesEditor.remove(SHARED_PREF_INSTITUTION);
+                sharedPreferencesEditor.remove(BOOKINGS_LEFT);
+                sharedPreferencesEditor.remove(INSTITUTION);
                 sharedPreferencesEditor.commit();
             }
             Timber.i("LoginAsynkTask finished WITH Errors");

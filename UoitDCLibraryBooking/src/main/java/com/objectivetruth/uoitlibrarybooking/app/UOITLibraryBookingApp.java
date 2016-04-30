@@ -10,8 +10,6 @@ import com.objectivetruth.uoitlibrarybooking.data.DataModule;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
-import java.util.UUID;
-
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 public class UOITLibraryBookingApp extends Application {
@@ -46,12 +44,12 @@ public class UOITLibraryBookingApp extends Application {
 
     private void _checkIfFirstTimeAppLaunchedSinceVersionUpgradeOrInstall() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int oldAppVersion = sharedPreferences.getInt(SHARED_PREF_APPVERSION, -1);
+        int oldAppVersion = sharedPreferences.getInt(APPVERSION, -1);
         if(oldAppVersion < 0){
             Crashlytics.setBool("Upgradeing" , false);
             IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = true;
             Timber.i("Previous version number not found, saving current app version as " + BuildConfig.VERSION_CODE);
-            sharedPreferences.edit().putInt(SHARED_PREF_APPVERSION, BuildConfig.VERSION_CODE).apply();
+            sharedPreferences.edit().putInt(APPVERSION, BuildConfig.VERSION_CODE).apply();
         }
         else if(oldAppVersion != BuildConfig.VERSION_CODE){
             Crashlytics.setBool("Upgradeing" , true);
@@ -59,7 +57,7 @@ public class UOITLibraryBookingApp extends Application {
             Timber.i("Previous version (" + oldAppVersion +
                     ") is different than this version (" + BuildConfig.VERSION_CODE +
                     "), updating the saved code");
-            sharedPreferences.edit().putInt(SHARED_PREF_APPVERSION, BuildConfig.VERSION_CODE).apply();
+            sharedPreferences.edit().putInt(APPVERSION, BuildConfig.VERSION_CODE).apply();
         }
         else{
             IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = false;
@@ -76,9 +74,9 @@ public class UOITLibraryBookingApp extends Application {
         } else {
             IS_DEBUG_MODE = false;
             Timber.plant(new CrashReportingTree());
-            String mUUID = PreferenceManager.getDefaultSharedPreferences(this).getString(SHARED_PREF_UUID, null);
+            String mUUID = PreferenceManager.getDefaultSharedPreferences(this).getString(UUID, null);
             if(mUUID == null){
-                mUUID = UUID.randomUUID().toString();
+                mUUID = java.util.UUID.randomUUID().toString();
             }
             Crashlytics.setUserIdentifier(mUUID);
         }
@@ -86,14 +84,14 @@ public class UOITLibraryBookingApp extends Application {
 
     private void _checkIfFirstTimeAppLaunchedSinceInstall() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isFirstTimeAppOpening = sharedPreferences.getBoolean(SHARED_PREF_IS_FIRST_TIME_LAUNCH, true);
+        boolean isFirstTimeAppOpening = sharedPreferences.getBoolean(IS_FIRST_TIME_LAUNCH, true);
         if(isFirstTimeAppOpening){
             Timber.i("First time app is being launched since initial install");
-            Crashlytics.setBool(SHARED_PREF_IS_FIRST_TIME_LAUNCH, true);
-            sharedPreferences.edit().putBoolean(SHARED_PREF_IS_FIRST_TIME_LAUNCH, false).apply();
+            Crashlytics.setBool(IS_FIRST_TIME_LAUNCH, true);
+            sharedPreferences.edit().putBoolean(IS_FIRST_TIME_LAUNCH, false).apply();
         }
         else{
-            Crashlytics.setBool(SHARED_PREF_IS_FIRST_TIME_LAUNCH, false);
+            Crashlytics.setBool(IS_FIRST_TIME_LAUNCH, false);
         }
     }
 

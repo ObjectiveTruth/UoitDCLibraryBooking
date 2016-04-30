@@ -1,16 +1,19 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.calendar;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import com.objectivetruth.uoitlibrarybooking.R;
+import android.view.*;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.objectivetruth.uoitlibrarybooking.*;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarloaded.CalendarLoaded;
+import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.sorrycartoon.SorryCartoon;
 import com.objectivetruth.uoitlibrarybooking.userinterface.loading.Loading;
 import rx.Observer;
@@ -20,8 +23,14 @@ import timber.log.Timber;
 
 import javax.inject.Inject;
 
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_HELP;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_REFRESH;
+
 public class Calendar extends Fragment {
     @Inject CalendarModel calendarModel;
+    @Inject SharedPreferences mDefaultSharedPreferences;
+    @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
+    @Inject Tracker googleAnalyticsTracker;
 
     @Nullable
     @Override
@@ -32,12 +41,24 @@ public class Calendar extends Fragment {
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
 
         // Place the loading fragment into the view while we wait for loading in the next step
+
+        _setupOptionsMenuHandling();
+        _setupListenerOnRefreshButtonToRefreshIfClicked();
+        return inflater.inflate(R.layout.calendar, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         getFragmentManager().beginTransaction()
-                .add(R.id.mainactivity_content_frame, new Loading()).commit();
-
+                .add(R.id.calendar_content_frame, new Loading()).commit();
         getLatestDataAndCreateOrRefreshCalendarUI();
+    }
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+    private void _setupListenerOnRefreshButtonToRefreshIfClicked() {
+    }
+
+    private void _setupOptionsMenuHandling() {
+        setHasOptionsMenu(true);
     }
 
     public void getLatestDataAndCreateOrRefreshCalendarUI() {
@@ -57,7 +78,7 @@ public class Calendar extends Fragment {
                         Timber.e(e, "Error getting the data required to show the calendar");
                         // Replace it with the sorry cartoon since something went wrong
                         getFragmentManager().beginTransaction()
-                                .replace(R.id.mainactivity_content_frame, SorryCartoon.newInstance()).commit();
+                                .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
                     }
 
                     @Override
@@ -67,14 +88,149 @@ public class Calendar extends Fragment {
                         if (calendarData == null) {
                             Timber.v("Calendar Data request is empty, showing sorry cartoon");
                             getFragmentManager().beginTransaction()
-                                    .replace(R.id.mainactivity_content_frame, SorryCartoon.newInstance()).commit();
+                                    .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
                         }else {
                             Timber.v("CalendarData has data, showing calendar");
                             getFragmentManager().beginTransaction()
-                                    .replace(R.id.mainactivity_content_frame,
+                                    .replace(R.id.calendar_content_frame,
                                             CalendarLoaded.newInstance(calendarData)).commit();
                         }
                     }
                 });
     }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        // Inflate the menu; this adds items to the action bar if it is present.
+    	if(BuildConfig.DEBUG){
+        	inflater.inflate(R.menu.calendar_action_icons_menu_debug, menu);
+        }
+        else{
+        	inflater.inflate(R.menu.calendar_action_icons_menu, menu);
+        }
+        MenuItem refreshItem = menu.findItem(R.id.refresh_calendar);
+        MenuItem myAccountItem = menu.findItem(R.id.user_account);
+
+/*        if(_hasUserNotLearnedRefresh(mDefaultSharedPreferences)){
+            ImageView iv = (ImageView) getActivity().getLayoutInflater().inflate(R.layout.action_bar_refresh_imageview,
+                    null);
+            Timber.i("User has Not Learned Refresh");
+            startActionBarBounceAnimation(iv);
+            iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    handleRefreshClick();
+
+                }
+            });
+            refreshItem.setActionView(iv);
+        }*/
+        //Prepare MyAccount Actionview if has learned refresh and has NOT learned myaccount
+/*        if(mDefaultSharedPreferences.getBoolean(HAS_LEARNED_REFRESH, false)
+                && !mDefaultSharedPreferences.getBoolean(HAS_LEARNED_MYACCOUNT, false)){
+            Timber.i("User has not Learned MyAccount");
+            LayoutInflater inflater = this.getLayoutInflater();
+            ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_myaccount_imageview,
+                    null);
+            startActionBarBounceAnimation(iv);
+            iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    handleMyAccountClick();
+                }
+            });
+            myAccountItem.setActionView(iv);
+        }*/
+/*        if(mCalendarRefresher != null && isFront == true){
+            if(refreshItem != null){
+                refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+            }
+        }*/
+    }
+
+    private boolean _hasUserNotLearnedRefresh(SharedPreferences mDefaultSharedPreferences) {
+         return !mDefaultSharedPreferences.getBoolean(HAS_LEARNED_REFRESH, false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(getContext(), ActivitySettings.class);
+            startActivity(intent);
+
+        }
+        else if(id == R.id.help_calendar){
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Calendar Home")
+                    .setAction("HelpDialog")
+                    .setLabel("Pressed by User")
+                    .build()
+            );
+            handleHelpClick();
+            return true;
+        }
+        else if(id == R.id.user_account){
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Calendar Home")
+                    .setAction("MyAccount")
+                    .setLabel("Pressed by User")
+                    .build()
+            );
+            //handleMyAccountClick();
+            return true;
+        }
+        else if(id == R.id.refresh_calendar){
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Calendar Home")
+                    .setAction("Refresh")
+                    .setLabel("Pressed by User")
+                    .build()
+            );
+            //handleRefreshClick();
+            return true;
+        }
+        else if(id == R.id.debug_success){
+            Intent intent = new Intent(getContext(), ActivityRoomInteraction.class);
+            intent.putExtra("type", "test");
+            startActivity(intent);
+        }
+        else if(id == R.id.debug_booknew){
+            Intent intent = new Intent(getContext(), ActivityRoomInteraction.class);
+            intent.putExtra("type", "createbooking");
+            intent.putExtra("room", "Lib999");
+            intent.putExtra("date", "March 15, 1984, Monday");
+            startActivity(intent);
+        }
+        else {
+            ((MainActivity) getActivity()).onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Displays the help dialog
+     */
+    private void handleHelpClick(){
+        String HELP_DIALOG_FRAGMENT_TAG = "SINGLETON_HELP_DIALOG_FRAGMENT_TAG";
+        Timber.i("User Clicked Help Dialog");
+        if(!mDefaultSharedPreferences.getBoolean(HAS_LEARNED_HELP, false)){
+            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Calendar Home")
+                    .setAction("HelpDialog")
+                    .setLabel("First Time Help Pressed")
+                    .build());
+            mDefaultSharedPreferencesEditor.putBoolean(HAS_LEARNED_HELP, true).commit();
+        }
+        new HelpDialogFragment()
+                .show(getFragmentManager(), HELP_DIALOG_FRAGMENT_TAG);
+    }
+
 }

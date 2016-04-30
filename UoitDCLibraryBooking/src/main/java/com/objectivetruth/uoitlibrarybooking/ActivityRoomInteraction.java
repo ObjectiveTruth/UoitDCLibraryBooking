@@ -39,7 +39,7 @@ import java.util.Calendar;
 
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.INSTITUTION;
 
 public class ActivityRoomInteraction extends FragmentActivity implements CommunicatorRoomInteractions {
 	final public String TAG = "ActivityRoomInteraction";
@@ -199,7 +199,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
                     if(isValidBook()) {
                         String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
                         String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
-                        String institutionSpinnerValue = mDefaultSharedPreferences.getString(SHARED_PREF_INSTITUTION, null);
+                        String institutionSpinnerValue = mDefaultSharedPreferences.getString(INSTITUTION, null);
                         //Checks if the sharedPrefs values are valid
                         if(inputPassword != null && inputUsername != null && institutionSpinnerValue != null){
                             String[] fieldData = new String[]{

@@ -21,7 +21,7 @@ public class CalendarLoaded extends Fragment {
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View calendarLoadedView = inflater.inflate(R.layout.calendar, container, false);
+        View calendarLoadedView = inflater.inflate(R.layout.calendar_loaded, container, false);
 
         ViewPager _mViewPager = (ViewPager) calendarLoadedView.findViewById(R.id.calendar_view_pager);
         TabLayout _mTabLayout = (TabLayout) calendarLoadedView.findViewById(R.id.calendar_tab_layout);

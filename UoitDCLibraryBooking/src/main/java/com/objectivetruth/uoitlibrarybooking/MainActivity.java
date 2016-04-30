@@ -20,16 +20,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.*;
-import android.view.animation.DecelerateInterpolator;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.ObjectAnimator;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarRefresher;
-import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
 import com.squareup.otto.Subscribe;
@@ -40,8 +39,9 @@ import java.net.CookieManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HASLEARNED_MYACCOUNT;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_HAS_LEARNED_HELP;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_MYACCOUNT;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_REFRESH;
+import static com.objectivetruth.uoitlibrarybooking.userinterface.common.CustomAnimators.startActionBarBounceAnimation;
 
 
 public class MainActivity extends ActivityBase implements AsyncResponse{
@@ -53,14 +53,12 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
     public static final int MAX_BOOKINGS_ALLOWED = 20; //This can safely be changed
     private static final long AUTO_REFRESH_DELAY = 6000;
-    private static final String HELP_DIALOGFRAGMENT_TAG = "helpDiaFrag";
     public static boolean isDialogShowing = false;
     private final String TAG = "MainActivity";
     public long activityStartTime = System.currentTimeMillis();
 	AppCompatActivity mActivity = this;
 	public static DbHelper mdbHelper;
     private boolean isRefreshWaiting = false;
-    public static String hasLEARNED_REFRESH = "has_learned_refresh";
 	public static CookieManager cookieManager;
 	MenuItem refreshItem;
     MenuItem myAccountItem;
@@ -117,125 +115,12 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        // Inflate the menu; this adds items to the action bar if it is present.
-    	if(BuildConfig.DEBUG){
-        	getMenuInflater().inflate(R.menu.calendar_action_icons_menu_debug, menu);
-        }
-        else{
-        	getMenuInflater().inflate(R.menu.calendar_action_icons_menu, menu);
-        }
-    	//getMenuInflater().inflate(R.menu.calendar_action_icons_menu_debug, menu);
-        refreshItem = menu.findItem(R.id.refresh_calendar);
-        myAccountItem = menu.findItem(R.id.user_account);
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+        return getActionBarDrawerToggle().onOptionsItemSelected(item);
+	}
 
-        if(!mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false)){
-
-            LayoutInflater inflater = this.getLayoutInflater();
-            ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_refresh_imageview,
-                    null);
-            Timber.i("User has Not Learned Refresh");
-            startActionBarBounceAnimation(iv);
-            iv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    handleRefreshClick();
-
-                }
-            });
-            refreshItem.setActionView(iv);
-        }
-        //Prepare MyAccount Actionview if has learned refresh and has NOT learned myaccount
-        if(mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false) && !mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
-            Timber.i("User has not Learned MyAccount");
-            LayoutInflater inflater = this.getLayoutInflater();
-            ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_myaccount_imageview,
-                    null);
-            startActionBarBounceAnimation(iv);
-            iv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    handleMyAccountClick();
-                }
-            });
-            myAccountItem.setActionView(iv);
-        }
-		isNewInstance = false;
-
-        if(mCalendarRefresher != null && isFront == true){
-            if(refreshItem != null){
-                refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-
-        if (id == R.id.action_settings) {
-        	Intent intent = new Intent(this, ActivitySettings.class);
-        	startActivity(intent);
-
-        }
-        else if(id == R.id.help_calendar){
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Calendar Home")
-                            .setAction("HelpDialog")
-                            .setLabel("Pressed by User")
-                            .build()
-            );
-            handleHelpClick();
-            return true;
-        }
-        else if(id == R.id.user_account){
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Calendar Home")
-                            .setAction("MyAccount")
-                            .setLabel("Pressed by User")
-                            .build()
-            );
-            handleMyAccountClick();
-            return true;
-        }
-        else if(id == R.id.refresh_calendar){
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Calendar Home")
-                            .setAction("Refresh")
-                            .setLabel("Pressed by User")
-                            .build()
-            );
-            handleRefreshClick();
-            return true;
-        }
-        else if(id == R.id.debug_success){
-        	Intent intent = new Intent(this, ActivityRoomInteraction.class);
-        	intent.putExtra("type", "test");
-        	startActivity(intent);
-        }
-        else if(id == R.id.debug_booknew){
-        	Intent intent = new Intent(this, ActivityRoomInteraction.class);
-        	intent.putExtra("type", "createbooking");
-            intent.putExtra("room", "Lib999");
-            intent.putExtra("date", "March 15, 1984, Monday");
-        	startActivity(intent);
-        }
-        // If the item that was clicked is in the drawer then do its workflow
-        else {
-            getActionBarDrawerToggle().onOptionsItemSelected(item);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
+	/**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
@@ -698,7 +583,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
 		super.onStart();
         hasManuallyRefreshedSinceOpeningActivity = false;
         Timber.i("Main Activity: onStart()");
-        if(mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
+        if(mDefaultSharedPreferences.getBoolean(HAS_LEARNED_MYACCOUNT, false)){
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -739,45 +624,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
     }
 
     /**
-     * starts the action bar bouncy animation. you can stop it by calling
-     * myMenuItem.setActionView(null). Inflate, animate then set for actionbar icons.
-     * @param iv View to be animated.
-     */
-    private void startActionBarBounceAnimation(View iv){
-        final ObjectAnimator animY = ObjectAnimator.ofFloat(iv, "translationY", 0f, -20f);
-        animY.setDuration(125);
-        animY.setInterpolator(new DecelerateInterpolator());
-        animY.setRepeatCount(1);
-        animY.setStartDelay(1000);
-        animY.addListener(new Animator.AnimatorListener() {
-            int repeatCount = 0;
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (repeatCount < 5) {
-                    repeatCount++;
-                    animY.setStartDelay(750);
-                    animY.start();
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
-        animY.setRepeatMode(ObjectAnimator.REVERSE);
-        animY.start();
-    }
-    /**
      * Takes care of creating the MyAccount Fragment, disabling the actionview if required, and
      * setting the correct sharedPref values
      */
@@ -794,7 +640,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
         if(myAccountItem != null){
             myAccountItem.setActionView(null);
         }
-        if(!mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false)){
+        if(!mDefaultSharedPreferences.getBoolean(HAS_LEARNED_MYACCOUNT, false)){
             Timber.i("User has learned My Account");
             long firstMyAccountDelay = activityStartTime - System.currentTimeMillis();
             googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
@@ -802,31 +648,12 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
                     .setAction("First Time My Account Pressed")
                     .setValue(firstMyAccountDelay)
                     .build());
-            mDefaultSharedPreferencesEditor.putBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, true)
+            mDefaultSharedPreferencesEditor.putBoolean(HAS_LEARNED_MYACCOUNT, true)
                     .commit();
         }
 
 
         currentFrag.show(fragMan, MY_ACCOUNT_DIALOGFRAGMENT_TAG);
-    }
-
-    /**
-     * Displays the help dialog
-     */
-    private void handleHelpClick(){
-        Timber.i("User Clicked Help Dialog");
-        if(!mDefaultSharedPreferences.getBoolean(SHARED_PREF_HAS_LEARNED_HELP, false)){
-            long firstHelpClickDelay = activityStartTime - System.currentTimeMillis();
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Calendar Home")
-                    .setAction("HelpDialog")
-                    .setLabel("First Time Help Pressed")
-                    .setValue(firstHelpClickDelay)
-                    .build());
-            mDefaultSharedPreferencesEditor.putBoolean(SHARED_PREF_HAS_LEARNED_HELP, true).commit();
-        }
-        new HelpDialogFragment()
-                .show(getSupportFragmentManager(), HELP_DIALOGFRAGMENT_TAG);
     }
 
     /**
@@ -850,7 +677,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
             DoRefresh();
         }
 
-        if(!mDefaultSharedPreferences.getBoolean(SHARED_PREF_HASLEARNED_MYACCOUNT, false) && myAccountItem != null){
+        if(!mDefaultSharedPreferences.getBoolean(HAS_LEARNED_MYACCOUNT, false) && myAccountItem != null){
             LayoutInflater inflater = this.getLayoutInflater();
             ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_myaccount_imageview,
                     null);
@@ -863,7 +690,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
             });
             myAccountItem.setActionView(iv);
         }
-        if(!mDefaultSharedPreferences.getBoolean(hasLEARNED_REFRESH, false)){
+        if(!mDefaultSharedPreferences.getBoolean(HAS_LEARNED_REFRESH, false)){
             Timber.i("User has learned Refresh");
             long firstRefreshDelay = activityStartTime - System.currentTimeMillis();
             googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
@@ -871,7 +698,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
                     .setAction("First Time Refresh Pressed")
                     .setValue(firstRefreshDelay)
                     .build());
-             mDefaultSharedPreferencesEditor.putBoolean(hasLEARNED_REFRESH, true)
+             mDefaultSharedPreferencesEditor.putBoolean(HAS_LEARNED_REFRESH, true)
                     .commit();
         }
 

@@ -35,8 +35,7 @@ import javax.inject.Inject;
 
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
 import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_KEY_BOOKINGS_LEFT;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 
 public class DiaFragMyAccount extends DialogFragment {
@@ -82,7 +81,7 @@ public class DiaFragMyAccount extends DialogFragment {
                 SharedPreferences.Editor shareEditor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
                 shareEditor.remove(SHARED_PREF_KEY_USERNAME);
                 shareEditor.remove(SHARED_PREF_KEY_PASSWORD);
-                shareEditor.remove(SHARED_PREF_KEY_BOOKINGS_LEFT);
+                shareEditor.remove(BOOKINGS_LEFT);
                 shareEditor.commit();
                 googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                         .setCategory("MyAccount")
@@ -101,7 +100,7 @@ public class DiaFragMyAccount extends DialogFragment {
         SharedPreferences defaultPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String username = defaultPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
         String password = defaultPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
-        String institution = defaultPreferences.getString(SHARED_PREF_INSTITUTION, null);
+        String institution = defaultPreferences.getString(INSTITUTION, null);
         //There's a previously saved username/password combo
         if(MainActivity.mLoginAsyncTask == null && username !=null && password != null && institution != null){
 
@@ -666,7 +665,7 @@ public class DiaFragMyAccount extends DialogFragment {
     private SpannableString getBookingsLeftSpan(){
         Resources resources = getResources();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        int bookingsLeft = sharedPreferences.getInt(SHARED_PREF_KEY_BOOKINGS_LEFT, -1);
+        int bookingsLeft = sharedPreferences.getInt(BOOKINGS_LEFT, -1);
         //No saved bookings left info
         String bookingsLeftWord = resources.getString(R.string.my_account_bookings_left_word);
         //Number 3 means "bookings left: ??"  that string would have 3 from the end, to keep consistency

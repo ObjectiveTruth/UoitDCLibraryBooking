@@ -14,9 +14,8 @@ import dagger.Module;
 import dagger.Provides;
 
 import javax.inject.Singleton;
-import java.util.UUID;
 
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_UUID;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.UUID;
 
 @Module
 class AppModule {
@@ -47,11 +46,11 @@ class AppModule {
             analytics.setDryRun(true);
         }
         Tracker googleAnalyticsTracker = analytics.newTracker(R.xml.app_tracker);
-        String usersUUID = defaultSharedPreferences.getString(SHARED_PREF_UUID, null);
+        String usersUUID = defaultSharedPreferences.getString(UUID, null);
 
         if(usersUUID == null){
             // Generate new Unique User ID if there isn't one already made. Ensures anonymity
-            usersUUID = UUID.randomUUID().toString();
+            usersUUID = java.util.UUID.randomUUID().toString();
         }
         googleAnalyticsTracker.set("&cid", usersUUID);
         return googleAnalyticsTracker;
