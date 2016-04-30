@@ -6,6 +6,7 @@ import timber.log.Timber;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CalendarParser {
@@ -71,7 +72,7 @@ public class CalendarParser {
         // Quit early if we don't find anything
         int foundAt = rawWebPage.indexOf("href=\"javascript:__doPostBack");
         if (_isStringNotFound(foundAt)) {
-            Timber.v("No clickable days found");
+            Timber.d("No clickable days found");
             Timber.i("Parsing Completed.");
             return null;
         }
@@ -82,7 +83,7 @@ public class CalendarParser {
         calendarData.days = new ArrayList<CalendarDay>(1);
         CalendarDay calendarDay = new CalendarDay();
 
-        Timber.v("Found at least 1 clickable day from the webpage, saving it and continuing to search for more...");
+        Timber.d("Found at least 1 clickable day from the webpage, saving it and continuing to search for more...");
 
         int stateStart = rawWebPage.indexOf("__VIEWSTATE\" value=");
         int stateEnd = rawWebPage.indexOf("/>", stateStart);
@@ -110,7 +111,7 @@ public class CalendarParser {
 
         // Keep doing this until foundAt returns -1 which means it didnt find it
         while(_stringIsFound(foundAt)) {
-            Timber.v("Found another clickable day saving it and continuing search for more...");
+            Timber.d("Found another clickable day saving it and continuing search for more...");
             CalendarDay addMeToCalendarData = new CalendarDay();
 
             addMeToCalendarData.extEventTarget = rawWebPage.substring(foundAt+31, foundAt+66);
@@ -122,7 +123,7 @@ public class CalendarParser {
             foundAt = rawWebPage.indexOf("href=\"javascript:__doPostBack", foundAt+1);
         }
 
-        Timber.v("No more clickable days found. Results:");
+        Timber.d("No more clickable days found");
         Timber.v(calendarData.toString());
 
         Timber.i("Parsing Completed for the uoitlibrary main webpage. Found " + calendarData.days.size() + " days");
@@ -153,12 +154,12 @@ public class CalendarParser {
 
     static private CalendarDay _getMoreDayDataByParsingRawClickableDayData(CalendarDay calendarDay, String rawWebPage)
             throws ParseException{
-        Timber.v("Parsing Day " + calendarDay.extDayOfMonthNumber);
+        Timber.d("Parsing Day " + calendarDay.extDayOfMonthNumber);
 
         calendarDay.timeCells = new ArrayList<TimeCell>();
         String[] tdStore = _getArrayOfAllTableDataElementsInPage(rawWebPage);
 
-        Timber.v("The number of <td> elements found is " + tdStore.length);
+        Timber.d("The number of <td> elements found is " + tdStore.length);
         if (tdStore.length < 2) {
             Timber.w("Suspiciously low number of <td> elements found in page. This may be an error");
         }
@@ -177,10 +178,14 @@ public class CalendarParser {
         for(int iterationIndex = 1; iterationIndex < tdStore.length; iterationIndex ++){
 
             currentTableDataElement = tdStore[iterationIndex];
+            Timber.d("Parsing: " + currentTableDataElement);
             TimeCell timeCellToBeAdded = new TimeCell();
 
+            // Is the very first cell thats being parsed means its the top left cell
+            if(iterationIndex == 1) { timeCellToBeAdded.timeCellType = TimeCellType.TABLE_TOP_LEFT_CELL;}
+
             // Finds partially booked time slots
-            if(currentTableDataElement.contains("Incomplete reservation")){
+            else if(currentTableDataElement.contains("Incomplete reservation")){
                 int hrefStart = currentTableDataElement.indexOf("href=");
                 timeCellToBeAdded.hrefSource =
                         currentTableDataElement.substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
@@ -218,30 +223,26 @@ public class CalendarParser {
             }
 
             // Row header cell or Column header cell
-            else if(currentTableDataElement.contains("font-size:8pt;\">")){
+            else if(_isRowHeaderOrColumnHeaderCell(currentTableDataElement)){
                 // Must be row header
                 if(_doesContainTimeInfo(currentTableDataElement)) {
                     timeCellToBeAdded.timeCellType = TimeCellType.TABLE_ROW_HEADER;
                     timeCellToBeAdded.timeStringOrRoomName =
-                            _findStringFromStringBetweenSearchTerms(currentTableDataElement,
-                                    "color=\"White\" size=\"1\">", "</td>");
+                            _getTimeStringOrRoomNameFromString(currentTableDataElement);
                     rowCountIncludingColumnHeadersRow++;
                 // Must be column header
                 }else{
                     timeCellToBeAdded.timeCellType = TimeCellType.TABLE_COLUMN_HEADER;
                     timeCellToBeAdded.timeStringOrRoomName =
-                            _findStringFromStringBetweenSearchTerms(currentTableDataElement,
-                                    "color=\"White\" size=\"1\">", "</td>");
+                            _getTimeStringOrRoomNameFromString(currentTableDataElement);
                     columnCountIncludingRowHeadersColumn++;
                 }
             }
 
-            // Is the very first cell thats being parsed means its the top left cell
-            else if(iterationIndex == 1) { timeCellToBeAdded.timeCellType = TimeCellType.TABLE_TOP_LEFT_CELL;}
-
             // Anything that's not caught should be pulled but put in unknown
             else{ timeCellToBeAdded.timeCellType = TimeCellType.UNKNOWN; }
 
+            Timber.d("Cell was determined to be: " + timeCellToBeAdded.timeCellType.name());
             calendarDay.timeCells.add(timeCellToBeAdded);
         }
 
@@ -249,7 +250,7 @@ public class CalendarParser {
         calendarDay.rowCountIncludingRowHeadersColumn = rowCountIncludingColumnHeadersRow;
 
         Timber.i("DayStart is" + dayStart);
-        Timber.v("Parsing Complete for day " + calendarDay.extDayOfMonthNumber);
+        Timber.d("Parsing Complete for day " + calendarDay.extDayOfMonthNumber);
         return calendarDay;
     }
 
@@ -291,12 +292,33 @@ public class CalendarParser {
     }
 
     static private boolean _doesContainTimeInfo(String subject) {
-        String TIME_REGEX = "\\d?\\d:\\d\\d [PA]M"; //finds all in the form of "10:30 PM" or "5:39 AM"
-        return Pattern.matches(TIME_REGEX, subject);
+        String TIME_REGEX = "\\d?\\d:\\d\\d [AP]M"; //finds all in the form of "10:30 PM" or "5:39 AM" with any prefix
+        final Matcher matcher = Pattern.compile(TIME_REGEX).matcher(subject);
+        return matcher.find();
     }
 
     static private String[] _getArrayOfAllTableDataElementsInPage(String rawWebPage) {
         int startOfCalendar = rawWebPage.indexOf("ContentPlaceHolder1_Table1");
         return rawWebPage.substring(startOfCalendar + 5).split("<td");
+    }
+
+    static private boolean _isRowHeaderOrColumnHeaderCell(String subject) {
+        // The webpage can take on 2 forms, one that uses <font> tag for styling and one that uses <style> tags for
+        // styling. We have to check for both types of webpages
+        String stylingWebpageSearchString = "<font color=\"white\" size=\"1\">";
+        String fontStyleWebpageSearchString = "font-size:8pt;\">";
+        return (subject.contains(stylingWebpageSearchString) || subject.contains(fontStyleWebpageSearchString));
+    }
+
+    static private String _getTimeStringOrRoomNameFromString(String subject) {
+        // The webpage can take on 2 forms, one that uses <font> tag for styling and one that uses <style> tags for
+        // styling. We have to check for both types of webpages
+        String stylingWebpageSearchString = "<font color=\"white\" size=\"1\">";
+        String fontStyleWebpageSearchString = "font-size:8pt;\">";
+        if(subject.contains("<font")) {
+            return _findStringFromStringBetweenSearchTerms(subject, stylingWebpageSearchString, "</font>");
+        }else {
+            return _findStringFromStringBetweenSearchTerms(subject, fontStyleWebpageSearchString, "</td>");
+        }
     }
 }

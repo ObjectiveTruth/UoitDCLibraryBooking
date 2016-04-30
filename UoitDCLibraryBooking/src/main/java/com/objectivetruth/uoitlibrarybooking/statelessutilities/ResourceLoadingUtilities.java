@@ -10,6 +10,12 @@ import java.io.InputStreamReader;
 
 public class ResourceLoadingUtilities {
 
+    /**
+     * Loads a file from the {@code /assets} folder of the app as a String ready to be manipulated
+     * @param context
+     * @param name
+     * @return
+     */
     public static String loadAssetTextAsString(Context context, String name) {
         BufferedReader in = null;
         try {

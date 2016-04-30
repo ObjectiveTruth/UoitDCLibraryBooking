@@ -53,10 +53,10 @@ public class CalendarModel {
                 .flatMap(new Func1<CalendarData, Observable<Pair<CalendarData, String[]>>>() {
                     @Override
                     public Observable<Pair<CalendarData, String[]>> call(final CalendarData calendarData) {
-                        // If there's less than 2 days, just pass through No need to make more calls
-                        if(calendarData.days.size() <= 1) {
+                        // If No data was found in the previous step or
+                        // there's less than 2 days, just pass through No need to make more calls
+                        if(calendarData == null || calendarData.days.size() <= 1) {
                             return Observable.just(new Pair<CalendarData, String[]>(calendarData, null));}
-
 
                         // If its greater than 1 it means we have to get fresh ViewStateMain and ViewStateValidation
                         // value or else the page won't respond correctly
