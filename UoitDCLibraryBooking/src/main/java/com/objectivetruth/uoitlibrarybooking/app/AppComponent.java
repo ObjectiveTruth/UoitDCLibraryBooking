@@ -7,6 +7,8 @@ import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.data.DataModule;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
+import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
+import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.LoginFragment;
 import dagger.Component;
 
 import javax.inject.Singleton;
@@ -22,4 +24,6 @@ public interface AppComponent {
     void inject(ActivityRoomInteraction activityRoomInteraction);
     void inject(CalendarWebService calendarWebService);
     void inject(Calendar calendar);
+    void inject(MyAccount myAccount);
+    void inject(LoginFragment loginFragment);
 }

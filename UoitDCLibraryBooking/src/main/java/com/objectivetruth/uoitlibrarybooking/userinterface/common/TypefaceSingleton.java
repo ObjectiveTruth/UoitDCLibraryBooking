@@ -13,7 +13,7 @@ public class TypefaceSingleton {
     }
     public Typeface getTypeface(Context context) {
         if(mTypeFace == null){
-            mTypeFace = Typeface.createFromAsset(context.getResources().getAssets(), "roboto_light.ttf");
+            mTypeFace = Typeface.createFromAsset(context.getResources().getAssets(), "fonts/roboto_light.ttf");
         }
         return mTypeFace;
     }

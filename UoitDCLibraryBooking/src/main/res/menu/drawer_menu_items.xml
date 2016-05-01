@@ -9,6 +9,12 @@
               android:title="Calendar"
               tools:ignore="HardcodedText"/>
 
+        <item android:id="@+id/drawer_menu_item_my_account"
+              android:icon="@drawable/ic_action_social_person"
+              android:checked="false"
+              android:title="My Account"
+              tools:ignore="HardcodedText"/>
+
         <item android:id="@+id/drawer_menu_item_guidelines_and_policies"
               android:icon="@drawable/ic_action_list_info"
               android:checked="false"

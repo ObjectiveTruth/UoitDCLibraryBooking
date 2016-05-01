@@ -20,13 +20,13 @@ import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.userinterface.about.About;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesAndPolicies;
+import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
 import timber.log.Timber;
 
 public abstract class ActivityBase extends AppCompatActivity {
     protected abstract String                           getActivityTitle();
     private ActionBarDrawerToggle _mDrawerToggle        = null;
     private DrawerLayout _mDrawerLayout                 = null;
-    private String[] _menuItemsArray                    = null;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -125,6 +125,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         String CALENDAR_FRAGMENT_TAG = "SINGLETON_CALENDAR_FRAGMENT_TAG";
         String GUIDELINES_POLICIES_FRAGMENT_TAG = "SINGLETON_GUIDELINES_POLICIES_FRAGMENT_TAG";
         String ABOUT_FRAGMENT_TAG = "SINGLETON_ABOUT_FRAGMENT_TAG";
+        String MY_ACCOUNT_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_FRAGMENT_TAG";
 
         Pair<Fragment, String> fragmentTagPair = null;
 
@@ -141,6 +142,10 @@ public abstract class ActivityBase extends AppCompatActivity {
             case R.id.drawer_menu_item_about:
                 Timber.i("About selected from Drawer");
                 fragmentTagPair = _findFragmentByTagOrReturnNewInstance(ABOUT_FRAGMENT_TAG, About.class);
+                break;
+            case R.id.drawer_menu_item_my_account:
+                Timber.i("My Account selected from Drawer");
+                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(MY_ACCOUNT_FRAGMENT_TAG, MyAccount.class);
                 break;
             default:
                 Timber.w("No layout mapped to the menu item requested, moving to the default, Calendar");

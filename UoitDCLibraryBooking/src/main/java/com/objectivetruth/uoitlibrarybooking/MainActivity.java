@@ -67,8 +67,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
 	static CalendarRefresher mCalendarRefresher = null;
     static LoginAsynkTask mLoginAsyncTask = null;
 	boolean isFront = false;
-    public final static String SHARED_PREF_KEY_USERNAME = "username";
-    public final static String SHARED_PREF_KEY_PASSWORD = "password";
     boolean hasManuallyRefreshedSinceOpeningActivity = false;
     //TODO put this in savedinstancestate
     public static String errorMessageFromLogin = "";

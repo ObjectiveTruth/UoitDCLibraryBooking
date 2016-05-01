@@ -44,8 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.INSTITUTION;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 
 public class Calendar_Generic_Page_Fragment extends Fragment {
@@ -764,9 +763,9 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
                             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                             if(isNetworkAvailable(getActivity())){
                                 //If there's a valid username/password combo
-                                if(sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_USERNAME, null) != null &&
-                                        sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null) != null &&
-                                        sharedPreferences.getString(INSTITUTION, null) != null){
+                                if(sharedPreferences.getString(USER_USERNAME, null) != null &&
+                                        sharedPreferences.getString(USER_PASSWORD, null) != null &&
+                                        sharedPreferences.getString(USER_INSTITUTION, null) != null){
                                     getDialog().dismiss();
                                     isMovingForward = true;
                                     new AsyncRoomInteraction(getActivity(), pageNumberInt, shareRow, shareColumn).execute(linkString);

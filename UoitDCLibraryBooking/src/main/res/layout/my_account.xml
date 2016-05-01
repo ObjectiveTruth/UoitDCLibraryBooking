@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/my_account_content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+<!--    android:layout_marginLeft="10dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginBottom="10dp" >-->
+
+<!--    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text='@string/my_account_logged_in_as_word'
+            android:id="@+id/logged_in_as"
+            android:layout_below="@+id/titleMyAccount"
+            android:layout_marginTop="10dp"
+            android:layout_alignLeft="@+id/my_account_movement_frame" />
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/my_account_bookings_left_word"
+            android:layout_alignLeft="@+id/my_account_movement_frame"
+            android:id="@+id/bookings_left"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/logged_in_as" />-->
+
+<!--    <FrameLayout
+            android:id="@+id/my_account_content_frame"
+            android:layout_height="350dp"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/bookings_left"
+            android:layout_alignParentBottom="true" />-->
+
+<!--    <ProgressBar
+            android:visibility="gone"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/my_account_small_progressBar"
+            android:layout_alignTop="@+id/bookings_left"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="26dp" />
+
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/logout_selector"
+            android:id="@+id/my_account_logout"
+            android:layout_alignTop="@+id/logged_in_as"
+            android:layout_alignParentRight="true" />-->
+</FrameLayout>
