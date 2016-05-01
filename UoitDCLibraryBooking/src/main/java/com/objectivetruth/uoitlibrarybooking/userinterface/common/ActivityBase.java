@@ -160,7 +160,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         // Highlight the selected item
         menuItem.setChecked(true);
         // Set action bar title
-        setTitle(menuItem.getTitle());
+        if(getSupportActionBar() != null) {getSupportActionBar().setTitle(menuItem.getTitle());};
         mDrawerLayout.closeDrawers();
         return true;
     }

@@ -31,7 +31,6 @@ import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarRefresher;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
-import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -555,7 +554,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
         if(mLoginAsyncTask != null){
             mLoginAsyncTask.cancel(true);
         }
-        OttoBusSingleton.getInstance().unregister(this);
+        //OttoBusSingleton.getInstance().unregister(this);
 		super.onDestroy();
 	}
 	
@@ -603,7 +602,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
 		super.onStop();
 	}
     
-    @Subscribe
+/*    @Subscribe
     public void LoginResults(MyAccountLoginResultEvent event) {
         this.errorMessageFromLogin = event.errorMessage;
     }
@@ -621,7 +620,7 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
             Timber.e(new IllegalStateException(), "mLoginTask was not null and executeLogin fired from the fragment");
         }
 
-    }
+    }*/
 
     /**
      * Takes care of creating the MyAccount Fragment, disabling the actionview if required, and

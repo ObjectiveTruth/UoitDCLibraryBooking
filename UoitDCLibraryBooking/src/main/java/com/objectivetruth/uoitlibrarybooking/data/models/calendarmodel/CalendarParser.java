@@ -178,7 +178,7 @@ public class CalendarParser {
         for(int iterationIndex = 1; iterationIndex < tdStore.length; iterationIndex ++){
 
             currentTableDataElement = tdStore[iterationIndex];
-            Timber.d("Parsing: " + currentTableDataElement);
+            Timber.v("Parsing: " + currentTableDataElement);
             TimeCell timeCellToBeAdded = new TimeCell();
 
             // Is the very first cell thats being parsed means its the top left cell
@@ -242,7 +242,7 @@ public class CalendarParser {
             // Anything that's not caught should be pulled but put in unknown
             else{ timeCellToBeAdded.timeCellType = TimeCellType.UNKNOWN; }
 
-            Timber.d("Cell was determined to be: " + timeCellToBeAdded.timeCellType.name());
+            Timber.v("Cell was determined to be: " + timeCellToBeAdded.timeCellType.name());
             calendarDay.timeCells.add(timeCellToBeAdded);
         }
 

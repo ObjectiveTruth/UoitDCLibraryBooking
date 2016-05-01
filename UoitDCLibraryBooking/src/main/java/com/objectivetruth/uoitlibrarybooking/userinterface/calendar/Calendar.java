@@ -1,10 +1,13 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.calendar;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -19,6 +22,7 @@ import com.objectivetruth.uoitlibrarybooking.userinterface.loading.Loading;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -31,38 +35,40 @@ public class Calendar extends Fragment {
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
+    private PublishSubject<Object> refreshClickSubject;
+    private final static String SAVED_BUNDLE_KEY_IS_FIRST_LOAD = "IS_FIRST_LOAD";
+    private String CALENDAR_LOADED_FRAGMENT_TAG = "SINGLETON_CALENDAR_LOADED_FRAGMENT_TAG";
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable final ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
 
-        // Place the loading fragment into the view while we wait for loading in the next step
-
-        _setupOptionsMenuHandling();
-        _setupListenerOnRefreshButtonToRefreshIfClicked();
+        setHasOptionsMenu(true); // Notifies activity that this fragment will interact with the action/options menu
         return inflater.inflate(R.layout.calendar, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        getFragmentManager().beginTransaction()
-                .add(R.id.calendar_content_frame, new Loading()).commit();
         getLatestDataAndCreateOrRefreshCalendarUI();
-    }
-
-    private void _setupListenerOnRefreshButtonToRefreshIfClicked() {
-    }
-
-    private void _setupOptionsMenuHandling() {
-        setHasOptionsMenu(true);
+/*        Fragment calendarLoadedFragment = getFragmentManager()
+                .findFragmentByTag(CALENDAR_LOADED_FRAGMENT_TAG);
+        if(calendarLoadedFragment == null) {
+        }else{
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.calendar_content_frame, calendarLoadedFragment, CALENDAR_LOADED_FRAGMENT_TAG)
+                    .commit();
+        }*/
     }
 
     public void getLatestDataAndCreateOrRefreshCalendarUI() {
         Timber.i("Calendar loading starting...");
+
+        Timber.d("Showing Loading screen.");
+        getFragmentManager().beginTransaction()
+                .replace(R.id.calendar_content_frame, new Loading()).commit();
 
         calendarModel.getCalendarDataObs()
                 .subscribeOn(Schedulers.newThread())
@@ -86,19 +92,19 @@ public class Calendar extends Fragment {
                         Timber.i("Calendar loading complete");
                         // Place the loading fragment into the view while we wait for loading
                         if (calendarData == null) {
-                            Timber.v("Calendar Data request is empty, showing sorry cartoon");
+                            Timber.d("Calendar Data request is empty, showing sorry cartoon");
                             getFragmentManager().beginTransaction()
                                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
                         }else {
-                            Timber.v("CalendarData has data, showing calendar");
+                            Timber.d("CalendarData has data, showing calendar");
                             getFragmentManager().beginTransaction()
                                     .replace(R.id.calendar_content_frame,
-                                            CalendarLoaded.newInstance(calendarData)).commit();
+                                            CalendarLoaded.newInstance(calendarData), CALENDAR_LOADED_FRAGMENT_TAG)
+                                    .commit();
                         }
                     }
                 });
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -113,6 +119,24 @@ public class Calendar extends Fragment {
         MenuItem refreshItem = menu.findItem(R.id.refresh_calendar);
         MenuItem myAccountItem = menu.findItem(R.id.user_account);
 
+        getRefreshClickSubject().subscribe(new Observer<Object>() {
+            @Override
+            public void onCompleted() {
+                // Nothing, will clean itself up
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                _showNetworkErrorAlertDialog(getContext());
+            }
+
+            @Override
+            public void onNext(Object o) {
+                getLatestDataAndCreateOrRefreshCalendarUI();
+            }
+        });
+
+
 /*        if(_hasUserNotLearnedRefresh(mDefaultSharedPreferences)){
             ImageView iv = (ImageView) getActivity().getLayoutInflater().inflate(R.layout.action_bar_refresh_imageview,
                     null);
@@ -126,7 +150,9 @@ public class Calendar extends Fragment {
                 }
             });
             refreshItem.setActionView(iv);
-        }*/
+        }
+        clickedObs()*/
+
         //Prepare MyAccount Actionview if has learned refresh and has NOT learned myaccount
 /*        if(mDefaultSharedPreferences.getBoolean(HAS_LEARNED_REFRESH, false)
                 && !mDefaultSharedPreferences.getBoolean(HAS_LEARNED_MYACCOUNT, false)){
@@ -152,6 +178,12 @@ public class Calendar extends Fragment {
 
     private boolean _hasUserNotLearnedRefresh(SharedPreferences mDefaultSharedPreferences) {
          return !mDefaultSharedPreferences.getBoolean(HAS_LEARNED_REFRESH, false);
+    }
+
+    @Override
+    public void onPause() {
+        getRefreshClickSubject().onCompleted();
+        super.onPause();
     }
 
     @Override
@@ -194,7 +226,7 @@ public class Calendar extends Fragment {
                     .setLabel("Pressed by User")
                     .build()
             );
-            //handleRefreshClick();
+            getRefreshClickSubject().onNext(new Object());
             return true;
         }
         else if(id == R.id.debug_success){
@@ -206,13 +238,21 @@ public class Calendar extends Fragment {
             Intent intent = new Intent(getContext(), ActivityRoomInteraction.class);
             intent.putExtra("type", "createbooking");
             intent.putExtra("room", "Lib999");
-            intent.putExtra("date", "March 15, 1984, Monday");
+            intent.putExtra("date", "March 15, 1990, Monday");
             startActivity(intent);
         }
         else {
             ((MainActivity) getActivity()).onOptionsItemSelected(item);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private PublishSubject<Object> getRefreshClickSubject() {
+        if (refreshClickSubject == null || refreshClickSubject.hasCompleted()) {
+            return refreshClickSubject = PublishSubject.create();
+        }else {
+            return refreshClickSubject;
+        }
     }
 
     /**
@@ -231,6 +271,19 @@ public class Calendar extends Fragment {
         }
         new HelpDialogFragment()
                 .show(getFragmentManager(), HELP_DIALOG_FRAGMENT_TAG);
+    }
+
+    private void _showNetworkErrorAlertDialog(Context context) {
+        new AlertDialog.Builder(context)
+                .setTitle("Connectivity Issue")
+                .setMessage(R.string.networkerrordialogue)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing special
+                    }
+                })
+                .setIcon(R.drawable.ic_dialog_alert)
+                .show();
     }
 
 }

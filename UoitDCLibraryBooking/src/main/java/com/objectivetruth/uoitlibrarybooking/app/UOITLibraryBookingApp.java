@@ -38,6 +38,11 @@ public class UOITLibraryBookingApp extends Application {
 
     }
 
+    public void setComponent(AppComponent mComponent) {
+        this.mComponent = mComponent;
+
+    }
+
     public AppComponent getComponent() {
         return mComponent;
     }

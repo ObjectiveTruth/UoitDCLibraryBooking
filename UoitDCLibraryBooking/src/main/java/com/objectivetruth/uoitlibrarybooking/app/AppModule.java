@@ -18,10 +18,10 @@ import javax.inject.Singleton;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.UUID;
 
 @Module
-class AppModule {
+public class AppModule {
     private Application mApplication;
 
-    AppModule(Application application) {
+    public AppModule(Application application) {
         mApplication = application;
     }
 
@@ -58,8 +58,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    RequestQueue providesRequestQueue() {
-        //return Volley.newRequestQueue(mApplication, new MockHttpStack(mApplication));
+    protected RequestQueue providesRequestQueue() {
         return Volley.newRequestQueue(mApplication, new OkHttp3Stack());
     }
 }
