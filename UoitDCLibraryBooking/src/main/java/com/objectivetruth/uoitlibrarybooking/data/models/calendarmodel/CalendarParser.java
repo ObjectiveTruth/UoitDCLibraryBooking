@@ -224,6 +224,7 @@ public class CalendarParser {
 
             // Row header cell or Column header cell
             else if(_isRowHeaderOrColumnHeaderCell(currentTableDataElement)){
+                Timber.v("Cell is either, row header or columns header");
                 // Must be row header
                 if(_doesContainTimeInfo(currentTableDataElement)) {
                     timeCellToBeAdded.timeCellType = TimeCellType.TABLE_ROW_HEADER;
@@ -287,10 +288,6 @@ public class CalendarParser {
         return (String) original.subSequence(startOfResultString, endSearchResult);
     }
 
-    static private boolean _isFirstRow(int iterationIndex) {
-        return (iterationIndex % 11) == 0;
-    }
-
     static private boolean _doesContainTimeInfo(String subject) {
         String TIME_REGEX = "\\d?\\d:\\d\\d [AP]M"; //finds all in the form of "10:30 PM" or "5:39 AM" with any prefix
         final Matcher matcher = Pattern.compile(TIME_REGEX).matcher(subject);
@@ -305,7 +302,7 @@ public class CalendarParser {
     static private boolean _isRowHeaderOrColumnHeaderCell(String subject) {
         // The webpage can take on 2 forms, one that uses <font> tag for styling and one that uses <style> tags for
         // styling. We have to check for both types of webpages
-        String stylingWebpageSearchString = "<font color=\"white\" size=\"1\">";
+        String stylingWebpageSearchString = "<font color=\"White\" size=\"1\">";
         String fontStyleWebpageSearchString = "font-size:8pt;\">";
         return (subject.contains(stylingWebpageSearchString) || subject.contains(fontStyleWebpageSearchString));
     }
@@ -313,7 +310,7 @@ public class CalendarParser {
     static private String _getTimeStringOrRoomNameFromString(String subject) {
         // The webpage can take on 2 forms, one that uses <font> tag for styling and one that uses <style> tags for
         // styling. We have to check for both types of webpages
-        String stylingWebpageSearchString = "<font color=\"white\" size=\"1\">";
+        String stylingWebpageSearchString = "<font color=\"White\" size=\"1\">";
         String fontStyleWebpageSearchString = "font-size:8pt;\">";
         if(subject.contains("<font")) {
             return _findStringFromStringBetweenSearchTerms(subject, stylingWebpageSearchString, "</font>");
