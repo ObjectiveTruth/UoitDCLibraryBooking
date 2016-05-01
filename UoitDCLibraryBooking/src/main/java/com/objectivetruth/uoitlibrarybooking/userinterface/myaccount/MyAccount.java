@@ -60,13 +60,14 @@ public class MyAccount extends Fragment {
                 .observeOn(Schedulers.computation())
 
                 .flatMap(new Func1<UserCredentials, Observable<UserData>>() {
-            @Override
-            public Observable<UserData> call(UserCredentials userCredentials) {
-                return userModel.signIn(userCredentials);
-            }
-        })
+                    @Override
+                    public Observable<UserData> call(UserCredentials userCredentials) {
+                        return userModel.signIn(userCredentials);
+                        }
+                    })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.computation())
+
                 .subscribe(new Observer<UserData>() {
             @Override
             public void onCompleted() {
@@ -75,14 +76,22 @@ public class MyAccount extends Fragment {
 
             @Override
             public void onError(Throwable e) {
-                _getLoginErrorSubject().onNext(e.getMessage());
             }
 
             @Override
             public void onNext(UserData userData) {
+                if(userData.errorMessage != null) {
+                    Timber.d("Received Error Message from Parser, publishing to Subject");
+                    _sendErrorMessageToLoginErrorSubject(userData.errorMessage, _getLoginErrorSubject());
+                }
                 Timber.i("Got it");
             }
         });
+    }
+
+    private static void _sendErrorMessageToLoginErrorSubject(String errorMessage,
+                                                            PublishSubject<String> loginErrorSubject) {
+        loginErrorSubject.onNext(errorMessage);
     }
 
     public static MyAccount newInstance() {
@@ -129,17 +138,27 @@ public class MyAccount extends Fragment {
     }*/
 
     private PublishSubject<UserCredentials> _getSignInClickSubject() {
-        if (signInClickSubject == null || signInClickSubject.hasCompleted()) {
+        if(signInClickSubject == null) {
+            Timber.d("Current singInClickSubject is NULL, making new one");
+            return signInClickSubject = PublishSubject.create();
+        }else if (signInClickSubject.hasCompleted()) {
+            Timber.d("Current singInClickSubject has completed already, making new one");
             return signInClickSubject = PublishSubject.create();
         }else {
+            Timber.d("Current singInClickSubject is still valid, passing it back");
             return signInClickSubject;
         }
     }
 
     private PublishSubject<String> _getLoginErrorSubject() {
-        if (loginErrorSubject == null || loginErrorSubject.hasCompleted()) {
+        if(loginErrorSubject == null) {
+            Timber.d("Current loginErrorSubject is NULL, making new one");
+            return loginErrorSubject = PublishSubject.create();
+        }else if (loginErrorSubject.hasCompleted()) {
+            Timber.d("Current loginErrorSubject hasCompleted, making new one");
             return loginErrorSubject = PublishSubject.create();
         }else {
+            Timber.d("Current loginErrorSubject is still valid, passing it back");
             return loginErrorSubject;
         }
     }

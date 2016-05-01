@@ -23,7 +23,6 @@
         android:lines="3"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="jfeklsfjeklsfjelskf\nfkejslfejsflse"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#FF0000" />
 

@@ -76,13 +76,8 @@ public class UserModel {
                 .flatMap(new Func1<String, Observable<UserData>>() {
                     @Override
                     public Observable<UserData> call(String rawSignedInMyReservationsWebPage) {
-                        try {
-                            return MyAccountParser
-                                    .parseRawSignedInMyReservationsWebPageForUserData(rawSignedInMyReservationsWebPage);
-                        } catch (AuthFailureError authFailureError) {
-                            Timber.w("Authentication Error");
-                            return Observable.error(authFailureError);
-                        }
+                    return MyAccountParser
+                            .parseRawSignedInMyReservationsWebPageForUserData(rawSignedInMyReservationsWebPage);
                     }
                 });
 

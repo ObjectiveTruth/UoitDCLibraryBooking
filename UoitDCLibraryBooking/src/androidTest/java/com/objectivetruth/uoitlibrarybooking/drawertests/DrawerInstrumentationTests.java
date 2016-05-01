@@ -91,6 +91,13 @@ public class DrawerInstrumentationTests {
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         Spoon.screenshot(mActivity, "after_open_drawer_3");
 
+        onView(withText("My Account")).perform(click());
+        Spoon.screenshot(mActivity, "after_open_my_account");
+        onView(withText("Login")).check(matches(isDisplayed()));
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
+        Spoon.screenshot(mActivity, "after_open_drawer_4");
+
         onView(withText("Calendar")).perform(click());
         Spoon.screenshot(mActivity, "after_open_calendar");
         onView(withId(R.id.calendar_page_grid)).

@@ -14,6 +14,8 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
@@ -92,6 +94,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (isInputValid()) {
+                    _clearErrorText(errorTextView);
                     signInClickSubject.onNext(new UserCredentials(
                             usernameField.getText().toString().trim(),
                             passwordField.getText().toString(),
@@ -113,6 +116,12 @@ public class LoginFragment extends Fragment {
         });
     }
 
+    private void _clearErrorText(TextView errorTextView) {
+        if(errorTextView != null) {
+            errorTextView.setText("");
+        }
+    }
+
     private String _getInsitutionIdFromRadioView(RadioGroup radioGroup) {
         switch(radioGroup.getCheckedRadioButtonId()){
             case R.id.uoit_radio :
@@ -126,7 +135,10 @@ public class LoginFragment extends Fragment {
 
     private static void _bindLoginErrorSubjectToErrorTextView(PublishSubject<String> loginErroSubject,
                                                               final TextView errorTextView) {
-        loginErroSubject.subscribe(new Observer<String>() {
+        loginErroSubject
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
             @Override
             public void onCompleted() {
 

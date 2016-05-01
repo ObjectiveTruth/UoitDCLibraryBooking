@@ -1,6 +1,5 @@
 package com.objectivetruth.uoitlibrarybooking.data.models.usermodel;
 
-import com.android.volley.AuthFailureError;
 import rx.Observable;
 import timber.log.Timber;
 
@@ -12,8 +11,7 @@ public class MyAccountParser {
         return Observable.just(_parseRawInitialWebPageToGetStateInfo(userCredentials, rawMyReservationWebPage));
     }
 
-    static public Observable<UserData> parseRawSignedInMyReservationsWebPageForUserData(
-            String rawMyReservationWebPage) throws AuthFailureError{
+    static public Observable<UserData> parseRawSignedInMyReservationsWebPageForUserData(String rawMyReservationWebPage){
         return Observable.just(_parseRawSignedInMyReservationsWebPageForUserData(rawMyReservationWebPage));
     }
 
@@ -41,13 +39,12 @@ public class MyAccountParser {
         return userCredentials;
     }
 
-    static private UserData _parseRawSignedInMyReservationsWebPageForUserData(
-            String rawWebPage) throws AuthFailureError{
+    static private UserData _parseRawSignedInMyReservationsWebPageForUserData(String rawWebPage) {
         Timber.i("Starting the parsing of the raw webpage from my reservations sign-in attempt");
 
         if(_doesRawMyReservationsSignInResultContainsError(rawWebPage)) {
             Timber.i("Finished parsing of the raw Webpage from my reservation sign in attempt");
-            throw new AuthFailureError(_getErrorMessageFromSignInResultWebPage(rawWebPage));
+            return _getUserDataObjectWithErrorMessage(_getErrorMessageFromSignInResultWebPage(rawWebPage));
         }
         Timber.i("Finished parsing of the raw Webpage from my reservation sign in attempt");
         return new UserData();
@@ -56,6 +53,12 @@ public class MyAccountParser {
     static private boolean _doesRawMyReservationsSignInResultContainsError(String rawWebpage) {
         String ERROR_LABEL_REGEX = "id=\"ContentPlaceHolder1_LabelError\"";
         return rawWebpage.contains(ERROR_LABEL_REGEX);
+    }
+
+    static private UserData _getUserDataObjectWithErrorMessage(String errorMessage) {
+        UserData userData = new UserData();
+        userData.errorMessage = errorMessage;
+        return userData;
     }
 
     static private String _getErrorMessageFromSignInResultWebPage(String rawWebPage) {

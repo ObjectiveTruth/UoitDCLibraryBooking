@@ -63,7 +63,7 @@ public class UserWebService {
      */
     private String _getRawSignedInMyReservationsWebpage(final UserCredentials userCredentials)
             throws ExecutionException, InterruptedException {
-        Timber.i("Starting the GET request to the signed-in my reservations uoitlibrary webpage...");
+        Timber.i("Starting the POST request to the signed-in my reservations uoitlibrary webpage...");
         RequestFuture<String> future = RequestFuture.newFuture();
 
         StringRequest stringRequest =
@@ -81,7 +81,7 @@ public class UserWebService {
                     }
                 };
         requestQueue.add(stringRequest);
-        Timber.i("GET request to the initial sign-in uoitlibrary webpage finished");
+        Timber.i("POST request to the initial sign-in uoitlibrary webpage finished");
         return future.get();
 
     }
