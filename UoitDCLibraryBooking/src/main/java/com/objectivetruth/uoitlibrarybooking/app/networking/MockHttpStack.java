@@ -35,17 +35,33 @@ public class MockHttpStack implements HttpStack{
         HttpResponse response
                 = new BasicHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, "OK"));
         response.setLocale(Locale.CANADA);
+        String MY_RESERVATIONS_ASPX = "https://rooms.library.dc-uoit.ca/uoit_studyrooms/myreservations.aspx";
 
-        switch(request.getMethod()) {
-            case Request.Method.GET:
-                response.setEntity(_getInitialWebpageEntity(request));
-                break;
-            case Request.Method.POST:
-                response.setEntity(_getClickableDateEntity(request));
-                break;
+        if(request.getUrl().equalsIgnoreCase(MY_RESERVATIONS_ASPX)) {
+            switch(request.getMethod()) {
+                case Request.Method.GET:
+                    response.setEntity(_getInitialReservationWebpageEntity());
+                    break;
+            }
+        }else{
+            switch(request.getMethod()) {
+                case Request.Method.GET:
+                    response.setEntity(_getInitialWebpageEntity(request));
+                    break;
+                case Request.Method.POST:
+                    response.setEntity(_getClickableDateEntity(request));
+                    break;
+            }
         }
 
         return response;
+    }
+
+    private HttpEntity _getInitialReservationWebpageEntity() throws UnsupportedEncodingException {
+        String FAKE_1_CLICKABLE_DATE_RESPONSE_FILENAME = "initial_my_reservations.aspx";
+        String rawWebPage = ResourceLoadingUtilities.loadAssetTextAsString(context,
+                FAKE_1_CLICKABLE_DATE_RESPONSE_FILENAME);
+        return new StringEntity(rawWebPage);
     }
 
     private HttpEntity _getInitialWebpageEntity(Request request) throws UnsupportedEncodingException {

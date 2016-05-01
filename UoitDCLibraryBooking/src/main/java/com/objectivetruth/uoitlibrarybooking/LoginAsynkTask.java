@@ -117,26 +117,26 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 		}*/
 //        progDialog.dismiss();
 
-		
+
 	}
-	
+
 	@Override
 	protected ArrayList<String[]> doInBackground(String[]... arg0) {
 		ArrayList<String[]> Results = new ArrayList<String[]>();
 		//Results holds all the data in the form of 0 = Completed Bookings, 1 is Incomplete
 		//Bokings and 2 is Past Bookings. It only Holds the Data, not the headings of each
 		//table, it reads from left to right
-		
+
 		//Document doc;
-	
-        try {			
+
+        try {
         		password = arg0[0][1];
         		studentID = arg0[0][0];
                 institution = arg0[0][2];
 				String __viewStateMain;
 				String __eventValidationMain;
                 String __viewStateGenerator;
-				
+
 
 		        OkHttpClient httpclient = new OkHttpClient();
                 Request request = new Request.Builder()
@@ -186,7 +186,7 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 					String[] incompleteBookingsArr;
 					String[] pastBookingsArr;
 					String timeRange;
-					
+
 					//TABLE COMPLETE
 					stateStart = responseString.indexOf("id=\"ContentPlaceHolder1_TableComplete\"");
 					stateEnd = responseString.indexOf("</table>", stateStart);
@@ -206,9 +206,9 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 							lastFoundAt = stateSubString.indexOf("<td", lastFoundAt+1);
 							stateStart = stateSubString.indexOf(">", lastFoundAt + 5);
 							stateEnd = stateSubString.indexOf("</font>", stateStart +1);
-							completedBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));	
-				
-							
+							completedBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));
+
+
 						}
 						completedBookingsArr = completedBookingTempArray.toArray(new String[completedBookingTempArray.size()]);
                         Timber.v("===");
@@ -227,7 +227,7 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 					stateEnd = responseString.indexOf("</table>", stateStart);
 					stateSubString = responseString.substring(stateStart, stateEnd);
 					lastFoundAt = 0;
-				
+
 					if(stateSubString.indexOf("<td", lastFoundAt) < 0){
 						incompleteBookingsArr = new String[0];
                         Timber.v("TableInComplete is empty");
@@ -242,9 +242,9 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 							lastFoundAt = stateSubString.indexOf("<td", lastFoundAt+1);
 							stateStart = stateSubString.indexOf(">", lastFoundAt + 5);
 							stateEnd = stateSubString.indexOf("</font>", stateStart +1);
-							incompletedBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));	
-				
-							
+							incompletedBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));
+
+
 						}
 						incompleteBookingsArr = incompletedBookingTempArray.toArray(new String[incompletedBookingTempArray.size()]);
                         Timber.v("===");
@@ -255,7 +255,7 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
                         }
                         Timber.v("===");
 					}
-					
+
 					//TABLE PAST
 					stateStart = responseString.indexOf("id=\"ContentPlaceHolder1_TablePast\"");
 					stateEnd = responseString.indexOf("</table>", stateStart);
@@ -274,9 +274,9 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 							lastFoundAt = stateSubString.indexOf("<td", lastFoundAt+1);
 							stateStart = stateSubString.indexOf(">", lastFoundAt + 5);
 							stateEnd = stateSubString.indexOf("</font>", stateStart +1);
-							pastBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));	
+							pastBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));
 
-							
+
 						}
 						pastBookingsArr = pastBookingTempArray.toArray(new String[pastBookingTempArray.size()]);
                         Timber.v("===");
@@ -287,15 +287,15 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
                         Timber.v("===");
 					}
 
-					
+
 					Results.add(incompleteBookingsArr);
 					Results.add(completedBookingsArr);
 					Results.add(pastBookingsArr);
 
 					return Results;
-		        	
+
 		        	/*doc = Jsoup.parse(responseString);
-		        	
+
 		        	returnMessage = doc.select("#LabelMessage").text();
 		        	return "success";*/
 		        }
@@ -312,8 +312,8 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 
 		        }
 
-													
-				        
+
+
         	}
             catch(IOException e){
                 String errorDescript = "Something went wrong with the login values or Internet Connection";

@@ -25,7 +25,6 @@ public class MainActivity extends ActivityBase {
     public static final String MY_ACCOUNT_DIALOGFRAGMENT_TAG = "myAccountDiaFrag";
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
     public static final int MAX_BOOKINGS_ALLOWED = 20; //This can safely be changed
-    private static final long AUTO_REFRESH_DELAY = 6000;
     public static boolean isDialogShowing = false;
 	AppCompatActivity mActivity = this;
 	public static DbHelper mdbHelper;

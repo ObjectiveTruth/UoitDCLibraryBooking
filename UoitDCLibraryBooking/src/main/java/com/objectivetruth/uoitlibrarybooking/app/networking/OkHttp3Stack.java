@@ -59,7 +59,7 @@ public class OkHttp3Stack implements HttpStack {
 
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        clientBuilder.cookieJar(customCookieJar);
+        //clientBuilder.cookieJar(customCookieJar);
         int timeoutMs = request.getTimeoutMs();
 
         clientBuilder.connectTimeout(timeoutMs, TimeUnit.MILLISECONDS);
@@ -71,10 +71,13 @@ public class OkHttp3Stack implements HttpStack {
 
         Map<String, String> headers = request.getHeaders();
         for(final String name : headers.keySet()) {
-            okHttpRequestBuilder.addHeader(name, headers.get(name));
+            String outgoingHeaderValue = headers.get(name);
+            okHttpRequestBuilder.addHeader(name, outgoingHeaderValue);
+            Timber.v("Outgoing Header:" + name + ": " + outgoingHeaderValue);
         }
         for(final String name : additionalHeaders.keySet()) {
             okHttpRequestBuilder.addHeader(name, additionalHeaders.get(name));
+            Timber.v("Outgoing Additional Header:" + name + ": " + additionalHeaders.get(name));
         }
 
         setConnectionParametersForRequest(okHttpRequestBuilder, request);
@@ -92,18 +95,16 @@ public class OkHttp3Stack implements HttpStack {
         for(int i = 0, len = responseHeaders.size(); i < len; i++) {
             final String name = responseHeaders.name(i), value = responseHeaders.value(i);
             if (name != null) {
-                Timber.v("header:" + name + ": " + value);
+                Timber.v("Incoming Header:" + name + ": " + value);
                 response.addHeader(new BasicHeader(name, value));
             }
         }
-
         return response;
     }
 
     private static HttpEntity entityFromOkHttpResponse(Response r) throws IOException {
         BasicHttpEntity entity = new BasicHttpEntity();
         ResponseBody body = r.body();
-
         entity.setContent(body.byteStream());
         entity.setContentLength(body.contentLength());
         entity.setContentEncoding(r.header("Content-Encoding"));

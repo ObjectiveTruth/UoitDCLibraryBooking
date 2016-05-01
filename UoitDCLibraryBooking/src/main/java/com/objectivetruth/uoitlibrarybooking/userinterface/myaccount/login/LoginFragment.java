@@ -19,11 +19,11 @@ import timber.log.Timber;
 import javax.inject.Inject;
 
 public class LoginFragment extends Fragment {
-    private PublishSubject<Object> signInClickSubject;
     private TextView errorTextView;
     private EditText usernameField;
     private EditText passwordField;
     private RadioGroup institutionRadio;
+    private PublishSubject<UserCredentials> signInClickSubject;
     @Inject Tracker googleAnalyticsTracker;
 
     @Override
@@ -32,8 +32,10 @@ public class LoginFragment extends Fragment {
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
     }
 
-    public static LoginFragment newInstance() {
-        return new LoginFragment();
+    public static LoginFragment newInstance(PublishSubject<UserCredentials> signInClickSubject) {
+        LoginFragment returnFragment = new LoginFragment();
+        returnFragment.signInClickSubject = signInClickSubject;
+        return returnFragment;
     }
 
     @Override
@@ -84,9 +86,8 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 errorTextView.setText("");
-
                 if (isInputValid()) {
-                    getSignInClickSubject().onNext(new UserCredentials(
+                    signInClickSubject.onNext(new UserCredentials(
                             usernameField.getText().toString().trim(),
                             passwordField.getText().toString(),
                             _getInsitutionIdFromRadioView(institutionRadio)));
@@ -107,20 +108,6 @@ public class LoginFragment extends Fragment {
         });
     }
 
-    private PublishSubject<Object> getSignInClickSubject() {
-        if (signInClickSubject == null || signInClickSubject.hasCompleted()) {
-            return signInClickSubject = PublishSubject.create();
-        }else {
-            return signInClickSubject;
-        }
-    }
-
-    @Override
-    public void onPause() {
-        getSignInClickSubject().onCompleted();
-        super.onPause();
-    }
-
     private String _getInsitutionIdFromRadioView(RadioGroup radioGroup) {
         switch(radioGroup.getCheckedRadioButtonId()){
             case R.id.uoit_radio :
@@ -131,6 +118,5 @@ public class LoginFragment extends Fragment {
                 return "dc";
         }
     }
-
 }
 
