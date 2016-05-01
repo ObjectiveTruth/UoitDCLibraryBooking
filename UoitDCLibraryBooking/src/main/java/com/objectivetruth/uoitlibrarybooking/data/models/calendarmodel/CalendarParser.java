@@ -280,22 +280,12 @@ public class CalendarParser {
     }
 
     static private boolean _isRowHeaderOrColumnHeaderCell(String subject) {
-        // The webpage can take on 2 forms, one that uses <font> tag for styling and one that uses <style> tags for
-        // styling. We have to check for both types of webpages
-        String stylingWebpageSearchString = "<font color=\"White\" size=\"1\">";
         String fontStyleWebpageSearchString = "font-size:8pt;\">";
-        return (subject.contains(stylingWebpageSearchString) || subject.contains(fontStyleWebpageSearchString));
+        return subject.contains(fontStyleWebpageSearchString);
     }
 
     static private String _getTimeStringOrRoomNameFromString(String subject) {
-        // The webpage can take on 2 forms, one that uses <font> tag for styling and one that uses <style> tags for
-        // styling. We have to check for both types of webpages
-        String stylingWebpageSearchString = "<font color=\"White\" size=\"1\">";
-        String fontStyleWebpageSearchString = "font-size:8pt;\">";
-        if(subject.contains("<font")) {
-            return findStringFromStringBetweenSearchTerms(subject, stylingWebpageSearchString, "</font>");
-        }else {
-            return findStringFromStringBetweenSearchTerms(subject, fontStyleWebpageSearchString, "</td>");
-        }
+        String webPageSearchString = "font-size:8pt;\">";
+        return findStringFromStringBetweenSearchTerms(subject, webPageSearchString, "</td>");
     }
 }

@@ -111,6 +111,7 @@ public class UserWebService {
                     + "&ctl00$ContentPlaceHolder1$TextBoxPassword=" + URLEncoder.encode(userCredentials.password, "UTF-8")
                     + "&ctl00$ContentPlaceHolder1$TextBoxID=" + URLEncoder.encode(userCredentials.username, "UTF-8")
                     + "&ctl00$ContentPlaceHolder1$ButtonListBookings=" + URLEncoder.encode("My Bookings", "UTF-8");
+            Timber.v("Body content will be:");
             Timber.v(content);
             return content.getBytes();
         }catch (UnsupportedEncodingException e) {

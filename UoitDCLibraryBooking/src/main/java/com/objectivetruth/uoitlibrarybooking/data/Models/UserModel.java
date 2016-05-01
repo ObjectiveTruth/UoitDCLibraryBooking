@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.android.volley.AuthFailureError;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
@@ -57,6 +56,8 @@ public class UserModel {
                 .flatMap(new Func1<String, Observable<UserCredentials>>() {
                     @Override
                     public Observable<UserCredentials> call(String rawMyReservationsLoginPage) {
+                        Timber.d("Received raw main My Reservation Login Page, passing to Parser");
+                        Timber.v(rawMyReservationsLoginPage);
                         return MyAccountParser.parseRawInitialWebPageToGetStateInfo(rawMyReservationsLoginPage,
                                 userCredentials);
                     }
@@ -76,29 +77,11 @@ public class UserModel {
                 .flatMap(new Func1<String, Observable<UserData>>() {
                     @Override
                     public Observable<UserData> call(String rawSignedInMyReservationsWebPage) {
-                    return MyAccountParser
-                            .parseRawSignedInMyReservationsWebPageForUserData(rawSignedInMyReservationsWebPage);
+                        Timber.d("Received raw signed In Result from My Reservation Login Page, passing to Parser");
+                        Timber.v(rawSignedInMyReservationsWebPage);
+                        return MyAccountParser
+                                .parseRawSignedInMyReservationsWebPageForUserData(rawSignedInMyReservationsWebPage);
                     }
                 });
-
-/*                .subscribeOn(Schedulers.computation())
-                .subscribe(new Observer<String>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e, "Error");
-
-            }
-
-            @Override
-            public void onNext(String s) {
-                Timber.i(s);
-
-            }
-        });*/
     }
 }

@@ -36,6 +36,8 @@ public class MockHttpStack implements HttpStack{
                 = new BasicHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, "OK"));
         response.setLocale(Locale.CANADA);
         String MY_RESERVATIONS_ASPX = "https://rooms.library.dc-uoit.ca/uoit_studyrooms/myreservations.aspx";
+        request.getHeaders(); //Simulate getting the headers
+        request.getBody(); // Simulate getting the request body
 
         if(request.getUrl().equalsIgnoreCase(MY_RESERVATIONS_ASPX)) {
             switch(request.getMethod()) {

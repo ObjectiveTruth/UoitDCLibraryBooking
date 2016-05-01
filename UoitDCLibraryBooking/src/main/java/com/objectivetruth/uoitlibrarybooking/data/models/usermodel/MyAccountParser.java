@@ -62,16 +62,26 @@ public class MyAccountParser {
     }
 
     static private String _getErrorMessageFromSignInResultWebPage(String rawWebPage) {
-        String ERROR_LABEL_START_TAG =
+        String errorMessageToReturn;
+        String STYLE_ERROR_LABEL_START_TAG =
                 "<span id=\"ContentPlaceHolder1_LabelError\" style=\"color:Red;font-size:11pt;z-index: 102; " +
                         "left: 2px; position: absolute; top: 74px; width: 406px; height: 34px;\">";
-        String ERROR_LABEL_END_TAG = "</span>";
-        String errorMessageToReturn =
-                findStringFromStringBetweenSearchTerms(rawWebPage, ERROR_LABEL_START_TAG, ERROR_LABEL_END_TAG);
-        if(errorMessageToReturn == null || errorMessageToReturn.isEmpty()){
+        String STYLE_ERROR_LABEL_END_TAG = "</span>";
+
+        errorMessageToReturn =
+                findStringFromStringBetweenSearchTerms(rawWebPage,
+                        STYLE_ERROR_LABEL_START_TAG, STYLE_ERROR_LABEL_END_TAG);
+
+        errorMessageToReturn = _removeNewLineCharacters(errorMessageToReturn);
+
+        // Check if there's any strangeness, so we can return something intelligable to the user
+        if(errorMessageToReturn == null || errorMessageToReturn.isEmpty() || errorMessageToReturn.length() > 200){
             errorMessageToReturn = "Something went wrong, try again";
         }
         return errorMessageToReturn;
     }
 
+    static private String _removeNewLineCharacters(String subject) {
+        return subject.replace("\r\n", " ").replace("\n", " ");
+    }
 }

@@ -48,6 +48,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class OkHttp3Stack implements HttpStack {
     private CustomCookieJar customCookieJar;
+    final static private String USER_AGENT_VALUE =
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:46.0) Gecko/20100101 Firefox/46.0";
 
     public OkHttp3Stack() {
         customCookieJar = new CustomCookieJar();
@@ -56,7 +58,7 @@ public class OkHttp3Stack implements HttpStack {
     @Override
     public HttpResponse performRequest(com.android.volley.Request<?> request, Map<String, String> additionalHeaders)
             throws IOException, AuthFailureError {
-
+        String USER_AGENT_KEY_NAME = "User-Agent";
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
         //clientBuilder.cookieJar(customCookieJar);
@@ -79,6 +81,10 @@ public class OkHttp3Stack implements HttpStack {
             okHttpRequestBuilder.addHeader(name, additionalHeaders.get(name));
             Timber.v("Outgoing Additional Header:" + name + ": " + additionalHeaders.get(name));
         }
+
+        Timber.d("Injecting User-Agent into request(will overwrite any other user-agent headers placed)");
+        okHttpRequestBuilder.addHeader(USER_AGENT_KEY_NAME, USER_AGENT_VALUE);
+        Timber.v("Outgoing Header:" + USER_AGENT_KEY_NAME + ": " + USER_AGENT_VALUE);
 
         setConnectionParametersForRequest(okHttpRequestBuilder, request);
 
