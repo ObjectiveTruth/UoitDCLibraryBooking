@@ -83,6 +83,9 @@ public class MyAccount extends Fragment {
                 if(userData.errorMessage != null) {
                     Timber.d("Received Error Message from Parser, publishing to Subject");
                     _sendErrorMessageToLoginErrorSubject(userData.errorMessage, _getLoginErrorSubject());
+                }else {
+                    Timber.i("Received UserData");
+                    Timber.v(userData.toString());
                 }
                 Timber.i("Got it");
             }

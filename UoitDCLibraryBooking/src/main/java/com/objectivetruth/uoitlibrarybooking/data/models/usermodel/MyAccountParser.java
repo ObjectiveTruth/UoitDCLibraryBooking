@@ -1,9 +1,15 @@
 package com.objectivetruth.uoitlibrarybooking.data.models.usermodel;
 
+import android.support.v4.util.Pair;
 import rx.Observable;
 import timber.log.Timber;
 
+import java.util.ArrayList;
+
 import static com.objectivetruth.uoitlibrarybooking.data.models.common.ParseUtilities.findStringFromStringBetweenSearchTerms;
+import static com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBookingType.COMPLETE_BOOKING;
+import static com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBookingType.INCOMPLETE_BOOKING;
+import static com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBookingType.PAST_BOOKING;
 
 public class MyAccountParser {
     static public Observable<UserCredentials> parseRawInitialWebPageToGetStateInfo(String rawMyReservationWebPage,
@@ -46,8 +52,76 @@ public class MyAccountParser {
             Timber.i("Finished parsing of the raw Webpage from my reservation sign in attempt");
             return _getUserDataObjectWithErrorMessage(_getErrorMessageFromSignInResultWebPage(rawWebPage));
         }
+
+        UserData returnUserData = new UserData();
+        returnUserData.completeBookings = _getBookingsList(COMPLETE_BOOKING, rawWebPage);
+        returnUserData.incompleteBookings = _getBookingsList(INCOMPLETE_BOOKING, rawWebPage);
+        returnUserData.pastBookings = _getBookingsList(PAST_BOOKING, rawWebPage);
+
         Timber.i("Finished parsing of the raw Webpage from my reservation sign in attempt");
-        return new UserData();
+        return returnUserData;
+    }
+
+    static private Pair<String, String> _getSearchTermForBookingType(MyAccountBookingType bookingType) {
+        switch(bookingType) {
+            case INCOMPLETE_BOOKING:
+                return new Pair<>("<table id=\"ContentPlaceHolder1_TableInComplete\" cellspacing=\"1\" " +
+                    "cellpadding=\"2\" style=\"border-width:1px;border-style:Outset;font-size:12pt;\">", "</table>");
+
+            case COMPLETE_BOOKING:
+                return new Pair<>("<table id=\"ContentPlaceHolder1_TableComplete\" cellspacing=\"1\" " +
+                    "cellpadding=\"2\" style=\"border-width:1px;border-style:Outset;font-size:12pt;\">", "</table>");
+
+            case PAST_BOOKING:
+                return new Pair<>("<table id=\"ContentPlaceHolder1_TablePast\" cellspacing=\"1\" " +
+                    "cellpadding=\"2\" style=\"border-width:1px;border-style:Outset;font-size:12pt;\">", "</table>");
+
+            default:
+                return new Pair<>("", "");
+        }
+    }
+
+    static private ArrayList<MyAccountBooking> _getBookingsList(MyAccountBookingType bookingType,
+                                                                String rawWebpage) {
+        Timber.i("Parsing for " + bookingType.name() + "...");
+
+        Pair<String, String> searchTerms = _getSearchTermForBookingType(bookingType);
+        String bookingTableSection = findStringFromStringBetweenSearchTerms(rawWebpage, searchTerms.first,
+                searchTerms.second);
+
+        if(bookingTableSection.contains("<tr")) {
+            String[] trStore = bookingTableSection.split("<tr");
+            ArrayList<MyAccountBooking> returnArrayList = new ArrayList<MyAccountBooking>();
+
+            // Start at 2 because 0 is the empty string and 1 is the headers in the table
+            // Example: "<tr".split("<tr")    =>    {"", "<tr"}
+            // Example:
+            // Header Row: // <tr><td>Room</td><td>Date</td><td>From</td><td>To</td></tr>
+            for(int i = 2; i < trStore.length; i++) {
+                MyAccountBooking returnMyAccountBooking = new MyAccountBooking();
+                String[] tdElements = trStore[2].split("<td");
+
+                // Will be returned in the form ">$$$$$</td>" where $ is the target string
+                returnMyAccountBooking.room =
+                        findStringFromStringBetweenSearchTerms(tdElements[1], ">", "</td");
+                returnMyAccountBooking.date =
+                        findStringFromStringBetweenSearchTerms(tdElements[2], ">", "</td");
+                returnMyAccountBooking.startTime =
+                        findStringFromStringBetweenSearchTerms(tdElements[3], ">", "</td");
+                returnMyAccountBooking.endTime =
+                        findStringFromStringBetweenSearchTerms(tdElements[4], ">", "</td");
+
+                returnArrayList.add(returnMyAccountBooking);
+            }
+            Timber.d(bookingType.name() + " Found: " + returnArrayList.size());
+            Timber.i("Parsing Completed for " + bookingType.name() + "...");
+            return returnArrayList;
+        }else {
+            // No InComplete Bookings
+            Timber.d("No " + bookingType.name() + " found for User");
+            Timber.i("Parsing Completed for " + bookingType.name() + "...");
+            return new ArrayList<MyAccountBooking>();
+        }
     }
 
     static private boolean _doesRawMyReservationsSignInResultContainsError(String rawWebpage) {
