@@ -6,11 +6,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.objectivetruth.uoitlibrarybooking.LoginAsynkTask;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.LoginFragment;
 import rx.Observable;
 import rx.Observer;
@@ -23,7 +23,7 @@ import javax.inject.Inject;
 
 public class MyAccount extends Fragment {
     private PublishSubject<UserCredentials> signInClickSubject;
-    LoginAsynkTask task;
+    private PublishSubject<String> loginErrorSubject;
     @Inject UserModel userModel;
 
     @Override
@@ -59,15 +59,15 @@ public class MyAccount extends Fragment {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation())
 
-                .flatMap(new Func1<UserCredentials, Observable<String>>() {
+                .flatMap(new Func1<UserCredentials, Observable<UserData>>() {
             @Override
-            public Observable<String> call(UserCredentials userCredentials) {
+            public Observable<UserData> call(UserCredentials userCredentials) {
                 return userModel.signIn(userCredentials);
             }
         })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.computation())
-                .subscribe(new Observer<String>() {
+                .subscribe(new Observer<UserData>() {
             @Override
             public void onCompleted() {
 
@@ -75,13 +75,12 @@ public class MyAccount extends Fragment {
 
             @Override
             public void onError(Throwable e) {
-                Timber.e(e, "Error");
+                _getLoginErrorSubject().onNext(e.getMessage());
             }
 
             @Override
-            public void onNext(String userData) {
+            public void onNext(UserData userData) {
                 Timber.i("Got it");
-                Timber.i(userData);
             }
         });
     }
@@ -103,7 +102,9 @@ public class MyAccount extends Fragment {
         }*/
         PublishSubject<UserCredentials> signInClickSubject = _getSignInClickSubject();
         getFragmentManager().beginTransaction()
-                .replace(R.id.my_account_content_frame, LoginFragment.newInstance(signInClickSubject), MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
+                .replace(R.id.my_account_content_frame,
+                        LoginFragment.newInstance(signInClickSubject, _getLoginErrorSubject()),
+                        MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
@@ -135,9 +136,18 @@ public class MyAccount extends Fragment {
         }
     }
 
+    private PublishSubject<String> _getLoginErrorSubject() {
+        if (loginErrorSubject == null || loginErrorSubject.hasCompleted()) {
+            return loginErrorSubject = PublishSubject.create();
+        }else {
+            return loginErrorSubject;
+        }
+    }
+
     @Override
     public void onPause() {
         _getSignInClickSubject().onCompleted();
+        _getLoginErrorSubject().onCompleted();
         super.onPause();
     }
 }

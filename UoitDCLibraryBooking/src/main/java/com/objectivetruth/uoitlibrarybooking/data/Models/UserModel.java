@@ -4,9 +4,15 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.android.volley.AuthFailureError;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebService;
 import rx.Observable;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
@@ -43,8 +49,43 @@ public class UserModel {
                 .commit();
     }
 
-    public Observable<String> signIn(UserCredentials userCredentials) {
-        return userWebService.getRawInitialSignInWebPageObs();
+    public Observable<UserData> signIn(final UserCredentials userCredentials) {
+        return userWebService.getRawInitialSignInWebPageObs()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
+
+                .flatMap(new Func1<String, Observable<UserCredentials>>() {
+                    @Override
+                    public Observable<UserCredentials> call(String rawMyReservationsLoginPage) {
+                        return MyAccountParser.parseRawInitialWebPageToGetStateInfo(rawMyReservationsLoginPage,
+                                userCredentials);
+                    }
+                })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
+
+                .flatMap(new Func1<UserCredentials, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(UserCredentials userCredentials) {
+                        return userWebService.getRawSignedInMyReservationsPageObs(userCredentials);
+                    }
+                })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
+
+                .flatMap(new Func1<String, Observable<UserData>>() {
+                    @Override
+                    public Observable<UserData> call(String rawSignedInMyReservationsWebPage) {
+                        try {
+                            return MyAccountParser
+                                    .parseRawSignedInMyReservationsWebPageForUserData(rawSignedInMyReservationsWebPage);
+                        } catch (AuthFailureError authFailureError) {
+                            Timber.w("Authentication Error");
+                            return Observable.error(authFailureError);
+                        }
+                    }
+                });
+
 /*                .subscribeOn(Schedulers.computation())
                 .subscribe(new Observer<String>() {
             @Override

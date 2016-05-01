@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.objectivetruth.uoitlibrarybooking.data.models.common.ParseUtilities.findStringFromStringBetweenSearchTerms;
+
 public class CalendarParser {
     static public Observable<CalendarData> parseDataToFindNumberOfDaysInfoObs(String rawWebPage) {
         return Observable.just(_parseDataToFindNumberOfDaysInfo(rawWebPage));
@@ -55,6 +57,9 @@ public class CalendarParser {
         stateStart = rawWebPage.indexOf("__VIEWSTATEGENERATOR\" value=");
         stateEnd = rawWebPage.indexOf("/>", stateStart);
         day.extViewStateGenerator = rawWebPage.substring(stateStart+29, stateEnd-2);
+
+        Timber.i("Finished parsing of the uoitlibrary main webpage for ViewState, ViewStateGenerator, " +
+                "and EvenValidation values...");
 
         return day;
     }
@@ -263,31 +268,6 @@ public class CalendarParser {
         return (resultOfIndexOf >= 0);
     }
 
-    /**
-     * Takes {@code original} String and returns the string between the 2 search terms, {@code beginningSearchTerm}
-     * and {@code endSearchTerm}. Will story searching at the first occurance. Example:
-     * original: aaaHELLOacWORLDccc
-     * beginningSearchTerm: aaa
-     * endSearchTerm: ccc
-     * returns: HELLOacWORLD
-     * @param original
-     * @param beginingSearchTerm
-     * @param endSearchTerm
-     * @return
-     */
-    static private String _findStringFromStringBetweenSearchTerms(String original,
-                                                          String beginingSearchTerm,
-                                                          String endSearchTerm) {
-        int offsetOfBeginningSearchTerm = beginingSearchTerm.length();
-
-        int startSearchResult = original.indexOf(beginingSearchTerm);
-        int endSearchResult = original.indexOf(endSearchTerm);
-
-        int startOfResultString = startSearchResult + offsetOfBeginningSearchTerm;
-
-        return (String) original.subSequence(startOfResultString, endSearchResult);
-    }
-
     static private boolean _doesContainTimeInfo(String subject) {
         String TIME_REGEX = "\\d?\\d:\\d\\d [AP]M"; //finds all in the form of "10:30 PM" or "5:39 AM" with any prefix
         final Matcher matcher = Pattern.compile(TIME_REGEX).matcher(subject);
@@ -313,9 +293,9 @@ public class CalendarParser {
         String stylingWebpageSearchString = "<font color=\"White\" size=\"1\">";
         String fontStyleWebpageSearchString = "font-size:8pt;\">";
         if(subject.contains("<font")) {
-            return _findStringFromStringBetweenSearchTerms(subject, stylingWebpageSearchString, "</font>");
+            return findStringFromStringBetweenSearchTerms(subject, stylingWebpageSearchString, "</font>");
         }else {
-            return _findStringFromStringBetweenSearchTerms(subject, fontStyleWebpageSearchString, "</td>");
+            return findStringFromStringBetweenSearchTerms(subject, fontStyleWebpageSearchString, "</td>");
         }
     }
 }

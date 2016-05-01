@@ -18,9 +18,12 @@
     <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_gravity="center_horizontal"
         android:id="@+id/my_account_login_error_notice"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal"
+        android:lines="3"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:text="jfeklsfjeklsfjelskf\nfkejslfejsflse"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="#FF0000" />
 

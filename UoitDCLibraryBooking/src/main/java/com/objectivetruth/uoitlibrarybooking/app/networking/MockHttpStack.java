@@ -42,6 +42,9 @@ public class MockHttpStack implements HttpStack{
                 case Request.Method.GET:
                     response.setEntity(_getInitialReservationWebpageEntity());
                     break;
+                case Request.Method.POST:
+                    response.setEntity(_getSignInFailReservationWebpageEntity());
+                    break;
             }
         }else{
             switch(request.getMethod()) {
@@ -57,10 +60,17 @@ public class MockHttpStack implements HttpStack{
         return response;
     }
 
-    private HttpEntity _getInitialReservationWebpageEntity() throws UnsupportedEncodingException {
-        String FAKE_1_CLICKABLE_DATE_RESPONSE_FILENAME = "initial_my_reservations.aspx";
+    private HttpEntity _getSignInFailReservationWebpageEntity() throws UnsupportedEncodingException {
+        String FAKE_SIGN_IN_FAILURE_RESPONSE_FILENAME = "wrong_username_password.aspx";
         String rawWebPage = ResourceLoadingUtilities.loadAssetTextAsString(context,
-                FAKE_1_CLICKABLE_DATE_RESPONSE_FILENAME);
+                FAKE_SIGN_IN_FAILURE_RESPONSE_FILENAME);
+        return new StringEntity(rawWebPage);
+    }
+
+    private HttpEntity _getInitialReservationWebpageEntity() throws UnsupportedEncodingException {
+        String FAKE_INITIAL_MY_RESERVATIONS_RESPONSE_FILENAME = "initial_my_reservations.aspx";
+        String rawWebPage = ResourceLoadingUtilities.loadAssetTextAsString(context,
+                FAKE_INITIAL_MY_RESERVATIONS_RESPONSE_FILENAME);
         return new StringEntity(rawWebPage);
     }
 

@@ -13,6 +13,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
+import rx.Observer;
 import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
@@ -24,6 +25,7 @@ public class LoginFragment extends Fragment {
     private EditText passwordField;
     private RadioGroup institutionRadio;
     private PublishSubject<UserCredentials> signInClickSubject;
+    private PublishSubject<String> loginErroSubject;
     @Inject Tracker googleAnalyticsTracker;
 
     @Override
@@ -32,9 +34,11 @@ public class LoginFragment extends Fragment {
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
     }
 
-    public static LoginFragment newInstance(PublishSubject<UserCredentials> signInClickSubject) {
+    public static LoginFragment newInstance(PublishSubject<UserCredentials> signInClickSubject,
+                                            PublishSubject<String> loginErroSubject) {
         LoginFragment returnFragment = new LoginFragment();
         returnFragment.signInClickSubject = signInClickSubject;
+        returnFragment.loginErroSubject = loginErroSubject;
         return returnFragment;
     }
 
@@ -82,10 +86,11 @@ public class LoginFragment extends Fragment {
         errorTextView = (TextView) view.findViewById(R.id.my_account_login_error_notice);
         Button signInButton = (Button) view.findViewById(R.id.my_account_login_sign_in_button);
 
+        _bindLoginErrorSubjectToErrorTextView(loginErroSubject, errorTextView);
+
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                errorTextView.setText("");
                 if (isInputValid()) {
                     signInClickSubject.onNext(new UserCredentials(
                             usernameField.getText().toString().trim(),
@@ -117,6 +122,29 @@ public class LoginFragment extends Fragment {
                 Timber.d("My Account Login: DC Selected");
                 return "dc";
         }
+    }
+
+    private static void _bindLoginErrorSubjectToErrorTextView(PublishSubject<String> loginErroSubject,
+                                                              final TextView errorTextView) {
+        loginErroSubject.subscribe(new Observer<String>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(String errorMessageToDisplay) {
+                Timber.d("Received new error message to display in Login: " + errorMessageToDisplay);
+                if(errorTextView != null) {
+                    errorTextView.setText(errorMessageToDisplay);
+                }
+            }
+        });
     }
 }
 
