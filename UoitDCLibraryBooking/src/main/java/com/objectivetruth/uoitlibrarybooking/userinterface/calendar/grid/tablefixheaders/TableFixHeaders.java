@@ -11,7 +11,6 @@ import android.view.*;
 import android.widget.ImageView;
 import android.widget.Scroller;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.Recycler;
 
 import java.util.ArrayList;
 import java.util.List;

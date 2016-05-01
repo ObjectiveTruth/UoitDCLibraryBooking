@@ -45,7 +45,6 @@ import static com.objectivetruth.uoitlibrarybooking.userinterface.common.CustomA
 
 public class MainActivity extends ActivityBase implements AsyncResponse{
     final static private String ACTIVITY_TITLE = "Calendar";
-    final static private int ACTIVITYPAGENUMBER = 0;
 
     public static final String MY_ACCOUNT_DIALOGFRAGMENT_TAG = "myAccountDiaFrag";
     public static final String PASSWORD_INFO_DIALOGFRAGMENT_TAG = "passwordInfoDiaFrag";
@@ -94,11 +93,6 @@ public class MainActivity extends ActivityBase implements AsyncResponse{
                 R.layout.activity_main,
                 R.id.drawer_layout,
                 R.id.toolbar);
-    }
-
-    @Override
-    protected int getActivityPageNumber() {
-        return ACTIVITYPAGENUMBER;
     }
 
     @Override

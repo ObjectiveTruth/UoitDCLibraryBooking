@@ -23,7 +23,6 @@ import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.Gu
 import timber.log.Timber;
 
 public abstract class ActivityBase extends AppCompatActivity {
-    protected abstract int                              getActivityPageNumber();
     protected abstract String                           getActivityTitle();
     private ActionBarDrawerToggle _mDrawerToggle        = null;
     private DrawerLayout _mDrawerLayout                 = null;

@@ -14,7 +14,7 @@
         <!-- Individual Tabs are Programmatically added -->
     </android.support.design.widget.TabLayout>
 
-    <com.objectivetruth.uoitlibrarybooking.NonSwipeableViewPager
+    <com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarloaded.NonSwipeableViewPager
         android:id="@+id/calendar_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
