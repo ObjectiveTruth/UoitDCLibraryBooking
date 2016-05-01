@@ -117,7 +117,6 @@ public class Calendar extends Fragment {
         	inflater.inflate(R.menu.calendar_action_icons_menu, menu);
         }
         MenuItem refreshItem = menu.findItem(R.id.refresh_calendar);
-        MenuItem myAccountItem = menu.findItem(R.id.user_account);
 
         getRefreshClickSubject().subscribe(new Observer<Object>() {
             @Override
@@ -207,16 +206,6 @@ public class Calendar extends Fragment {
                     .build()
             );
             handleHelpClick();
-            return true;
-        }
-        else if(id == R.id.user_account){
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Calendar Home")
-                    .setAction("MyAccount")
-                    .setLabel("Pressed by User")
-                    .build()
-            );
-            //handleMyAccountClick();
             return true;
         }
         else if(id == R.id.refresh_calendar){

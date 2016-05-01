@@ -17,7 +17,7 @@
 
     <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:layout_gravity="center_horizontal"
-        android:id="@+id/error_textview"
+        android:id="@+id/my_account_login_error_notice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -78,7 +78,7 @@
     <Button
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:id="@+id/buttonSignIn"
+        android:id="@+id/my_account_login_sign_in_button"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
         android:text="Sign In" />

@@ -504,7 +504,7 @@ public class DiaFragMyAccount extends DialogFragment {
          * view using YoYo
          * @return true if both edit texts are valid, false if not valid
          */
-        private boolean isInputValid(){
+/*        private boolean isInputValid(){
             if(usernameField != null && passwordField != null && institutionRadio != null){
                 String usernameInput = usernameField.getText().toString();
                 String passwordInput = passwordField.getText().toString();
@@ -527,7 +527,7 @@ public class DiaFragMyAccount extends DialogFragment {
             }
             return false;
 
-        }
+        }*/
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
@@ -539,8 +539,8 @@ public class DiaFragMyAccount extends DialogFragment {
             institutionRadio = (RadioGroup) view.findViewById(R.id.radioInstitution);
             usernameField = (EditText) view.findViewById(R.id.editTextUserNameToLogin);
             passwordField = (EditText) view.findViewById(R.id.editTextPasswordToLogin);
-            Button signInButton = (Button) view.findViewById(R.id.buttonSignIn);
-            errorTextView = (TextView) view.findViewById(R.id.error_textview);
+            Button signInButton = (Button) view.findViewById(R.id.my_account_login_sign_in_button);
+            errorTextView = (TextView) view.findViewById(R.id.my_account_login_error_notice);
             errorTextView.setGravity(Gravity.CENTER);
             errorTextView.setText(errorMessage);
             //ImageButton passwordImageButton = (ImageButton) view.findViewById(R.id.info_password);
@@ -578,7 +578,6 @@ public class DiaFragMyAccount extends DialogFragment {
 
 
                     if (isNetworkAvailable(getActivity())) {
-                        if(isInputValid()){
                             String institutionId;
                             switch(institutionRadio.getCheckedRadioButtonId()){
                                 case R.id.uoit_radio : institutionId = "uoit";
@@ -595,7 +594,6 @@ public class DiaFragMyAccount extends DialogFragment {
                                     .setAction("Login Start Event - User Initiated")
                                     .build());
                             MainActivity.errorMessageFromLogin = "";
-                        }
 
 
 

@@ -772,7 +772,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
                                 }
                                 else{
                                     Toast.makeText(getActivity(), R.string.error_please_log_in, Toast.LENGTH_LONG).show();
-                                    ((MainActivity) getActivity()).displayMyAccountHint();
+                                    //((MainActivity) getActivity()).displayMyAccountHint();
                                 }
 
 
