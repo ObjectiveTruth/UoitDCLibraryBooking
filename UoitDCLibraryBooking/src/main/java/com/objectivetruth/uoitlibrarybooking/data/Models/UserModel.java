@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v4.util.Pair;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebService;
 import rx.Observable;
+import rx.Observer;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
@@ -36,11 +38,12 @@ public class UserModel {
         boolean returnIsUserLoggedIn = (username != null && password != null && institution != null);
 
         // Make sure we're in a consistent state, so remove all personal info in case only 1 or 2 is present
-        if(!returnIsUserLoggedIn) {clearPersonalData();}
+        if(!returnIsUserLoggedIn) {_clearPersonalData();}
         return returnIsUserLoggedIn;
     }
 
-    private void clearPersonalData() {
+    private void _clearPersonalData() {
+        Timber.d("Clearing all personal data");
         userPreferencesEditor
                 .remove(USER_USERNAME)
                 .remove(USER_PASSWORD)
@@ -48,8 +51,18 @@ public class UserModel {
                 .commit();
     }
 
-    public Observable<UserData> signIn(final UserCredentials userCredentials) {
-        return userWebService.getRawInitialSignInWebPageObs()
+    private void _savePersonalData(UserCredentials userCredentials) {
+        Timber.d("Saving user's personal data");
+        userPreferencesEditor
+                .putString(USER_USERNAME, userCredentials.username)
+                .putString(USER_PASSWORD, userCredentials.password)
+                .putString(USER_INSTITUTION, userCredentials.institutionId)
+                .commit();
+    }
+
+    public Observable<Pair<UserData, UserCredentials>> signIn(final UserCredentials userCredentials) {
+        Observable<Pair<UserData, UserCredentials>> returnObservable =
+                userWebService.getRawInitialSignInWebPageObs()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation())
 
@@ -65,23 +78,51 @@ public class UserModel {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation())
 
-                .flatMap(new Func1<UserCredentials, Observable<String>>() {
+                .flatMap(new Func1<UserCredentials, Observable<Pair<String, UserCredentials>>>() {
                     @Override
-                    public Observable<String> call(UserCredentials userCredentials) {
+                    public Observable<Pair<String, UserCredentials>> call(UserCredentials userCredentials) {
                         return userWebService.getRawSignedInMyReservationsPageObs(userCredentials);
                     }
                 })
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation())
 
-                .flatMap(new Func1<String, Observable<UserData>>() {
+                .flatMap(new Func1<Pair<String, UserCredentials>, Observable<Pair<UserData, UserCredentials>>>() {
                     @Override
-                    public Observable<UserData> call(String rawSignedInMyReservationsWebPage) {
+                    public Observable<Pair<UserData, UserCredentials>>
+                    call(Pair<String, UserCredentials>  rawWebpageUserCredentialsPair) {
                         Timber.d("Received raw signed In Result from My Reservation Login Page, passing to Parser");
-                        Timber.v(rawSignedInMyReservationsWebPage);
+                        Timber.v(rawWebpageUserCredentialsPair.first);
                         return MyAccountParser
-                                .parseRawSignedInMyReservationsWebPageForUserData(rawSignedInMyReservationsWebPage);
+                                .parseRawSignedInMyReservationsWebPageForUserData(rawWebpageUserCredentialsPair);
                     }
                 });
+        _bindObservableAndLoginState(returnObservable);
+        return returnObservable;
+    }
+
+    private void _bindObservableAndLoginState(Observable<Pair<UserData, UserCredentials>>
+                                                      userDataUserCredPairObservable) {
+        userDataUserCredPairObservable.subscribe(new Observer<Pair<UserData, UserCredentials>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
+                Timber.i("Observed a request to login, changing the Stored UserState to match the result");
+                if(userDataUserCredentialsPair.first.errorMessage != null) {
+                    _clearPersonalData();
+                }else {
+                    _savePersonalData(userDataUserCredentialsPair.second);
+                }
+            }
+        });
     }
 }

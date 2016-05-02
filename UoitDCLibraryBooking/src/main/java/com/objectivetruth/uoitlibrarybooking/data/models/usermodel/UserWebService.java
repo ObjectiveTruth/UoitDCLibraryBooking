@@ -1,6 +1,7 @@
 package com.objectivetruth.uoitlibrarybooking.data.models.usermodel;
 
 import android.app.Application;
+import android.support.v4.util.Pair;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -41,12 +42,13 @@ public class UserWebService {
         });
     }
 
-    public Observable<String> getRawSignedInMyReservationsPageObs(final UserCredentials userCredentials) {
-        return Observable.defer(new Func0<Observable<String>>() {
+    public Observable<Pair<String, UserCredentials>> getRawSignedInMyReservationsPageObs(final UserCredentials userCredentials) {
+        return Observable.defer(new Func0<Observable<Pair<String, UserCredentials>>>() {
             @Override
-            public Observable<String> call() {
+            public Observable<Pair<String, UserCredentials>> call() {
                 try {
-                    return Observable.just(_getRawSignedInMyReservationsWebpage(userCredentials));
+                    return Observable.just(new Pair<>(_getRawSignedInMyReservationsWebpage(userCredentials),
+                            userCredentials));
                 } catch (InterruptedException | ExecutionException e) {
                     Timber.e(e, "Error while trying to load signed-in myreservations uoitlibrary webpage");
                     return Observable.error(e);
@@ -70,7 +72,7 @@ public class UserWebService {
                 new StringRequest(Request.Method.POST, UOIT_LIBRARY_SIGNIN_URL, future, future) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> headers = new HashMap<String, String>();
+                        Map<String, String> headers = new HashMap<>();
                         headers.put("Content-Type", "application/x-www-form-urlencoded");
                         return headers;
                     }

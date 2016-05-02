@@ -17,8 +17,12 @@ public class MyAccountParser {
         return Observable.just(_parseRawInitialWebPageToGetStateInfo(userCredentials, rawMyReservationWebPage));
     }
 
-    static public Observable<UserData> parseRawSignedInMyReservationsWebPageForUserData(String rawMyReservationWebPage){
-        return Observable.just(_parseRawSignedInMyReservationsWebPageForUserData(rawMyReservationWebPage));
+    static public Observable<Pair<UserData, UserCredentials>> parseRawSignedInMyReservationsWebPageForUserData(
+            Pair<String, UserCredentials> rawWebpageUserCredentialsPair){
+        return Observable.just(
+                new Pair<>(
+                        _parseRawSignedInMyReservationsWebPageForUserData(rawWebpageUserCredentialsPair.first),
+                        rawWebpageUserCredentialsPair.second));
     }
 
     static private UserCredentials _parseRawInitialWebPageToGetStateInfo(UserCredentials userCredentials,

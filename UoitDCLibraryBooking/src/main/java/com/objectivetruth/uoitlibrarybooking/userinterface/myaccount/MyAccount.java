@@ -3,6 +3,7 @@ package com.objectivetruth.uoitlibrarybooking.userinterface.myaccount;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class MyAccount extends Fragment {
         //ImageButton logoutButton = (ImageButton) view.findViewById(R.id.my_account_logout);
 
         if(userModel.isUserSignedIn()) {
+            Timber.i("User is already signed in, showing his details");
             //_showAccountInfoFragment();
             //logoutButton.setVisibility(View.VISIBLE);
             //logoutButton.setVisibility(View.GONE);
@@ -59,16 +61,16 @@ public class MyAccount extends Fragment {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation())
 
-                .flatMap(new Func1<UserCredentials, Observable<UserData>>() {
+                .flatMap(new Func1<UserCredentials, Observable<Pair<UserData, UserCredentials>>>() {
                     @Override
-                    public Observable<UserData> call(UserCredentials userCredentials) {
+                    public Observable<Pair<UserData, UserCredentials>> call(UserCredentials userCredentials) {
                         return userModel.signIn(userCredentials);
                         }
                     })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.computation())
 
-                .subscribe(new Observer<UserData>() {
+                .subscribe(new Observer<Pair<UserData, UserCredentials>>() {
             @Override
             public void onCompleted() {
 
@@ -79,13 +81,14 @@ public class MyAccount extends Fragment {
             }
 
             @Override
-            public void onNext(UserData userData) {
-                if(userData.errorMessage != null) {
+            public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
+                if(userDataUserCredentialsPair.first.errorMessage != null) {
                     Timber.d("Received Error Message from Parser, publishing to Subject");
-                    _sendErrorMessageToLoginErrorSubject(userData.errorMessage, _getLoginErrorSubject());
+                    _sendErrorMessageToLoginErrorSubject(userDataUserCredentialsPair.first.errorMessage,
+                            _getLoginErrorSubject());
                 }else {
                     Timber.i("Received UserData");
-                    Timber.v(userData.toString());
+                    Timber.v(userDataUserCredentialsPair.first.toString());
                 }
                 Timber.i("Got it");
             }
