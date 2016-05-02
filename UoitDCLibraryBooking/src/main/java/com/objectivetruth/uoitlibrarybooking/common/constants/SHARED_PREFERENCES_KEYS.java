@@ -12,4 +12,5 @@ public class SHARED_PREFERENCES_KEYS {
     public final static String USER_USERNAME = "username";
     public final static String USER_PASSWORD = "password";
     public static final String USER_INSTITUTION = "shared_pref_institution";
+    public static final String USER_DATA_JSON = "user_data_json";
 }

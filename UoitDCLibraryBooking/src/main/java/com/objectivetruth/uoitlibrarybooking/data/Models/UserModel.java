@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
+import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
@@ -13,21 +14,23 @@ import rx.Observable;
 import rx.Observer;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 import timber.log.Timber;
+
+import javax.inject.Inject;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 public class UserModel {
     private SharedPreferences userSharedPreferences;
-    private SharedPreferences.Editor userPreferencesEditor;
     final static private String USER_SHARED_PREFERENCES_NAME = "USER_INFO";
     private UserWebService userWebService;
+    @Inject Gson gson;
 
     @SuppressLint("CommitPrefEdits")
     public UserModel(Application mApplication) {
         userSharedPreferences = mApplication.getSharedPreferences(USER_SHARED_PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
-        userPreferencesEditor = userSharedPreferences.edit();
         userWebService = new UserWebService(mApplication);
     }
 
@@ -44,20 +47,31 @@ public class UserModel {
 
     private void _clearPersonalData() {
         Timber.d("Clearing all personal data");
-        userPreferencesEditor
+        userSharedPreferences.edit()
                 .remove(USER_USERNAME)
                 .remove(USER_PASSWORD)
                 .remove(USER_INSTITUTION)
-                .commit();
+                .apply();
     }
 
-    private void _savePersonalData(UserCredentials userCredentials) {
+    private void _savePersonalData(UserData userData, UserCredentials userCredentials) {
         Timber.d("Saving user's personal data");
-        userPreferencesEditor
+        //String userDataInJSON = gson.toJson(userData);
+        //Timber.i(userDataInJSON);
+        userSharedPreferences.edit()
                 .putString(USER_USERNAME, userCredentials.username)
                 .putString(USER_PASSWORD, userCredentials.password)
                 .putString(USER_INSTITUTION, userCredentials.institutionId)
+         //       .putString(USER_DATA_JSON, userDataInJSON)
                 .commit();
+    }
+
+    public UserData getUserDataFromCache() {
+        String userDataJSON = userSharedPreferences.getString(USER_DATA_JSON, null);
+        if(userDataJSON == null) {return new UserData();}
+
+        UserData returnUserData = gson.fromJson(userDataJSON, UserData.class);
+        return returnUserData;
     }
 
     public Observable<Pair<UserData, UserCredentials>> signIn(final UserCredentials userCredentials) {
@@ -101,6 +115,25 @@ public class UserModel {
         return returnObservable;
     }
 
+    public void setLogoutClickSubject(PublishSubject<Object> logoutClickSubject) {
+        logoutClickSubject.subscribe(new Observer<Object>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+                _clearPersonalData();
+            }
+        });
+    }
+
     private void _bindObservableAndLoginState(Observable<Pair<UserData, UserCredentials>>
                                                       userDataUserCredPairObservable) {
         userDataUserCredPairObservable.subscribe(new Observer<Pair<UserData, UserCredentials>>() {
@@ -120,7 +153,8 @@ public class UserModel {
                 if(userDataUserCredentialsPair.first.errorMessage != null) {
                     _clearPersonalData();
                 }else {
-                    _savePersonalData(userDataUserCredentialsPair.second);
+                    _savePersonalData(userDataUserCredentialsPair.first,
+                            userDataUserCredentialsPair.second);
                 }
             }
         });

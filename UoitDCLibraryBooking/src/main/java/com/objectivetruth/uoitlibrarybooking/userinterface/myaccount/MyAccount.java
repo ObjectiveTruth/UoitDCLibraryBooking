@@ -13,6 +13,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.LoginFragment;
+import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.myaccountloaded.MyAccountLoaded;
 import rx.Observable;
 import rx.Observer;
 import rx.functions.Func1;
@@ -25,6 +26,7 @@ import javax.inject.Inject;
 public class MyAccount extends Fragment {
     private PublishSubject<UserCredentials> signInClickSubject;
     private PublishSubject<String> loginErrorSubject;
+    private PublishSubject<Object> logoutClickedSubject;
     @Inject UserModel userModel;
 
     @Override
@@ -46,13 +48,10 @@ public class MyAccount extends Fragment {
 
         if(userModel.isUserSignedIn()) {
             Timber.i("User is already signed in, showing his details");
-            //_showAccountInfoFragment();
-            //logoutButton.setVisibility(View.VISIBLE);
-            //logoutButton.setVisibility(View.GONE);
+            _showMyAccountLoadedFragment();
         }else {
             Timber.i("User isn't signed in, showing login screen");
-            _showLoginFragment();
-            _subscribeToSignInClickSubject(_getSignInClickSubject());
+            _showLoginFragment(_getSignInClickSubject());
         }
     }
 
@@ -89,8 +88,8 @@ public class MyAccount extends Fragment {
                 }else {
                     Timber.i("Received UserData");
                     Timber.v(userDataUserCredentialsPair.first.toString());
+                    _showMyAccountLoadedFragment();
                 }
-                Timber.i("Got it");
             }
         });
     }
@@ -104,7 +103,17 @@ public class MyAccount extends Fragment {
         return new MyAccount();
     }
 
-    private void _showLoginFragment() {
+    private void _showMyAccountLoadedFragment() {
+        String MY_ACCOUNT_LOADED_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOADED_FRAGMENT_TAG";
+        getFragmentManager().beginTransaction()
+                .replace(R.id.my_account_content_frame,
+                        MyAccountLoaded.newInstance(userModel.getUserDataFromCache(), _getLogoutClickedSubject()),
+                        MY_ACCOUNT_LOADED_FRAGMENT_TAG)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void _showLoginFragment(PublishSubject<UserCredentials> signInClickSubject) {
         String MY_ACCOUNT_LOGIN_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOGIN_FRAGMENT_TAG";
 /*        Fragment mLoginFragment = getFragmentManager()
                 .findFragmentByTag(MY_ACCOUNT_LOGIN_FRAGMENT_TAG);
@@ -115,7 +124,7 @@ public class MyAccount extends Fragment {
             Timber.d("Fragment with tag: " + MY_ACCOUNT_LOGIN_FRAGMENT_TAG +
                     " found. retrieving it without creating a new one");
         }*/
-        PublishSubject<UserCredentials> signInClickSubject = _getSignInClickSubject();
+        _subscribeToSignInClickSubject(signInClickSubject);
         getFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
                         LoginFragment.newInstance(signInClickSubject, _getLoginErrorSubject()),
@@ -169,10 +178,49 @@ public class MyAccount extends Fragment {
         }
     }
 
+    private PublishSubject<Object> _getLogoutClickedSubject() {
+        if(logoutClickedSubject == null) {
+            Timber.d("Current logoutClickedSubject is NULL, making new one");
+            logoutClickedSubject = PublishSubject.create();
+            userModel.setLogoutClickSubject(logoutClickedSubject);
+            _bindLogoutClickSubjectToSwitchingToLoginFragment(logoutClickedSubject);
+            return logoutClickedSubject;
+        }else if (logoutClickedSubject.hasCompleted()) {
+            Timber.d("Current logoutClickedSubject hasCompleted, making new one");
+            logoutClickedSubject = PublishSubject.create();
+            userModel.setLogoutClickSubject(logoutClickedSubject);
+            _bindLogoutClickSubjectToSwitchingToLoginFragment(logoutClickedSubject);
+            return logoutClickedSubject;
+        }else {
+            Timber.d("Current logoutClickedSubject is still valid, passing it back");
+            return logoutClickedSubject;
+        }
+    }
+
+    private void _bindLogoutClickSubjectToSwitchingToLoginFragment(PublishSubject<Object> logoutClickedSubject){
+        logoutClickedSubject.subscribe(new Observer<Object>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+                _showLoginFragment(_getSignInClickSubject());
+            }
+        });
+    }
+
     @Override
     public void onPause() {
         _getSignInClickSubject().onCompleted();
         _getLoginErrorSubject().onCompleted();
+        _getLogoutClickedSubject().onCompleted();
         super.onPause();
     }
 }
