@@ -16,6 +16,7 @@ import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.Login
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.myaccountloaded.MyAccountLoaded;
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -24,10 +25,12 @@ import timber.log.Timber;
 import javax.inject.Inject;
 
 public class MyAccount extends Fragment {
-    private PublishSubject<UserCredentials> signInClickSubject;
     private PublishSubject<String> loginErrorSubject;
-    private PublishSubject<Object> logoutClickedSubject;
-    @Inject UserModel userModel;
+    private Subscription currentLogoutSubscription;
+    private Subscription currentSignInSubscription;
+    private PublishSubject<UserCredentials> signInClickedSubject;
+    private PublishSubject<LogOutClicked> logoutClickedSubject;
+    public @Inject UserModel userModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,54 +47,14 @@ public class MyAccount extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //ImageButton logoutButton = (ImageButton) view.findViewById(R.id.my_account_logout);
 
         if(userModel.isUserSignedIn()) {
             Timber.i("User is already signed in, showing his details");
-            _showMyAccountLoadedFragment();
+            _showMyAccountLoadedFragment(_getLogoutClickedSubject());
         }else {
             Timber.i("User isn't signed in, showing login screen");
-            _showLoginFragment(_getSignInClickSubject());
+            _showLoginFragment(_getSignInClickedSubject());
         }
-    }
-
-    private void _subscribeToSignInClickSubject(PublishSubject<UserCredentials> signInClickSubject) {
-        signInClickSubject
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
-
-                .flatMap(new Func1<UserCredentials, Observable<Pair<UserData, UserCredentials>>>() {
-                    @Override
-                    public Observable<Pair<UserData, UserCredentials>> call(UserCredentials userCredentials) {
-                        return userModel.signIn(userCredentials);
-                        }
-                    })
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.computation())
-
-                .subscribe(new Observer<Pair<UserData, UserCredentials>>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
-                if(userDataUserCredentialsPair.first.errorMessage != null) {
-                    Timber.d("Received Error Message from Parser, publishing to Subject");
-                    _sendErrorMessageToLoginErrorSubject(userDataUserCredentialsPair.first.errorMessage,
-                            _getLoginErrorSubject());
-                }else {
-                    Timber.i("Received UserData");
-                    Timber.v(userDataUserCredentialsPair.first.toString());
-                    _showMyAccountLoadedFragment();
-                }
-            }
-        });
     }
 
     private static void _sendErrorMessageToLoginErrorSubject(String errorMessage,
@@ -103,17 +66,18 @@ public class MyAccount extends Fragment {
         return new MyAccount();
     }
 
-    private void _showMyAccountLoadedFragment() {
+    private void _showMyAccountLoadedFragment(PublishSubject<LogOutClicked> logoutClickedSubject) {
         String MY_ACCOUNT_LOADED_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOADED_FRAGMENT_TAG";
+        _bindLogoutClickedSubjectToLogoutFlow(logoutClickedSubject);
         getFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        MyAccountLoaded.newInstance(userModel.getUserDataFromCache(), _getLogoutClickedSubject()),
+                        MyAccountLoaded.newInstance(userModel.getUserDataFromCache(), logoutClickedSubject),
                         MY_ACCOUNT_LOADED_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
 
-    private void _showLoginFragment(PublishSubject<UserCredentials> signInClickSubject) {
+    private void _showLoginFragment(PublishSubject<UserCredentials> signInClickedSubject) {
         String MY_ACCOUNT_LOGIN_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOGIN_FRAGMENT_TAG";
 /*        Fragment mLoginFragment = getFragmentManager()
                 .findFragmentByTag(MY_ACCOUNT_LOGIN_FRAGMENT_TAG);
@@ -124,10 +88,10 @@ public class MyAccount extends Fragment {
             Timber.d("Fragment with tag: " + MY_ACCOUNT_LOGIN_FRAGMENT_TAG +
                     " found. retrieving it without creating a new one");
         }*/
-        _subscribeToSignInClickSubject(signInClickSubject);
+        _bindSignInClickedSubjectToSignInFlow(signInClickedSubject);
         getFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        LoginFragment.newInstance(signInClickSubject, _getLoginErrorSubject()),
+                        LoginFragment.newInstance(signInClickedSubject, _getLoginErrorSubject()),
                         MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
@@ -152,19 +116,6 @@ public class MyAccount extends Fragment {
         }
     }*/
 
-    private PublishSubject<UserCredentials> _getSignInClickSubject() {
-        if(signInClickSubject == null) {
-            Timber.d("Current singInClickSubject is NULL, making new one");
-            return signInClickSubject = PublishSubject.create();
-        }else if (signInClickSubject.hasCompleted()) {
-            Timber.d("Current singInClickSubject has completed already, making new one");
-            return signInClickSubject = PublishSubject.create();
-        }else {
-            Timber.d("Current singInClickSubject is still valid, passing it back");
-            return signInClickSubject;
-        }
-    }
-
     private PublishSubject<String> _getLoginErrorSubject() {
         if(loginErrorSubject == null) {
             Timber.d("Current loginErrorSubject is NULL, making new one");
@@ -178,18 +129,88 @@ public class MyAccount extends Fragment {
         }
     }
 
-    private PublishSubject<Object> _getLogoutClickedSubject() {
+    private void _bindLogoutClickedSubjectToLogoutFlow(PublishSubject<LogOutClicked> logoutClickedSubject){
+        currentLogoutSubscription = logoutClickedSubject
+                .subscribe(new Observer<LogOutClicked>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(LogOutClicked logOutClicked) {
+                        userModel.getLogoutSubject().onNext(new UserModel.LogoutEvent());
+                        _showLoginFragment(_getSignInClickedSubject());
+                    }
+                });
+    }
+
+    private void _bindSignInClickedSubjectToSignInFlow(PublishSubject<UserCredentials>
+                                                                              signInClickSubject) {
+        currentSignInSubscription = signInClickSubject
+                .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
+
+                .flatMap(new Func1<UserCredentials, Observable<Pair<UserData, UserCredentials>>>() {
+                    @Override
+                    public Observable<Pair<UserData, UserCredentials>> call(UserCredentials userCredentials) {
+                        return userModel.signIn(userCredentials);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.computation())
+
+                .subscribe(new Observer<Pair<UserData, UserCredentials>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
+                        if(userDataUserCredentialsPair.first.errorMessage != null) {
+                            Timber.d("Received Error Message from Parser, publishing to Subject");
+                            _sendErrorMessageToLoginErrorSubject(userDataUserCredentialsPair.first.errorMessage,
+                                    _getLoginErrorSubject());
+                        }else {
+                            Timber.i("Received UserData");
+                            Timber.v(userDataUserCredentialsPair.first.toString());
+                            _showMyAccountLoadedFragment(_getLogoutClickedSubject());
+                        }
+                    }
+                });
+    }
+
+    private PublishSubject<UserCredentials> _getSignInClickedSubject() {
+        if(signInClickedSubject == null) {
+            Timber.d("Current singInClickSubject is NULL, making new one");
+            return signInClickedSubject = PublishSubject.create();
+        }else if (signInClickedSubject.hasCompleted()) {
+            Timber.d("Current singInClickSubject has completed already, making new one");
+            return signInClickedSubject = PublishSubject.create();
+        }else {
+            Timber.d("Current singInClickSubject is still valid, passing it back");
+            return signInClickedSubject;
+        }
+    }
+
+    private PublishSubject<LogOutClicked> _getLogoutClickedSubject() {
         if(logoutClickedSubject == null) {
             Timber.d("Current logoutClickedSubject is NULL, making new one");
             logoutClickedSubject = PublishSubject.create();
-            userModel.setLogoutClickSubject(logoutClickedSubject);
-            _bindLogoutClickSubjectToSwitchingToLoginFragment(logoutClickedSubject);
             return logoutClickedSubject;
         }else if (logoutClickedSubject.hasCompleted()) {
             Timber.d("Current logoutClickedSubject hasCompleted, making new one");
             logoutClickedSubject = PublishSubject.create();
-            userModel.setLogoutClickSubject(logoutClickedSubject);
-            _bindLogoutClickSubjectToSwitchingToLoginFragment(logoutClickedSubject);
             return logoutClickedSubject;
         }else {
             Timber.d("Current logoutClickedSubject is still valid, passing it back");
@@ -197,30 +218,22 @@ public class MyAccount extends Fragment {
         }
     }
 
-    private void _bindLogoutClickSubjectToSwitchingToLoginFragment(PublishSubject<Object> logoutClickedSubject){
-        logoutClickedSubject.subscribe(new Observer<Object>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Object o) {
-                _showLoginFragment(_getSignInClickSubject());
-            }
-        });
-    }
-
     @Override
-    public void onPause() {
-        _getSignInClickSubject().onCompleted();
-        _getLoginErrorSubject().onCompleted();
-        _getLogoutClickedSubject().onCompleted();
-        super.onPause();
+    public void onDestroyView() {
+        _unsubscribeFromAllObservablesAndCompleteAllSubjectsCreated();
+        super.onDestroyView();
     }
+
+    /**
+     * Prevents memory leaks by unsubscribing to any active subscriptions and completing any
+     * subjects created by MyAccount
+     */
+    private void _unsubscribeFromAllObservablesAndCompleteAllSubjectsCreated() {
+        if(currentLogoutSubscription != null) {currentLogoutSubscription.unsubscribe();}
+        if(currentSignInSubscription != null) {currentSignInSubscription.unsubscribe();}
+        if(signInClickedSubject != null) {signInClickedSubject.onCompleted();}
+        if(loginErrorSubject != null) {loginErrorSubject.onCompleted();}
+    }
+
+    static public class LogOutClicked {}
 }

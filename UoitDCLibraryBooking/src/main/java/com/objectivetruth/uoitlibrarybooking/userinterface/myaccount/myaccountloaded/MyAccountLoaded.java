@@ -10,13 +10,15 @@ import android.view.*;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
+import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
 import rx.subjects.PublishSubject;
+import timber.log.Timber;
 
 import javax.inject.Inject;
 
 public class MyAccountLoaded extends Fragment {
     private UserData userData;
-    private PublishSubject<Object> logoutClickedSubject;
+    private PublishSubject<MyAccount.LogOutClicked> logoutClickedSubject;
     @Inject UserModel userModel;
 
     @Nullable
@@ -41,7 +43,8 @@ public class MyAccountLoaded extends Fragment {
         return myBookingsLoadedView;
     }
 
-    public static MyAccountLoaded newInstance(UserData userData, PublishSubject<Object> logoutClickedSubject) {
+    public static MyAccountLoaded newInstance(UserData userData, PublishSubject<MyAccount.LogOutClicked>
+            logoutClickedSubject) {
         MyAccountLoaded returnFragment = new MyAccountLoaded();
         returnFragment.userData = userData;
         returnFragment.logoutClickedSubject = logoutClickedSubject;
@@ -65,7 +68,8 @@ public class MyAccountLoaded extends Fragment {
 
         switch(id) {
             case R.id.my_account_menu_item_logout:
-                logoutClickedSubject.onNext(new Object());
+                Timber.i("Logout clicked");
+                logoutClickedSubject.onNext(new MyAccount.LogOutClicked());
                 return true;
             default:
                 getActivity().onOptionsItemSelected(item);

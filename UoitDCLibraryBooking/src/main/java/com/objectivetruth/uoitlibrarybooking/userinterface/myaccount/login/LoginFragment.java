@@ -14,6 +14,7 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import rx.Observer;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -28,6 +29,7 @@ public class LoginFragment extends Fragment {
     private RadioGroup institutionRadio;
     private PublishSubject<UserCredentials> signInClickSubject;
     private PublishSubject<String> loginErroSubject;
+    private Subscription currentLoginErrorSubscription;
     @Inject Tracker googleAnalyticsTracker;
 
     @Override
@@ -100,18 +102,6 @@ public class LoginFragment extends Fragment {
                             passwordField.getText().toString(),
                             _getInsitutionIdFromRadioView(institutionRadio)));
                 }
-
-
-                //OttoBusSingleton.getInstance().post(new MyAccountLoginTaskStart(loginInput, MY_ACCOUNT_USER_INITIATED));
-/*            public boolean isNetworkAvailable(Context ctx) {
-                ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo netInfo = cm.getActiveNetworkInfo();
-                if (netInfo != null && netInfo.isConnectedOrConnecting() && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }*/
             }
         });
     }
@@ -133,9 +123,9 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    private static void _bindLoginErrorSubjectToErrorTextView(PublishSubject<String> loginErroSubject,
+    private void _bindLoginErrorSubjectToErrorTextView(PublishSubject<String> loginErroSubject,
                                                               final TextView errorTextView) {
-        loginErroSubject
+        currentLoginErrorSubscription =  loginErroSubject
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<String>() {
@@ -157,6 +147,12 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        if(currentLoginErrorSubscription != null) {currentLoginErrorSubscription.unsubscribe();}
+        super.onDestroyView();
     }
 }
 

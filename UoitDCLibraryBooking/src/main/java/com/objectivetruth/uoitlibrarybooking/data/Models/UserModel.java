@@ -25,6 +25,7 @@ public class UserModel {
     private SharedPreferences userSharedPreferences;
     final static private String USER_SHARED_PREFERENCES_NAME = "USER_INFO";
     private UserWebService userWebService;
+    private PublishSubject<LogoutEvent> logoutSubject;
     @Inject Gson gson;
 
     @SuppressLint("CommitPrefEdits")
@@ -40,8 +41,10 @@ public class UserModel {
         String institution = userSharedPreferences.getString(USER_INSTITUTION, null);
         boolean returnIsUserLoggedIn = (username != null && password != null && institution != null);
 
-        // Make sure we're in a consistent state, so remove all personal info in case only 1 or 2 is present
-        if(!returnIsUserLoggedIn) {_clearPersonalData();}
+        if(!returnIsUserLoggedIn) {
+            Timber.d("User credentials not found, clearing all credentials to make sure data stays consistent");
+            _clearPersonalData();
+        }
         return returnIsUserLoggedIn;
     }
 
@@ -63,7 +66,7 @@ public class UserModel {
                 .putString(USER_PASSWORD, userCredentials.password)
                 .putString(USER_INSTITUTION, userCredentials.institutionId)
          //       .putString(USER_DATA_JSON, userDataInJSON)
-                .commit();
+                .apply();
     }
 
     public UserData getUserDataFromCache() {
@@ -111,12 +114,12 @@ public class UserModel {
                                 .parseRawSignedInMyReservationsWebPageForUserData(rawWebpageUserCredentialsPair);
                     }
                 });
-        _bindObservableAndLoginState(returnObservable);
+        _subscribeToSignInObservable(returnObservable);
         return returnObservable;
     }
 
-    public void setLogoutClickSubject(PublishSubject<Object> logoutClickSubject) {
-        logoutClickSubject.subscribe(new Observer<Object>() {
+    private void _subscribeToLogoutSubject(PublishSubject<LogoutEvent> logoutClickSubject) {
+        logoutClickSubject.subscribe(new Observer<LogoutEvent>() {
             @Override
             public void onCompleted() {
 
@@ -128,13 +131,13 @@ public class UserModel {
             }
 
             @Override
-            public void onNext(Object o) {
+            public void onNext(LogoutEvent logoutEvent) {
                 _clearPersonalData();
             }
         });
     }
 
-    private void _bindObservableAndLoginState(Observable<Pair<UserData, UserCredentials>>
+    private void _subscribeToSignInObservable(Observable<Pair<UserData, UserCredentials>>
                                                       userDataUserCredPairObservable) {
         userDataUserCredPairObservable.subscribe(new Observer<Pair<UserData, UserCredentials>>() {
             @Override
@@ -159,4 +162,23 @@ public class UserModel {
             }
         });
     }
+
+    public PublishSubject<LogoutEvent> getLogoutSubject() {
+        if(logoutSubject == null) {
+            Timber.d("Current logoutSubject is NULL, making new one");
+            logoutSubject = PublishSubject.create();
+            _subscribeToLogoutSubject(logoutSubject);
+            return logoutSubject;
+        }else if (logoutSubject.hasCompleted()) {
+            Timber.d("Current logoutSubject hasCompleted, making new one");
+            logoutSubject = PublishSubject.create();
+            _subscribeToLogoutSubject(logoutSubject);
+            return logoutSubject;
+        }else {
+            Timber.d("Current logoutSubject is still valid, passing it back");
+            return logoutSubject;
+        }
+    }
+
+    public static class LogoutEvent {}
 }
