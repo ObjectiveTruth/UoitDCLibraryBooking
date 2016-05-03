@@ -34,9 +34,9 @@ public class Tab_Past extends Fragment {
             Timber.e(e, "Coudln't get accountinfo from Database");
             arrayToUse = new String[0];
         }
-        View rootView = inflater.inflate(R.layout.my_bookings_tab, container, false);
-        gridView = (GridView)rootView.findViewById(R.id.my_bookings_gridview);
-        noInfo = (RelativeLayout)rootView.findViewById(R.id.no_info);
+        View rootView = inflater.inflate(R.layout.my_account_loaded_booking_tab, container, false);
+        gridView = (GridView)rootView.findViewById(R.id.my_account_loaded_grid_item_textview);
+        noInfo = (RelativeLayout)rootView.findViewById(R.id.my_account_loaded_grid_item_textview);
 		if(arrayToUse.length > 1){
 			gridView.setVisibility(View.VISIBLE);
 			noInfo.setVisibility(View.GONE);
@@ -155,9 +155,9 @@ public class Tab_Past extends Fragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 	        if (convertView == null) {
-	            convertView = inflater.inflate(R.layout.my_bookings_item, null);
+	            convertView = inflater.inflate(R.layout.my_account_loaded_booking_grid_item, null);
 
-	            txtView = (TextView) convertView.findViewById(R.id.my_booking_item_color);
+	            txtView = (TextView) convertView.findViewById(R.id.my_account_loaded_grid_item_textview);
 	        }
 	        txtView.setText(items[position]);
 

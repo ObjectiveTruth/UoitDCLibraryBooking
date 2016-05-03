@@ -20,7 +20,7 @@ public class CompleteBookingTab extends Fragment{
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.loading_large, container, false);
+        return inflater.inflate(R.layout.my_account_loaded_booking_tab, container, false);
     }
 
     public static CompleteBookingTab newInstance(ArrayList<MyAccountBooking> myAccountBookings) {

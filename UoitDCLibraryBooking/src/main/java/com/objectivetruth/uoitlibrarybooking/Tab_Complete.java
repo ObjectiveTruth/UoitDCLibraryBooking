@@ -37,9 +37,9 @@ public class Tab_Complete extends Fragment {
             Timber.e(e, "Couldn't get accountinfo from Database");
             arrayToUse = new String[0];
         }
-        View rootView = inflater.inflate(R.layout.my_bookings_tab, container, false);
-        gridView = (GridView)rootView.findViewById(R.id.my_bookings_gridview);
-         noInfo = (RelativeLayout)rootView.findViewById(R.id.no_info);
+        View rootView = inflater.inflate(R.layout.my_account_loaded_booking_tab, container, false);
+        gridView = (GridView)rootView.findViewById(R.id.my_account_loaded_gridview);
+         noInfo = (RelativeLayout)rootView.findViewById(R.id.calendar_page_grid);
 		if(arrayToUse.length > 1){
 			gridView.setVisibility(View.VISIBLE);
 			noInfo.setVisibility(View.GONE);
@@ -175,9 +175,9 @@ public void onCreate(Bundle savedInstanceState) {
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 	        if (convertView == null) {
-	            convertView = inflater.inflate(R.layout.my_bookings_item, null);
+	            convertView = inflater.inflate(R.layout.my_account_loaded_booking_grid_item, null);
 
-	            txtView = (TextView) convertView.findViewById(R.id.my_booking_item_color);
+	            txtView = (TextView) convertView.findViewById(R.id.calendar_item_layout);
 	        }
 	        
 	        txtView.setTextColor(Color.parseColor("#0099CC"));

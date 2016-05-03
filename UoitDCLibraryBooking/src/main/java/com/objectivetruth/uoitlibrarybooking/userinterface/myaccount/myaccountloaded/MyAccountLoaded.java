@@ -34,7 +34,7 @@ public class MyAccountLoaded extends Fragment {
         TabLayout _mTabLayout = (TabLayout) myBookingsLoadedView.findViewById(R.id.my_account_tab_layout);
 
         // Will supply the ViewPager with what should be displayed
-        PagerAdapter _mPagerAdapter = new MyAccountPagerAdapter(getFragmentManager(), userData);
+        PagerAdapter _mPagerAdapter = new MyAccountPagerAdapter(getFragmentManager(), userData, getContext());
         _mViewPager.setAdapter(_mPagerAdapter);
 
         // Bind the TabLayout and ViewPager together

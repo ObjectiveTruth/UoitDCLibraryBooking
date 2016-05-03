@@ -5,14 +5,10 @@
     android:orientation="vertical" >
 
     <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
-        android:id="@+id/my_booking_item_color"
-        android:textColor="@color/blue_font"
+        android:id="@+id/my_account_loaded_grid_item_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:minLines="3"
-        android:textSize="16sp"
-        android:background="@drawable/bottom_border_white"
-        />
-
+        android:textSize="16sp" />
 </LinearLayout>

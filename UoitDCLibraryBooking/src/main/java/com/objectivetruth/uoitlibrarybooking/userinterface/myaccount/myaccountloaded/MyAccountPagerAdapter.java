@@ -1,5 +1,6 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.myaccountloaded;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -8,26 +9,28 @@ import timber.log.Timber;
 
 class MyAccountPagerAdapter extends FragmentStatePagerAdapter {
     private UserData userData;
+    private Context context;
 
-    MyAccountPagerAdapter(FragmentManager fragmentManager, UserData userData) {
+    MyAccountPagerAdapter(FragmentManager fragmentManager, UserData userData, Context context) {
         super(fragmentManager);
         this.userData = userData;
+        this.context = context;
     }
 
     @Override
     public Fragment getItem(int position) {
         switch(position) {
             case 0:
-                return IncompleteBookingTab.newInstance(userData.incompleteBookings);
+                return BookingsTab.newInstance(userData.incompleteBookings, context);
             case 1:
-                return CompleteBookingTab.newInstance(userData.completeBookings);
+                return BookingsTab.newInstance(userData.completeBookings, context);
             case 2:
-                return PastBookingTab.newInstance(userData.pastBookings);
+                return BookingsTab.newInstance(userData.pastBookings, context);
             default:
                 // Should never happen
                 Timber.w("WTF? My Account requested a tab that's outside of what's expected(0-2). Requested: " +
                         position);
-                return CompleteBookingTab.newInstance(userData.completeBookings);
+                return BookingsTab.newInstance(userData.completeBookings, context);
         }
     }
 
