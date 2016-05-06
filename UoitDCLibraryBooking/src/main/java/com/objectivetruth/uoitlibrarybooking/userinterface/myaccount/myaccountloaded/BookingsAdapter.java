@@ -9,12 +9,18 @@ import android.widget.TextView;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBooking;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class BookingsAdapter extends ArrayAdapter<MyAccountBooking>{
+    private ArrayList<MyAccountBooking> myAccountBookings;
 
-    public BookingsAdapter(Context context, List<MyAccountBooking> myAccountBookings) {
+    public BookingsAdapter(Context context, ArrayList<MyAccountBooking> myAccountBookings) {
         super(context, 0, myAccountBookings); // 0 is the view to instantiate by default. We'll use our own in getView
+        if(myAccountBookings == null ) {
+            this.myAccountBookings = new ArrayList<MyAccountBooking>();
+        }else{
+            this.myAccountBookings = myAccountBookings;
+        }
     }
 
     @Override
@@ -49,6 +55,11 @@ public class BookingsAdapter extends ArrayAdapter<MyAccountBooking>{
         }
 
         return convertView;
+    }
+
+    @Override
+    public int getCount() {
+        return myAccountBookings.size();
     }
 
     private static class ViewHolder {

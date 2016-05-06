@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
+import com.android.volley.AuthFailureError;
 import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
@@ -17,8 +18,6 @@ import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
-import javax.inject.Inject;
-
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 public class UserModel {
@@ -26,7 +25,7 @@ public class UserModel {
     final static private String USER_SHARED_PREFERENCES_NAME = "USER_INFO";
     private UserWebService userWebService;
     private PublishSubject<LogoutEvent> logoutSubject;
-    @Inject Gson gson;
+    private static final String EMPTY_JSON = "{}";
 
     @SuppressLint("CommitPrefEdits")
     public UserModel(Application mApplication) {
@@ -57,27 +56,49 @@ public class UserModel {
                 .apply();
     }
 
+    private boolean isUserNotSignedIn() {
+        return !isUserSignedIn();
+    }
+
+    private UserCredentials _getUserCredentialsFromStorage() {
+        Timber.d("Getting user's credentials from storage");
+        UserCredentials userCredentials = new UserCredentials(
+                userSharedPreferences.getString(USER_USERNAME, ""),
+                userSharedPreferences.getString(USER_PASSWORD, ""),
+                userSharedPreferences.getString(USER_INSTITUTION, ""));
+        return userCredentials;
+    }
+
     private void _savePersonalData(UserData userData, UserCredentials userCredentials) {
         Timber.d("Saving user's personal data");
-        //String userDataInJSON = gson.toJson(userData);
-        //Timber.i(userDataInJSON);
+        Gson gson = new Gson();
+        String userDataInJSON = gson.toJson(userData);
+        Timber.v(userDataInJSON);
         userSharedPreferences.edit()
                 .putString(USER_USERNAME, userCredentials.username)
                 .putString(USER_PASSWORD, userCredentials.password)
                 .putString(USER_INSTITUTION, userCredentials.institutionId)
-         //       .putString(USER_DATA_JSON, userDataInJSON)
+                .putString(USER_DATA_JSON, userDataInJSON)
                 .apply();
     }
 
-    public UserData getUserDataFromCache() {
-        String userDataJSON = userSharedPreferences.getString(USER_DATA_JSON, null);
-        if(userDataJSON == null) {return new UserData();}
-
+    public UserData getUserDataFromStorage() {
+        Timber.d("Gettign Users Data from Storage");
+        Gson gson = new Gson();
+        String userDataJSON = userSharedPreferences.getString(USER_DATA_JSON, EMPTY_JSON);
         UserData returnUserData = gson.fromJson(userDataJSON, UserData.class);
         return returnUserData;
     }
 
-    public Observable<Pair<UserData, UserCredentials>> signIn(final UserCredentials userCredentials) {
+    public Observable<Pair<UserData, UserCredentials>> signInObs() {
+        if(isUserNotSignedIn()) {
+            return Observable.error(new AuthFailureError("User is not signed in, no credentials found in storage"));}
+
+        UserCredentials userCredentials = _getUserCredentialsFromStorage();
+        return signInObs(userCredentials);
+    }
+
+    public Observable<Pair<UserData, UserCredentials>> signInObs(final UserCredentials userCredentials) {
         Observable<Pair<UserData, UserCredentials>> returnObservable =
                 userWebService.getRawInitialSignInWebPageObs()
                 .subscribeOn(Schedulers.computation())

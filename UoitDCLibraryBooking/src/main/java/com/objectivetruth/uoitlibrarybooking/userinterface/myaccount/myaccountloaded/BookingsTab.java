@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public class BookingsTab extends Fragment{
     private ArrayList<MyAccountBooking> myAccountBookings;
     private Context context;
+    public int positionInParentPagerAdapter;
 
     @Nullable
     @Override
@@ -31,10 +32,12 @@ public class BookingsTab extends Fragment{
         return bookingTabView;
     }
 
-    public static BookingsTab newInstance(ArrayList<MyAccountBooking> myAccountBookings, Context context) {
+    public static BookingsTab newInstance(ArrayList<MyAccountBooking> myAccountBookings, Context context,
+                                          int positionInParentPagerAdapter) {
         BookingsTab returnFragment = new BookingsTab();
         returnFragment.myAccountBookings = myAccountBookings;
         returnFragment.context = context;
+        returnFragment.positionInParentPagerAdapter = positionInParentPagerAdapter;
         return returnFragment;
     }
 

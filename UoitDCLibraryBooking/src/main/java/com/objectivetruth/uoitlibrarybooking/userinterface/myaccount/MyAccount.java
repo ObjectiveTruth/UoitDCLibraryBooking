@@ -71,7 +71,7 @@ public class MyAccount extends Fragment {
         _bindLogoutClickedSubjectToLogoutFlow(logoutClickedSubject);
         getFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        MyAccountLoaded.newInstance(userModel.getUserDataFromCache(), logoutClickedSubject),
+                        MyAccountLoaded.newInstance(userModel.getUserDataFromStorage(), logoutClickedSubject, this),
                         MY_ACCOUNT_LOADED_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
@@ -129,6 +129,10 @@ public class MyAccount extends Fragment {
         }
     }
 
+    public Observable<Pair<UserData, UserCredentials>> getSignInObs() {
+        return userModel.signInObs();
+    }
+
     private void _bindLogoutClickedSubjectToLogoutFlow(PublishSubject<LogOutClicked> logoutClickedSubject){
         currentLogoutSubscription = logoutClickedSubject
                 .subscribe(new Observer<LogOutClicked>() {
@@ -159,7 +163,7 @@ public class MyAccount extends Fragment {
                 .flatMap(new Func1<UserCredentials, Observable<Pair<UserData, UserCredentials>>>() {
                     @Override
                     public Observable<Pair<UserData, UserCredentials>> call(UserCredentials userCredentials) {
-                        return userModel.signIn(userCredentials);
+                        return userModel.signInObs(userCredentials);
                     }
                 })
                 .subscribeOn(Schedulers.newThread())
@@ -192,13 +196,13 @@ public class MyAccount extends Fragment {
 
     private PublishSubject<UserCredentials> _getSignInClickedSubject() {
         if(signInClickedSubject == null) {
-            Timber.d("Current singInClickSubject is NULL, making new one");
+            Timber.d("Current sigInClickSubject is NULL, making new one");
             return signInClickedSubject = PublishSubject.create();
         }else if (signInClickedSubject.hasCompleted()) {
-            Timber.d("Current singInClickSubject has completed already, making new one");
+            Timber.d("Current signInClickSubject has completed already, making new one");
             return signInClickedSubject = PublishSubject.create();
         }else {
-            Timber.d("Current singInClickSubject is still valid, passing it back");
+            Timber.d("Current signInClickSubject is still valid, passing it back");
             return signInClickedSubject;
         }
     }

@@ -22,6 +22,11 @@
         app:showAsAction="always"
         />
     <item
+        android:id="@+id/calendar_action_menu_item_debug_gson"
+        android:orderInCategory="100"
+        android:title="Debug - GSON"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/debug_success"
         android:orderInCategory="150"
         android:title="Debug - Success"

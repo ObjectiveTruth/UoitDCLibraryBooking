@@ -11,10 +11,17 @@ import android.support.v7.app.AlertDialog;
 import android.view.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.objectivetruth.uoitlibrarybooking.*;
+import com.google.gson.Gson;
+import com.objectivetruth.uoitlibrarybooking.ActivityRoomInteraction;
+import com.objectivetruth.uoitlibrarybooking.ActivitySettings;
+import com.objectivetruth.uoitlibrarybooking.BuildConfig;
+import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBooking;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarloaded.CalendarLoaded;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.sorrycartoon.SorryCartoon;
@@ -26,6 +33,7 @@ import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_HELP;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_REFRESH;
@@ -35,7 +43,7 @@ public class Calendar extends Fragment {
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
-    private PublishSubject<Object> refreshClickSubject;
+    private PublishSubject<RefreshClickEvent> refreshClickSubject;
     private final static String SAVED_BUNDLE_KEY_IS_FIRST_LOAD = "IS_FIRST_LOAD";
     private String CALENDAR_LOADED_FRAGMENT_TAG = "SINGLETON_CALENDAR_LOADED_FRAGMENT_TAG";
 
@@ -187,11 +195,7 @@ public class Calendar extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
 
         if (id == R.id.action_settings) {
             Intent intent = new Intent(getContext(), ActivitySettings.class);
@@ -215,7 +219,7 @@ public class Calendar extends Fragment {
                     .setLabel("Pressed by User")
                     .build()
             );
-            getRefreshClickSubject().onNext(new Object());
+            getRefreshClickSubject().onNext(new RefreshClickEvent());
             return true;
         }
         else if(id == R.id.debug_success){
@@ -230,16 +234,46 @@ public class Calendar extends Fragment {
             intent.putExtra("date", "March 15, 1990, Monday");
             startActivity(intent);
         }
+        else if(id == R.id.calendar_action_menu_item_debug_gson){
+            UserCredentials userCredentials = new UserCredentials("username", "password", "institution");
+            UserData userData = new UserData();
+            userData.completeBookings = new ArrayList<MyAccountBooking>();
+            userData.incompleteBookings = new ArrayList<MyAccountBooking>();
+            userData.pastBookings = new ArrayList<MyAccountBooking>();
+/*            MyAccountBooking myAccountBooking = new MyAccountBooking();
+            myAccountBooking.endTime = "99:99";
+            myAccountBooking.startTime = "11:11";
+            myAccountBooking.room = "LIB123";
+            myAccountBooking.date = "May, 23, 1984";
+            userData.completeBookings.add(myAccountBooking);*/
+
+            Timber.v("JSON-test-before");
+            Gson gson = new Gson();
+            String s = gson.toJson(userData);
+            Timber.v(s);
+            String userDataJson = "{}";
+            UserData userData1 = gson.fromJson(userDataJson, UserData.class);
+            Timber.v("JSON-test-after");
+            Timber.v(userData1.toString());
+        }
         else {
-            ((MainActivity) getActivity()).onOptionsItemSelected(item);
+            // If no match to the action button, let the activity handle it (for back/up buttons)
+            getActivity().onOptionsItemSelected(item);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private PublishSubject<Object> getRefreshClickSubject() {
-        if (refreshClickSubject == null || refreshClickSubject.hasCompleted()) {
-            return refreshClickSubject = PublishSubject.create();
-        }else {
+    public PublishSubject<RefreshClickEvent> getRefreshClickSubject() {
+        if (refreshClickSubject == null) {
+            Timber.d("Current refreshClickSubject is NULL, making new one");
+            refreshClickSubject = PublishSubject.create();
+            return refreshClickSubject;
+        } else if (refreshClickSubject.hasCompleted()) {
+            Timber.d("Current refreshClickSubject hasCompleted, making new one");
+            refreshClickSubject = PublishSubject.create();
+            return refreshClickSubject;
+        } else {
+            Timber.d("Current refreshClickSubject is still valid, passing it back");
             return refreshClickSubject;
         }
     }
@@ -275,4 +309,5 @@ public class Calendar extends Fragment {
                 .show();
     }
 
+    static class RefreshClickEvent {}
 }

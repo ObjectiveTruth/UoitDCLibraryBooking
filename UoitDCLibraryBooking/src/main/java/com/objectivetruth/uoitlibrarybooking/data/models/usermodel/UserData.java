@@ -77,7 +77,7 @@ public class UserData {
         return (object != null);
     }
 
-    private boolean _notEmpty(ArrayList<MyAccountBooking> arrayList) {
-        return !arrayList.isEmpty();
+    private boolean _notEmpty(ArrayList<MyAccountBooking> list) {
+        return !list.isEmpty();
     }
 }
