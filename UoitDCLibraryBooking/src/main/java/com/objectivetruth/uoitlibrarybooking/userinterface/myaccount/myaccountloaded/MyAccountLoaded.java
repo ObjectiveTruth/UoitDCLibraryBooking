@@ -4,12 +4,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.*;
+import android.widget.Toast;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
@@ -110,30 +115,26 @@ public class MyAccountLoaded extends Fragment {
             @Override
             public void onRefresh() {
                 Timber.v("Successfully refreshed!");
-                myAccountPagerAdapter.refreshPagerFragmentsAndViews();
-                swipeRefreshLayout.setRefreshing(false);
-/*                parentMyAccountFragment.getSignInObs()
-                        .observeOn(Schedulers.newThread())
+                parentMyAccountFragment.getSignInObs()
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(AndroidSchedulers.mainThread())
-
                         .subscribe(new Observer<Pair<UserData, UserCredentials>>() {
                             @Override
                             public void onCompleted() {
-
+                                swipeRefreshLayout.setRefreshing(false);
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                swipeRefreshLayout.setRefreshing(false);
+                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
                             public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
                                 Timber.v("Successfully refreshed!");
                                 myAccountPagerAdapter.refreshPagerFragmentsAndViews();
-                                swipeRefreshLayout.setRefreshing(false);
                             }
-                        });*/
+                        });
             }
         });
     }

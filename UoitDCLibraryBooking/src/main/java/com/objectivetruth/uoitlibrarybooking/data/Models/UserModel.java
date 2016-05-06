@@ -134,6 +134,20 @@ public class UserModel {
                         return MyAccountParser
                                 .parseRawSignedInMyReservationsWebPageForUserData(rawWebpageUserCredentialsPair);
                     }
+                })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
+
+                .flatMap(new Func1<Pair<UserData, UserCredentials>, Observable<Pair<UserData, UserCredentials>>>() {
+                    @Override
+                    public Observable<Pair<UserData, UserCredentials>>
+                    call(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
+                        if(userDataUserCredentialsPair.first.errorMessage != null) {
+                            Timber.d("Got Error from Sign in, clearing personal user data");
+                            _clearPersonalData();
+                        }
+                        return Observable.just(userDataUserCredentialsPair);
+                    }
                 });
         _subscribeToSignInObservable(returnObservable);
         return returnObservable;

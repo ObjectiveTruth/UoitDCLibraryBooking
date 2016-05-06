@@ -130,7 +130,27 @@ public class MyAccount extends Fragment {
     }
 
     public Observable<Pair<UserData, UserCredentials>> getSignInObs() {
-        return userModel.signInObs();
+        Observable<Pair<UserData, UserCredentials>> returnObservable = userModel.signInObs();
+        returnObservable
+                .subscribe(new Observer<Pair<UserData, UserCredentials>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
+                        if(userDataUserCredentialsPair.first.errorMessage != null) {
+                            Timber.w("There was an authentication error in MyAccount, showing Login fragment");
+                            _showLoginFragment(_getSignInClickedSubject());
+                        }
+                    }
+                });
+        return returnObservable;
     }
 
     private void _bindLogoutClickedSubjectToLogoutFlow(PublishSubject<LogOutClicked> logoutClickedSubject){
