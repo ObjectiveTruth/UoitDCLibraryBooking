@@ -46,6 +46,5 @@ public class CalendarLoaded extends Fragment {
 
     public void refreshPagerFragmentsAndViews(CalendarData calendarData) {
         _mPagerAdapter.refreshPagerFragmentsAndViews(calendarData);
-
     }
 }

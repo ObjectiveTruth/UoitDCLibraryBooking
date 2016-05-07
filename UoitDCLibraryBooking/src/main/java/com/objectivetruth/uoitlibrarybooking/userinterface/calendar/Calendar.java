@@ -45,7 +45,6 @@ public class Calendar extends Fragment {
     @Inject Tracker googleAnalyticsTracker;
     private PublishSubject<RefreshActivateEvent> refreshActivateSubject;
     private final static String SAVED_BUNDLE_KEY_IS_FIRST_LOAD = "IS_FIRST_LOAD";
-    private String CALENDAR_LOADED_FRAGMENT_TAG = "SINGLETON_CALENDAR_LOADED_FRAGMENT_TAG";
 
     @Nullable
     @Override
@@ -136,6 +135,7 @@ public class Calendar extends Fragment {
      * @param calendarData
      */
     private void _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(CalendarData calendarData) {
+        String CALENDAR_LOADED_FRAGMENT_TAG = "SINGLETON_CALENDAR_LOADED_FRAGMENT_TAG";
         Fragment currentFragmentInContentFrame = getFragmentManager().findFragmentById(R.id.calendar_content_frame);
         if(currentFragmentInContentFrame instanceof SorryCartoon) {
             Timber.d("Calendar content frame contains Sorry Cartoon, will replace with CalendarLoaded");

@@ -152,7 +152,7 @@ public class CalendarModel {
     }
 
     public CalendarData getCalendarDataFromStorage() {
-        Timber.d("Gettign Calendar Data from Storage");
+        Timber.d("Getting Calendar Data from Storage");
         Gson gson = new Gson();
         String userDataJSON = calendarSharedPreferences.getString(CALENDAR_DATA_JSON, EMPTY_JSON);
         CalendarData returnCalendarData = gson.fromJson(userDataJSON, CalendarData.class);

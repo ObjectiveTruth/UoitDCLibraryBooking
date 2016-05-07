@@ -4,9 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
@@ -29,7 +27,6 @@ public class MyAccount extends Fragment {
     private Subscription currentLogoutSubscription;
     private Subscription currentSignInSubscription;
     private PublishSubject<UserCredentials> signInClickedSubject;
-    private PublishSubject<LogOutClicked> logoutClickedSubject;
     public @Inject UserModel userModel;
 
     @Override
@@ -41,6 +38,7 @@ public class MyAccount extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true); // Notifies activity that this fragment will interact with the action/options menu
         return inflater.inflate(R.layout.my_account, container, false);
     }
 
@@ -50,7 +48,7 @@ public class MyAccount extends Fragment {
 
         if(userModel.isUserSignedIn()) {
             Timber.i("User is already signed in, showing his details");
-            _showMyAccountLoadedFragment(_getLogoutClickedSubject());
+            _showMyAccountLoadedFragment();
         }else {
             Timber.i("User isn't signed in, showing login screen");
             _showLoginFragment(_getSignInClickedSubject());
@@ -58,20 +56,43 @@ public class MyAccount extends Fragment {
     }
 
     private static void _sendErrorMessageToLoginErrorSubject(String errorMessage,
-                                                            PublishSubject<String> loginErrorSubject) {
+                                                             PublishSubject<String> loginErrorSubject) {
         loginErrorSubject.onNext(errorMessage);
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.my_account_loaded_action_icons_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch(id) {
+            case R.id.my_account_menu_item_logout:
+                Timber.i("Logout clicked");
+                userModel.getLogoutSubject().onNext(new UserModel.LogoutEvent());
+                _showLoginFragment(_getSignInClickedSubject());
+                return true;
+            default:
+                getActivity().onOptionsItemSelected(item);
+                return true;
+        }
+    }
+
 
     public static MyAccount newInstance() {
         return new MyAccount();
     }
 
-    private void _showMyAccountLoadedFragment(PublishSubject<LogOutClicked> logoutClickedSubject) {
+    private void _showMyAccountLoadedFragment() {
         String MY_ACCOUNT_LOADED_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOADED_FRAGMENT_TAG";
-        _bindLogoutClickedSubjectToLogoutFlow(logoutClickedSubject);
+        getActivity().invalidateOptionsMenu();
         getFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        MyAccountLoaded.newInstance(userModel.getUserDataFromStorage(), logoutClickedSubject, this),
+                        MyAccountLoaded.newInstance(userModel.getUserDataFromStorage(), this),
                         MY_ACCOUNT_LOADED_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
@@ -96,25 +117,6 @@ public class MyAccount extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
-
-    /**
-     * Replaces the my_account_content_frame with the AccountInfoFragment which loads its info from the database
-     */
-/*    private void _showAccountInfoFragment(){
-        String MY_ACCOUNT_PAGER_ADAPTER_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_PAGER_ADAPTER_FRAGMENT_TAG";
-        ViewPagerFragment mViewPagerFragment = (ViewPagerFragment) getFragmentManager()
-                .findFragmentByTag(MY_ACCOUNT_PAGER_ADAPTER_FRAGMENT_TAG);
-        if(mViewPagerFragment ==null ){
-            mViewPagerFragment = ViewPagerFragment.newInstance(new CustomViewPagerAdapter(getFragmentManager()));
-            getFragmentManager().beginTransaction().
-                    replace(R.id.my_account_movement_frame, mViewPagerFragment, MY_ACCOUNT_PAGER_ADAPTER_FRAGMENT_TAG)
-                    .commit();
-        }
-        else{
-            //Do nothing Each Tab is registered to Auto to receive an update success callback
-
-        }
-    }*/
 
     private PublishSubject<String> _getLoginErrorSubject() {
         if(loginErrorSubject == null) {
@@ -153,27 +155,6 @@ public class MyAccount extends Fragment {
         return returnObservable;
     }
 
-    private void _bindLogoutClickedSubjectToLogoutFlow(PublishSubject<LogOutClicked> logoutClickedSubject){
-        currentLogoutSubscription = logoutClickedSubject
-                .subscribe(new Observer<LogOutClicked>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(LogOutClicked logOutClicked) {
-                        userModel.getLogoutSubject().onNext(new UserModel.LogoutEvent());
-                        _showLoginFragment(_getSignInClickedSubject());
-                    }
-                });
-    }
-
     private void _bindSignInClickedSubjectToSignInFlow(PublishSubject<UserCredentials>
                                                                               signInClickSubject) {
         currentSignInSubscription = signInClickSubject
@@ -208,7 +189,7 @@ public class MyAccount extends Fragment {
                         }else {
                             Timber.i("Received UserData");
                             Timber.v(userDataUserCredentialsPair.first.toString());
-                            _showMyAccountLoadedFragment(_getLogoutClickedSubject());
+                            _showMyAccountLoadedFragment();
                         }
                     }
                 });
@@ -224,21 +205,6 @@ public class MyAccount extends Fragment {
         }else {
             Timber.d("Current signInClickSubject is still valid, passing it back");
             return signInClickedSubject;
-        }
-    }
-
-    private PublishSubject<LogOutClicked> _getLogoutClickedSubject() {
-        if(logoutClickedSubject == null) {
-            Timber.d("Current logoutClickedSubject is NULL, making new one");
-            logoutClickedSubject = PublishSubject.create();
-            return logoutClickedSubject;
-        }else if (logoutClickedSubject.hasCompleted()) {
-            Timber.d("Current logoutClickedSubject hasCompleted, making new one");
-            logoutClickedSubject = PublishSubject.create();
-            return logoutClickedSubject;
-        }else {
-            Timber.d("Current logoutClickedSubject is still valid, passing it back");
-            return logoutClickedSubject;
         }
     }
 
@@ -258,6 +224,4 @@ public class MyAccount extends Fragment {
         if(signInClickedSubject != null) {signInClickedSubject.onCompleted();}
         if(loginErrorSubject != null) {loginErrorSubject.onCompleted();}
     }
-
-    static public class LogOutClicked {}
 }
