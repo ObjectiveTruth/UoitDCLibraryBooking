@@ -123,6 +123,8 @@ public class Calendar extends Fragment {
                     @Override
                     public void onNext(CalendarData calendarData) {
                         Timber.i("Calendar loading complete");
+                        Toast.makeText(getContext(), "Refresh Successful",
+                                Toast.LENGTH_SHORT).show();
                         if (calendarData == null) {
                             Timber.d("Calendar Data request is empty, showing sorry cartoon");
                             getFragmentManager().beginTransaction()
