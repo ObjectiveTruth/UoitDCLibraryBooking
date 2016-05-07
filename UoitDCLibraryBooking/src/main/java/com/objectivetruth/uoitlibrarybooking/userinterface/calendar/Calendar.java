@@ -10,6 +10,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.*;
+import android.widget.Toast;
+import com.android.volley.TimeoutError;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
@@ -107,16 +109,19 @@ public class Calendar extends Fragment {
                     @Override
                     public void onError(Throwable e) {
                         Timber.e(e, "Error getting the data required to show the calendar");
-                        swipeRefreshLayout.setRefreshing(false);
-                        // Replace it with the sorry cartoon since something went wrong
-                        getFragmentManager().beginTransaction()
-                                .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
+                        if(e instanceof TimeoutError) {
+                            Toast.makeText(getContext(), "Server timeout, try again", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(getContext(), "Something went wrong, try again",
+                                    Toast.LENGTH_SHORT).show();
+                            getFragmentManager().beginTransaction()
+                                    .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
+                        }
                     }
 
                     @Override
                     public void onNext(CalendarData calendarData) {
                         Timber.i("Calendar loading complete");
-                        // Place the loading fragment into the view while we wait for loading
                         if (calendarData == null) {
                             Timber.d("Calendar Data request is empty, showing sorry cartoon");
                             getFragmentManager().beginTransaction()
