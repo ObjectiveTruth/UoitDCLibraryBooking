@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.*;
 import com.google.android.gms.analytics.HitBuilders;
@@ -25,7 +26,6 @@ import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarloaded.CalendarLoaded;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.sorrycartoon.SorryCartoon;
-import com.objectivetruth.uoitlibrarybooking.userinterface.loading.Loading;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -36,14 +36,13 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_HELP;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_REFRESH;
 
 public class Calendar extends Fragment {
     @Inject CalendarModel calendarModel;
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
-    private PublishSubject<RefreshClickEvent> refreshClickSubject;
+    private PublishSubject<RefreshActivateEvent> refreshActivateSubject;
     private final static String SAVED_BUNDLE_KEY_IS_FIRST_LOAD = "IS_FIRST_LOAD";
     private String CALENDAR_LOADED_FRAGMENT_TAG = "SINGLETON_CALENDAR_LOADED_FRAGMENT_TAG";
 
@@ -55,28 +54,43 @@ public class Calendar extends Fragment {
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
 
         setHasOptionsMenu(true); // Notifies activity that this fragment will interact with the action/options menu
+
         return inflater.inflate(R.layout.calendar, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        getLatestDataAndCreateOrRefreshCalendarUI();
-/*        Fragment calendarLoadedFragment = getFragmentManager()
-                .findFragmentByTag(CALENDAR_LOADED_FRAGMENT_TAG);
-        if(calendarLoadedFragment == null) {
-        }else{
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.calendar_content_frame, calendarLoadedFragment, CALENDAR_LOADED_FRAGMENT_TAG)
-                    .commit();
-        }*/
+        _showCalendarWithDataFromStorage();
+
+        SwipeRefreshLayout _mSwipeLayout =
+                (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
+
+        _bindSwipeLayoutToCalendarRefreshEvent(_mSwipeLayout);
     }
 
-    public void getLatestDataAndCreateOrRefreshCalendarUI() {
-        Timber.i("Calendar loading starting...");
+    private void _bindSwipeLayoutToCalendarRefreshEvent(final SwipeRefreshLayout swipeRefreshLayout) {
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchLatestDataAndRefreshCalendarUI(swipeRefreshLayout);
+            }
+        });
+    }
 
-        Timber.d("Showing Loading screen.");
-        getFragmentManager().beginTransaction()
-                .replace(R.id.calendar_content_frame, new Loading()).commit();
+    private void _showCalendarWithDataFromStorage() {
+        Timber.d("Showing Calendar screen with data from storage");
+        CalendarData storedCalendarData = calendarModel.getCalendarDataFromStorage();
+        if(storedCalendarData == null ) {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
+        }else{
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.calendar_content_frame, CalendarLoaded.newInstance(storedCalendarData)).commit();
+        }
+    }
+
+    public void fetchLatestDataAndRefreshCalendarUI(final SwipeRefreshLayout swipeRefreshLayout) {
+        Timber.i("Calendar loading starting...");
 
         calendarModel.getCalendarDataObs()
                 .subscribeOn(Schedulers.newThread())
@@ -84,12 +98,13 @@ public class Calendar extends Fragment {
                 .subscribe(new Observer<CalendarData>() {
                     @Override
                     public void onCompleted() {
-                        // Will auto-complete itself when onNext is called Once
+                        swipeRefreshLayout.setRefreshing(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         Timber.e(e, "Error getting the data required to show the calendar");
+                        swipeRefreshLayout.setRefreshing(false);
                         // Replace it with the sorry cartoon since something went wrong
                         getFragmentManager().beginTransaction()
                                 .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
@@ -105,13 +120,30 @@ public class Calendar extends Fragment {
                                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
                         }else {
                             Timber.d("CalendarData has data, showing calendar");
-                            getFragmentManager().beginTransaction()
-                                    .replace(R.id.calendar_content_frame,
-                                            CalendarLoaded.newInstance(calendarData), CALENDAR_LOADED_FRAGMENT_TAG)
-                                    .commit();
+                            _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(calendarData);
                         }
                     }
                 });
+    }
+
+    /**
+     * Checks the currently loaded fragment in the calendar_content_frame. If calendar loaded is there
+     * it will tell it to refresh with new calendarData, otherwise it will make a new CalendarData fragment
+     * @param calendarData
+     */
+    private void _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(CalendarData calendarData) {
+        Fragment currentFragmentInContentFrame = getFragmentManager().findFragmentById(R.id.calendar_content_frame);
+        if(currentFragmentInContentFrame instanceof SorryCartoon) {
+            Timber.d("Calendar content frame contains Sorry Cartoon, will replace with CalendarLoaded");
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.calendar_content_frame,
+                            CalendarLoaded.newInstance(calendarData),
+                            CALENDAR_LOADED_FRAGMENT_TAG)
+                    .commit();
+        }else if(currentFragmentInContentFrame instanceof CalendarLoaded){
+            Timber.d("Calendar content frame already contains CalendarLoaded, will tell it to redraw/refresh itself");
+            ((CalendarLoaded) currentFragmentInContentFrame).refreshPagerFragmentsAndViews(calendarData);
+        }
     }
 
     @Override
@@ -124,73 +156,6 @@ public class Calendar extends Fragment {
         else{
         	inflater.inflate(R.menu.calendar_action_icons_menu, menu);
         }
-        MenuItem refreshItem = menu.findItem(R.id.refresh_calendar);
-
-        getRefreshClickSubject().subscribe(new Observer<Object>() {
-            @Override
-            public void onCompleted() {
-                // Nothing, will clean itself up
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                _showNetworkErrorAlertDialog(getContext());
-            }
-
-            @Override
-            public void onNext(Object o) {
-                getLatestDataAndCreateOrRefreshCalendarUI();
-            }
-        });
-
-
-/*        if(_hasUserNotLearnedRefresh(mDefaultSharedPreferences)){
-            ImageView iv = (ImageView) getActivity().getLayoutInflater().inflate(R.layout.action_bar_refresh_imageview,
-                    null);
-            Timber.i("User has Not Learned Refresh");
-            startActionBarBounceAnimation(iv);
-            iv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    handleRefreshClick();
-
-                }
-            });
-            refreshItem.setActionView(iv);
-        }
-        clickedObs()*/
-
-        //Prepare MyAccount Actionview if has learned refresh and has NOT learned myaccount
-/*        if(mDefaultSharedPreferences.getBoolean(HAS_LEARNED_REFRESH, false)
-                && !mDefaultSharedPreferences.getBoolean(HAS_LEARNED_MYACCOUNT, false)){
-            Timber.i("User has not Learned MyAccount");
-            LayoutInflater inflater = this.getLayoutInflater();
-            ImageView iv = (ImageView) inflater.inflate(R.layout.action_bar_myaccount_imageview,
-                    null);
-            startActionBarBounceAnimation(iv);
-            iv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    handleMyAccountClick();
-                }
-            });
-            myAccountItem.setActionView(iv);
-        }*/
-/*        if(mCalendarRefresher != null && isFront == true){
-            if(refreshItem != null){
-                refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
-            }
-        }*/
-    }
-
-    private boolean _hasUserNotLearnedRefresh(SharedPreferences mDefaultSharedPreferences) {
-         return !mDefaultSharedPreferences.getBoolean(HAS_LEARNED_REFRESH, false);
-    }
-
-    @Override
-    public void onPause() {
-        getRefreshClickSubject().onCompleted();
-        super.onPause();
     }
 
     @Override
@@ -212,16 +177,6 @@ public class Calendar extends Fragment {
             handleHelpClick();
             return true;
         }
-        else if(id == R.id.refresh_calendar){
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Calendar Home")
-                    .setAction("Refresh")
-                    .setLabel("Pressed by User")
-                    .build()
-            );
-            getRefreshClickSubject().onNext(new RefreshClickEvent());
-            return true;
-        }
         else if(id == R.id.debug_success){
             Intent intent = new Intent(getContext(), ActivityRoomInteraction.class);
             intent.putExtra("type", "test");
@@ -240,12 +195,6 @@ public class Calendar extends Fragment {
             userData.completeBookings = new ArrayList<MyAccountBooking>();
             userData.incompleteBookings = new ArrayList<MyAccountBooking>();
             userData.pastBookings = new ArrayList<MyAccountBooking>();
-/*            MyAccountBooking myAccountBooking = new MyAccountBooking();
-            myAccountBooking.endTime = "99:99";
-            myAccountBooking.startTime = "11:11";
-            myAccountBooking.room = "LIB123";
-            myAccountBooking.date = "May, 23, 1984";
-            userData.completeBookings.add(myAccountBooking);*/
 
             Timber.v("JSON-test-before");
             Gson gson = new Gson();
@@ -261,21 +210,6 @@ public class Calendar extends Fragment {
             getActivity().onOptionsItemSelected(item);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public PublishSubject<RefreshClickEvent> getRefreshClickSubject() {
-        if (refreshClickSubject == null) {
-            Timber.d("Current refreshClickSubject is NULL, making new one");
-            refreshClickSubject = PublishSubject.create();
-            return refreshClickSubject;
-        } else if (refreshClickSubject.hasCompleted()) {
-            Timber.d("Current refreshClickSubject hasCompleted, making new one");
-            refreshClickSubject = PublishSubject.create();
-            return refreshClickSubject;
-        } else {
-            Timber.d("Current refreshClickSubject is still valid, passing it back");
-            return refreshClickSubject;
-        }
     }
 
     /**
@@ -309,5 +243,5 @@ public class Calendar extends Fragment {
                 .show();
     }
 
-    static class RefreshClickEvent {}
+    public static class RefreshActivateEvent {}
 }

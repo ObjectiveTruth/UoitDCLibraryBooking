@@ -10,15 +10,19 @@ import timber.log.Timber;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
 public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
     private CalendarData calendarData;
+    private boolean[] arrayCopyToTellWhichViewsToRefresh;
 
     public CalendarPagerAdapter(FragmentManager fragmentManager, CalendarData calendarData) {
         super(fragmentManager);
         this.calendarData = calendarData;
+        arrayCopyToTellWhichViewsToRefresh = new boolean[calendarData.days.size()];
+        Arrays.fill(arrayCopyToTellWhichViewsToRefresh, false);
     }
 
     @Override
@@ -41,6 +45,44 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
                 ", " + dayAtThisPosition.extMonthWord;
 
         return tabTitleString;
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        if(_shouldRefreshDataForObject(object, arrayCopyToTellWhichViewsToRefresh, calendarData)) {
+            if(_isObjectAtValidPositionInArray(object, arrayCopyToTellWhichViewsToRefresh, calendarData)) {
+                Timber.d("Fragment at position " + calendarData.days.indexOf(object) +
+                        " in Calendar Loaded will be refreshed");
+                arrayCopyToTellWhichViewsToRefresh[calendarData.days.indexOf(object)] = false;
+            }
+            return POSITION_NONE;
+        }
+        return super.getItemPosition(object);
+    }
+
+    private boolean _isObjectAtValidPositionInArray(Object objectRequested,
+                                                    boolean[] arrayCopyToTellWhichViewsToRefresh,
+                                                    CalendarData calendarData) {
+        int indexOfObject = calendarData.days.indexOf(objectRequested);
+        return indexOfObject > -1;
+
+    }
+
+    private boolean _shouldRefreshDataForObject(Object objectRequested, boolean[] arrayCopyToTellWhichViewsToRefresh,
+                                                CalendarData calendarData) {
+        int indexOfObject = calendarData.days.indexOf(objectRequested);
+        if(indexOfObject < 0) {
+            return true;
+        }else{
+            return arrayCopyToTellWhichViewsToRefresh[indexOfObject];
+        }
+    }
+
+    public void refreshPagerFragmentsAndViews(CalendarData calendarData) {
+        this.calendarData = calendarData;
+        arrayCopyToTellWhichViewsToRefresh = new boolean[calendarData.days.size()];
+        Arrays.fill(arrayCopyToTellWhichViewsToRefresh, true);
+        notifyDataSetChanged(); // Will set off a call to getItemPosition to refresh the views
     }
 
     @Override
@@ -71,7 +113,6 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
             Timber.e(e, "Couldn't parse the string for the date. Got: " + parseMe);
             return "";
         }
-
     }
 
     /**

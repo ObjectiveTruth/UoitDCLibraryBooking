@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,8 @@ import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.common.Calen
 
 public class CalendarLoaded extends Fragment {
     private CalendarData calendarData;
+    private CalendarPagerAdapter _mPagerAdapter;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -27,7 +28,7 @@ public class CalendarLoaded extends Fragment {
         TabLayout _mTabLayout = (TabLayout) calendarLoadedView.findViewById(R.id.calendar_tab_layout);
 
         // Will supply the ViewPager with what should be displayed
-        PagerAdapter _mPagerAdapter = new CalendarPagerAdapter(getFragmentManager(), calendarData);
+        _mPagerAdapter = new CalendarPagerAdapter(getFragmentManager(), calendarData);
         _mViewPager.setAdapter(_mPagerAdapter);
 
         // Bind the TabLayout and ViewPager together
@@ -43,4 +44,8 @@ public class CalendarLoaded extends Fragment {
         return calendarLoadedToReturn;
     }
 
+    public void refreshPagerFragmentsAndViews(CalendarData calendarData) {
+        _mPagerAdapter.refreshPagerFragmentsAndViews(calendarData);
+
+    }
 }

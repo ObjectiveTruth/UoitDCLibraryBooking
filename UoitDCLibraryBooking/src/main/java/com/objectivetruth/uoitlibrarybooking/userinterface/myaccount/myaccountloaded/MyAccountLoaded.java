@@ -114,7 +114,6 @@ public class MyAccountLoaded extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Timber.v("Successfully refreshed!");
                 parentMyAccountFragment.getSignInObs()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(AndroidSchedulers.mainThread())

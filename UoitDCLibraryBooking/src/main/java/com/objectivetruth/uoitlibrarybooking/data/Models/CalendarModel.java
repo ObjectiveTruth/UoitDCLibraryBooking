@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
+import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
@@ -17,11 +18,14 @@ import timber.log.Timber;
 
 import java.util.ArrayList;
 
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.CALENDAR_DATA_JSON;
+
 public class CalendarModel {
     private SharedPreferences calendarSharedPreferences;
     private SharedPreferences.Editor calendarSharedPreferencesEditor;
     final static private String CALENDAR_SHARED_PREFERENCES_NAME = "CALENDAR";
     private CalendarWebService calendarWebService;
+    private static final String EMPTY_JSON = "{}";
 
     @SuppressLint("CommitPrefEdits")
     public CalendarModel(Application mApplication) {
@@ -123,7 +127,36 @@ public class CalendarModel {
                     }
                 })
                 .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
+
+                // Store the final result in Storage
+                .flatMap(new Func1<CalendarData, Observable<CalendarData>>() {
+                    @Override
+                    public Observable<CalendarData> call(CalendarData calendarData) {
+                        _storeCalendarDataResultsInStorage(calendarData);
+                        return Observable.just(calendarData);
+                    }
+                })
+                .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation());
+    }
+
+    private void _storeCalendarDataResultsInStorage(CalendarData calendarData) {
+        Timber.d("Storing claendar Data in storage");
+        Gson gson = new Gson();
+        String calendarDataJson = gson.toJson(calendarData);
+        Timber.v(calendarDataJson);
+        calendarSharedPreferencesEditor
+                .putString(CALENDAR_DATA_JSON, calendarDataJson)
+                .apply();
+    }
+
+    public CalendarData getCalendarDataFromStorage() {
+        Timber.d("Gettign Calendar Data from Storage");
+        Gson gson = new Gson();
+        String userDataJSON = calendarSharedPreferences.getString(CALENDAR_DATA_JSON, EMPTY_JSON);
+        CalendarData returnCalendarData = gson.fromJson(userDataJSON, CalendarData.class);
+        return returnCalendarData;
     }
 
     private ArrayList<Observable<String>>

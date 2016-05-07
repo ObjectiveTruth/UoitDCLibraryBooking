@@ -9,12 +9,6 @@
         android:title="@string/action_settings"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/refresh_calendar"
-        android:orderInCategory="50"
-        android:title="@string/refresh_label"
-        android:icon="@drawable/ic_action_av_replay"
-        app:showAsAction="always"/>
-    <item
         android:id="@+id/help_calendar"
         android:orderInCategory="30"
         android:title="Help"

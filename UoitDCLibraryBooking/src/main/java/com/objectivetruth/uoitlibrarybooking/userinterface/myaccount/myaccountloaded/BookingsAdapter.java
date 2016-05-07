@@ -65,5 +65,4 @@ public class BookingsAdapter extends ArrayAdapter<MyAccountBooking>{
     private static class ViewHolder {
         TextView textView;
     }
-
 }
