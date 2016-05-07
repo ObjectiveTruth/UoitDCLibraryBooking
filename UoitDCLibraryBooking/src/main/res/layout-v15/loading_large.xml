@@ -1,0 +1,50 @@
+<!-- see https://github.com/glomadrian/RoadRunner for more info -->
+<FrameLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/progressBar" android:layout_gravity="center"/>
+</FrameLayout>
+<!--
+<com.github.glomadrian.roadrunner.IndeterminateRoadRunner
+        android:layout_centerInParent="true"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" xmlns:lib="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/two_way"
+        lib:movement_loop_time="4000"
+        lib:movement_direction="counter_clockwise"
+        lib:path_color="@color/PrimaryColor"
+        lib:line_size="0.05"
+        lib:stroke_width="5sp"
+        lib:left_line_animation_time="2800"
+        lib:left_line_max_size="0.5"
+        lib:left_line_animation_start_delay="2500"
+        lib:right_line_animation_start_delay="2000"
+        lib:right_line_max_size="0.5"
+        lib:right_line_animation_time="2000"
+        lib:path_data="M306.314,58.9801 C275.235,27.9011,224.837,27.9011,193.759,58.9801
+L39.0019,213.736 C15.6832,237.055,15.6832,274.838,39.0019,298.158
+C58.2219,317.378,87.2116,320.482,109.874,308.007
+C112.241,307.888,114.569,306.993,116.38,305.202 L271.136,150.445
+C286.675,134.906,286.675,109.717,271.136,94.1779
+C255.597,78.6389,230.408,78.6389,214.869,94.1779 L88.2461,220.8
+C84.366,224.68,84.366,230.987,88.2461,234.866
+C92.1263,238.746,98.4335,238.746,102.313,234.866 L228.935,108.245
+C236.715,100.465,249.309,100.465,257.07,108.245
+C264.85,116.025,264.85,128.619,257.07,136.379 L109.337,284.111
+C93.7979,299.65,68.6085,299.65,53.0694,284.111
+C37.5304,268.572,37.5304,243.383,53.0694,227.844 L207.825,73.0468
+C231.144,49.7281,268.928,49.7281,292.247,73.0468
+C315.566,96.3654,315.566,134.149,292.247,157.469 L151.558,298.158
+C147.678,302.038,147.678,308.345,151.558,312.225
+C155.438,316.105,161.745,316.105,165.625,312.225 L306.314,171.535
+C337.393,140.457,337.393,90.0591,306.314,58.98 Z"
+        lib:path_original_width="316"
+        lib:path_original_height="512"
+        lib:path_animation_type="twoWay"
+        xmlns:android="http://schemas.android.com/apk/res/android"/>-->

@@ -5,17 +5,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import com.squareup.okhttp.*;
+import okhttp3.*;
 import timber.log.Timber;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
-import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_KEY_BOOKINGS_LEFT;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[]>> {
 	final String TAG = "LoginAsyncTask";
@@ -80,10 +77,10 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
             int bookingsLeft = MainActivity.MAX_BOOKINGS_ALLOWED - bookingsUsed;
             Timber.i("New update shows that " + bookingsUsed + " bookings have been used out of " + MainActivity.MAX_BOOKINGS_ALLOWED);
             Timber.v("Storing to sharedPrefs. bookingsLeft: " + bookingsLeft + ", studentID, password, institution: " + institution);
-            sharedPreferencesEditor.putInt(SHARED_PREF_KEY_BOOKINGS_LEFT, bookingsLeft);
-            sharedPreferencesEditor.putString(SHARED_PREF_KEY_USERNAME, studentID);
-            sharedPreferencesEditor.putString(SHARED_PREF_KEY_PASSWORD, password);
-            sharedPreferencesEditor.putString(SHARED_PREF_INSTITUTION, institution);
+            sharedPreferencesEditor.putInt(BOOKINGS_LEFT, bookingsLeft);
+            sharedPreferencesEditor.putString(USER_USERNAME, studentID);
+            sharedPreferencesEditor.putString(USER_PASSWORD, password);
+            sharedPreferencesEditor.putString(USER_INSTITUTION, institution);
             sharedPreferencesEditor.commit();
             if(options == DiaFragMyAccount.MY_ACCOUNT_USER_INITIATED){
                 long loginTaskDuration = loginAsynkTaskStartTime - System.currentTimeMillis();
@@ -100,10 +97,10 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
             else{
                 Timber.v("User made an ERRORs with inputs in LoginAsynk Task");
                 SharedPreferences.Editor sharedPreferencesEditor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-                sharedPreferencesEditor.remove(SHARED_PREF_KEY_USERNAME);
-                sharedPreferencesEditor.remove(SHARED_PREF_KEY_PASSWORD);
-                sharedPreferencesEditor.remove(SHARED_PREF_KEY_BOOKINGS_LEFT);
-                sharedPreferencesEditor.remove(SHARED_PREF_INSTITUTION);
+                sharedPreferencesEditor.remove(USER_USERNAME);
+                sharedPreferencesEditor.remove(USER_PASSWORD);
+                sharedPreferencesEditor.remove(BOOKINGS_LEFT);
+                sharedPreferencesEditor.remove(USER_INSTITUTION);
                 sharedPreferencesEditor.commit();
             }
             Timber.i("LoginAsynkTask finished WITH Errors");
@@ -120,26 +117,26 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 		}*/
 //        progDialog.dismiss();
 
-		
+
 	}
-	
+
 	@Override
 	protected ArrayList<String[]> doInBackground(String[]... arg0) {
 		ArrayList<String[]> Results = new ArrayList<String[]>();
 		//Results holds all the data in the form of 0 = Completed Bookings, 1 is Incomplete
 		//Bokings and 2 is Past Bookings. It only Holds the Data, not the headings of each
 		//table, it reads from left to right
-		
+
 		//Document doc;
-	
-        try {			
+
+        try {
         		password = arg0[0][1];
         		studentID = arg0[0][0];
                 institution = arg0[0][2];
 				String __viewStateMain;
 				String __eventValidationMain;
                 String __viewStateGenerator;
-				
+
 
 		        OkHttpClient httpclient = new OkHttpClient();
                 Request request = new Request.Builder()
@@ -189,7 +186,7 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 					String[] incompleteBookingsArr;
 					String[] pastBookingsArr;
 					String timeRange;
-					
+
 					//TABLE COMPLETE
 					stateStart = responseString.indexOf("id=\"ContentPlaceHolder1_TableComplete\"");
 					stateEnd = responseString.indexOf("</table>", stateStart);
@@ -209,9 +206,9 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 							lastFoundAt = stateSubString.indexOf("<td", lastFoundAt+1);
 							stateStart = stateSubString.indexOf(">", lastFoundAt + 5);
 							stateEnd = stateSubString.indexOf("</font>", stateStart +1);
-							completedBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));	
-				
-							
+							completedBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));
+
+
 						}
 						completedBookingsArr = completedBookingTempArray.toArray(new String[completedBookingTempArray.size()]);
                         Timber.v("===");
@@ -230,7 +227,7 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 					stateEnd = responseString.indexOf("</table>", stateStart);
 					stateSubString = responseString.substring(stateStart, stateEnd);
 					lastFoundAt = 0;
-				
+
 					if(stateSubString.indexOf("<td", lastFoundAt) < 0){
 						incompleteBookingsArr = new String[0];
                         Timber.v("TableInComplete is empty");
@@ -245,9 +242,9 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 							lastFoundAt = stateSubString.indexOf("<td", lastFoundAt+1);
 							stateStart = stateSubString.indexOf(">", lastFoundAt + 5);
 							stateEnd = stateSubString.indexOf("</font>", stateStart +1);
-							incompletedBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));	
-				
-							
+							incompletedBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));
+
+
 						}
 						incompleteBookingsArr = incompletedBookingTempArray.toArray(new String[incompletedBookingTempArray.size()]);
                         Timber.v("===");
@@ -258,7 +255,7 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
                         }
                         Timber.v("===");
 					}
-					
+
 					//TABLE PAST
 					stateStart = responseString.indexOf("id=\"ContentPlaceHolder1_TablePast\"");
 					stateEnd = responseString.indexOf("</table>", stateStart);
@@ -277,9 +274,9 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 							lastFoundAt = stateSubString.indexOf("<td", lastFoundAt+1);
 							stateStart = stateSubString.indexOf(">", lastFoundAt + 5);
 							stateEnd = stateSubString.indexOf("</font>", stateStart +1);
-							pastBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));	
+							pastBookingTempArray.add(stateSubString.substring(stateStart+1, stateEnd));
 
-							
+
 						}
 						pastBookingsArr = pastBookingTempArray.toArray(new String[pastBookingTempArray.size()]);
                         Timber.v("===");
@@ -290,15 +287,15 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
                         Timber.v("===");
 					}
 
-					
+
 					Results.add(incompleteBookingsArr);
 					Results.add(completedBookingsArr);
 					Results.add(pastBookingsArr);
 
 					return Results;
-		        	
+
 		        	/*doc = Jsoup.parse(responseString);
-		        	
+
 		        	returnMessage = doc.select("#LabelMessage").text();
 		        	return "success";*/
 		        }
@@ -315,8 +312,8 @@ public class LoginAsynkTask extends AsyncTask<String[], int[], ArrayList<String[
 
 		        }
 
-													
-				        
+
+
         	}
             catch(IOException e){
                 String errorDescript = "Something went wrong with the login values or Internet Connection";

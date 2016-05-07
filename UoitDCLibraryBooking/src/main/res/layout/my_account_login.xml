@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_centerHorizontal="true"
+    android:layout_height="match_parent" >
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="Login"
+            android:textColor="@color/blue_font"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="@dimen/dialog_title_text" />
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/my_account_login_error_notice"
+        android:layout_width="match_parent"
+        android:gravity="center_horizontal"
+        android:lines="3"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#FF0000" />
+
+    <EditText
+        style="@style/flat_edittext"
+        android:id="@+id/editTextUserNameToLogin"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:textColorHint="@color/dark_light"
+        android:layout_marginTop="10dp"
+        android:hint="Student Number"
+        android:inputType="phone"
+        android:maxLength="13" />
+
+    <EditText
+        style="@style/flat_edittext"
+        android:id="@+id/editTextPasswordToLogin"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:hint="UOIT/DC Connect Password"
+        android:textColorHint="@color/dark_light"
+        android:inputType="textPassword"
+        android:maxLength="15" />
+
+    <RadioGroup
+        android:id="@+id/radioInstitution"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:layout_height="wrap_content" >
+
+        <RadioButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginRight="10dp"
+            android:id="@+id/uoit_radio"
+            android:text="UOIT"
+            />
+
+        <RadioButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="DC"
+            />
+
+    </RadioGroup>
+
+
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/my_account_login_sign_in_button"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="Sign In" />
+
+
+</LinearLayout>

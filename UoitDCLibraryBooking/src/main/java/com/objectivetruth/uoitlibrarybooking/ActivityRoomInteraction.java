@@ -37,9 +37,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
-import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 public class ActivityRoomInteraction extends FragmentActivity implements CommunicatorRoomInteractions {
 	final public String TAG = "ActivityRoomInteraction";
@@ -92,7 +90,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		bundleExtras = intent.getExtras();
 		mActivity = this;
         OttoBusSingleton.getInstance().register(this);
-        //TODO added the eventViewstateGenerrator to the main head part, now use it in the book instance
+        //TODO added the eventViewstateGenerrator to the calendar_action_icons_menu head part, now use it in the book instance
         if (bundleExtras != null){
             eventValidation = bundleExtras.getString("eventValidation");
             viewState = bundleExtras.getString("viewState");
@@ -197,9 +195,9 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
                 @Override
                 public void onClick(View view) {
                     if(isValidBook()) {
-                        String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                        String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
-                        String institutionSpinnerValue = mDefaultSharedPreferences.getString(SHARED_PREF_INSTITUTION, null);
+                        String inputUsername = mDefaultSharedPreferences.getString(USER_USERNAME, null);
+                        String inputPassword = mDefaultSharedPreferences.getString(USER_PASSWORD, null);
+                        String institutionSpinnerValue = mDefaultSharedPreferences.getString(USER_INSTITUTION, null);
                         //Checks if the sharedPrefs values are valid
                         if(inputPassword != null && inputUsername != null && institutionSpinnerValue != null){
                             String[] fieldData = new String[]{
@@ -387,8 +385,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 				@Override
 				public void onClick(View view) {
 
-                    String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = mDefaultSharedPreferences.getString(USER_USERNAME, null);
+                    String inputPassword = mDefaultSharedPreferences.getString(USER_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] joinGroupInput = new String[]{
@@ -431,8 +429,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 			leaveButton.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View view) {
-                    String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = mDefaultSharedPreferences.getString(USER_USERNAME, null);
+                    String inputPassword = mDefaultSharedPreferences.getString(USER_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] leaveGroupInput = new String[]{
@@ -527,8 +525,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 
 				@Override
 				public void onClick(View view) {
-                    String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = mDefaultSharedPreferences.getString(USER_USERNAME, null);
+                    String inputPassword = mDefaultSharedPreferences.getString(USER_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] joinGroupInput = new String[]{
@@ -568,8 +566,8 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 			leaveButton.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View view) {
-                    String inputUsername = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-                    String inputPassword = mDefaultSharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
+                    String inputUsername = mDefaultSharedPreferences.getString(USER_USERNAME, null);
+                    String inputPassword = mDefaultSharedPreferences.getString(USER_PASSWORD, null);
                     //Checks if the sharedPrefs values are valid
                     if(inputPassword != null && inputUsername != null){
                         String[] leaveGroupInput = new String[]{

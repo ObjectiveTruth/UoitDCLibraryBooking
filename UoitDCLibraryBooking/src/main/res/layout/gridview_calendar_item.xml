@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:id="@+id/gridview_text_view"
         android:layout_width="100dp"
         android:layout_height="60dp"

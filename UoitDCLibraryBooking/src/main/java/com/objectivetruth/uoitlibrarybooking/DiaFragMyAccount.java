@@ -33,10 +33,7 @@ import timber.log.Timber;
 
 import javax.inject.Inject;
 
-import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
-import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_USERNAME;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_KEY_BOOKINGS_LEFT;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 
 public class DiaFragMyAccount extends DialogFragment {
@@ -80,9 +77,9 @@ public class DiaFragMyAccount extends DialogFragment {
             @Override
             public void onClick(View view) {
                 SharedPreferences.Editor shareEditor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
-                shareEditor.remove(SHARED_PREF_KEY_USERNAME);
-                shareEditor.remove(SHARED_PREF_KEY_PASSWORD);
-                shareEditor.remove(SHARED_PREF_KEY_BOOKINGS_LEFT);
+                shareEditor.remove(USER_USERNAME);
+                shareEditor.remove(USER_PASSWORD);
+                shareEditor.remove(BOOKINGS_LEFT);
                 shareEditor.commit();
                 googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                         .setCategory("MyAccount")
@@ -99,9 +96,9 @@ public class DiaFragMyAccount extends DialogFragment {
 
 
         SharedPreferences defaultPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String username = defaultPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
-        String password = defaultPreferences.getString(SHARED_PREF_KEY_PASSWORD, null);
-        String institution = defaultPreferences.getString(SHARED_PREF_INSTITUTION, null);
+        String username = defaultPreferences.getString(USER_USERNAME, null);
+        String password = defaultPreferences.getString(USER_PASSWORD, null);
+        String institution = defaultPreferences.getString(USER_INSTITUTION, null);
         //There's a previously saved username/password combo
         if(MainActivity.mLoginAsyncTask == null && username !=null && password != null && institution != null){
 
@@ -498,7 +495,7 @@ public class DiaFragMyAccount extends DialogFragment {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
-            View v = inflater.inflate(R.layout.my_bookings_login, container, false);
+            View v = inflater.inflate(R.layout.my_account_login, container, false);
 
             return v;
         }
@@ -507,7 +504,7 @@ public class DiaFragMyAccount extends DialogFragment {
          * view using YoYo
          * @return true if both edit texts are valid, false if not valid
          */
-        private boolean isInputValid(){
+/*        private boolean isInputValid(){
             if(usernameField != null && passwordField != null && institutionRadio != null){
                 String usernameInput = usernameField.getText().toString();
                 String passwordInput = passwordField.getText().toString();
@@ -530,7 +527,7 @@ public class DiaFragMyAccount extends DialogFragment {
             }
             return false;
 
-        }
+        }*/
         @Override
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
@@ -542,13 +539,13 @@ public class DiaFragMyAccount extends DialogFragment {
             institutionRadio = (RadioGroup) view.findViewById(R.id.radioInstitution);
             usernameField = (EditText) view.findViewById(R.id.editTextUserNameToLogin);
             passwordField = (EditText) view.findViewById(R.id.editTextPasswordToLogin);
-            Button signInButton = (Button) view.findViewById(R.id.buttonSignIn);
-            errorTextView = (TextView) view.findViewById(R.id.error_textview);
+            Button signInButton = (Button) view.findViewById(R.id.my_account_login_sign_in_button);
+            errorTextView = (TextView) view.findViewById(R.id.my_account_login_error_notice);
             errorTextView.setGravity(Gravity.CENTER);
             errorTextView.setText(errorMessage);
-            ImageButton passwordImageButton = (ImageButton) view.findViewById(R.id.info_password);
+            //ImageButton passwordImageButton = (ImageButton) view.findViewById(R.id.info_password);
 
-            passwordImageButton.setOnClickListener(new View.OnClickListener() {
+/*            passwordImageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     FragmentManager fragMan = getChildFragmentManager();
@@ -556,7 +553,7 @@ public class DiaFragMyAccount extends DialogFragment {
                     frag.setArguments("Password Information", getString(R.string.credentials_instructions));
                     frag.show(fragMan, MainActivity.PASSWORD_INFO_DIALOGFRAGMENT_TAG);
                 }
-            });
+            });*/
 
 
             signInButton.setOnClickListener(new View.OnClickListener() {
@@ -581,7 +578,6 @@ public class DiaFragMyAccount extends DialogFragment {
 
 
                     if (isNetworkAvailable(getActivity())) {
-                        if(isInputValid()){
                             String institutionId;
                             switch(institutionRadio.getCheckedRadioButtonId()){
                                 case R.id.uoit_radio : institutionId = "uoit";
@@ -598,7 +594,6 @@ public class DiaFragMyAccount extends DialogFragment {
                                     .setAction("Login Start Event - User Initiated")
                                     .build());
                             MainActivity.errorMessageFromLogin = "";
-                        }
 
 
 
@@ -633,7 +628,7 @@ public class DiaFragMyAccount extends DialogFragment {
     private SpannableString getLoggedInAsSpan(){
         Resources resources = getResources();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String username = sharedPreferences.getString(SHARED_PREF_KEY_USERNAME, null);
+        String username = sharedPreferences.getString(USER_USERNAME, null);
 
         String loggedInAsWord= resources.getString(R.string.my_account_logged_in_as_word);
         //Number 3 means "bookings left: ??"  that string would have 3 from the end, to keep consistency
@@ -666,7 +661,7 @@ public class DiaFragMyAccount extends DialogFragment {
     private SpannableString getBookingsLeftSpan(){
         Resources resources = getResources();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        int bookingsLeft = sharedPreferences.getInt(SHARED_PREF_KEY_BOOKINGS_LEFT, -1);
+        int bookingsLeft = sharedPreferences.getInt(BOOKINGS_LEFT, -1);
         //No saved bookings left info
         String bookingsLeftWord = resources.getString(R.string.my_account_bookings_left_word);
         //Number 3 means "bookings left: ??"  that string would have 3 from the end, to keep consistency

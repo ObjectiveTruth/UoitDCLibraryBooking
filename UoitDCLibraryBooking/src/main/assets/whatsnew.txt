@@ -1,13 +1,25 @@
-Version 1.20041
-===============
 ‣ Removed all ads!
-‣ No more premium version
-‣ Removed QR feature completely
-‣ Can add bookings to phone's calendar
-‣ Lots of bug fixes
+    No more premium version
 ‣ App is now Open Source!
+    See About section for more info
+    on how to get involved and learn
+    android development
+‣ Material design
+‣ Removed QR feature completely
+    Nobody was using it
+‣ Lots of bug fixes
 
-See About section for more info
-and how you can get involved!
+Known Issues:
+==============
+‣ Can't book any rooms
+    Disabled until its fully working
 
+Dev Stuff:
+===============
+‣ New Slack Channel
+    See About section
+‣ Continuous Integration
+    Travis-CI and CircleCI
+‣ Completely reworked app architecture
+‣ Smoke tests available
 

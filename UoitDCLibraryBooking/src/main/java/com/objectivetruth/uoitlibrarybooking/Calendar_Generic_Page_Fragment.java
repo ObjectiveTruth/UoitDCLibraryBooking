@@ -34,9 +34,9 @@ import android.widget.*;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView;
-import com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.FixedTableAdapter;
-import com.objectivetruth.uoitlibrarybooking.calendar.tablewithfixedheaders.TableFixHeaders;
+import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
+import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.TableFixHeaders;
+import com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -44,8 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.objectivetruth.uoitlibrarybooking.MainActivity.SHARED_PREF_KEY_PASSWORD;
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_INSTITUTION;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 
 public class Calendar_Generic_Page_Fragment extends Fragment {
@@ -764,16 +763,16 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
                             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                             if(isNetworkAvailable(getActivity())){
                                 //If there's a valid username/password combo
-                                if(sharedPreferences.getString(MainActivity.SHARED_PREF_KEY_USERNAME, null) != null &&
-                                        sharedPreferences.getString(SHARED_PREF_KEY_PASSWORD, null) != null &&
-                                        sharedPreferences.getString(SHARED_PREF_INSTITUTION, null) != null){
+                                if(sharedPreferences.getString(USER_USERNAME, null) != null &&
+                                        sharedPreferences.getString(USER_PASSWORD, null) != null &&
+                                        sharedPreferences.getString(USER_INSTITUTION, null) != null){
                                     getDialog().dismiss();
                                     isMovingForward = true;
                                     new AsyncRoomInteraction(getActivity(), pageNumberInt, shareRow, shareColumn).execute(linkString);
                                 }
                                 else{
                                     Toast.makeText(getActivity(), R.string.error_please_log_in, Toast.LENGTH_LONG).show();
-                                    ((MainActivity) getActivity()).displayMyAccountHint();
+                                    //((MainActivity) getActivity()).displayMyAccountHint();
                                 }
 
 

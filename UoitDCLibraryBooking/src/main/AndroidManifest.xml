@@ -16,6 +16,8 @@
     <uses-permission
             android:name="com.google.android.c2dm.permission.RECEIVE" />
 
+    <!-- Ignore minSDK warning with this library. It is not instantiate unless its 15+ so its safe to include -->
+    <uses-sdk tools:overrideLibrary="com.github.glomadrian.roadrunner"/>
 
 
     <application
@@ -44,10 +46,6 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".guidelinespolicies.GuidelinesPoliciesActivity"
-                android:configChanges="keyboardHidden|orientation|screenSize"
-                android:launchMode="singleTop" />
-        <activity
                 android:name=".ActivityRoomInteraction"
                 android:configChanges="keyboardHidden|orientation|screenSize"
                 android:launchMode="standard"
@@ -56,16 +54,11 @@
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="com.objectivetruth.uoitlibrarybooking.MainActivity" />
         </activity>
-        <activity
-                android:name=".about.ActivityAboutMe"
-                android:configChanges="keyboardHidden|orientation|screenSize"
-                android:launchMode="singleTop" />
         <meta-data
                 android:name="com.crashlytics.ApiKey"
                 android:value="33f64deb44c8b23abaa0e0b5ba951b29710f027f" />
 
     </application>
-
 
 
 

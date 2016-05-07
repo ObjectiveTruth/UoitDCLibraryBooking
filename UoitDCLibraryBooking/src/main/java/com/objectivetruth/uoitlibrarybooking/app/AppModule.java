@@ -3,23 +3,25 @@ package com.objectivetruth.uoitlibrarybooking.app;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.networking.OkHttp3Stack;
 import dagger.Module;
 import dagger.Provides;
 
 import javax.inject.Singleton;
-import java.util.UUID;
 
-import static com.objectivetruth.uoitlibrarybooking.constants.SHARED_PREFERENCES_KEYS.SHARED_PREF_UUID;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.UUID;
 
 @Module
-class AppModule {
+public class AppModule {
     private Application mApplication;
 
-    AppModule(Application application) {
+    public AppModule(Application application) {
         mApplication = application;
     }
 
@@ -44,14 +46,20 @@ class AppModule {
             analytics.setDryRun(true);
         }
         Tracker googleAnalyticsTracker = analytics.newTracker(R.xml.app_tracker);
-        String usersUUID = defaultSharedPreferences.getString(SHARED_PREF_UUID, null);
+        String usersUUID = defaultSharedPreferences.getString(UUID, null);
 
         if(usersUUID == null){
             // Generate new Unique User ID if there isn't one already made. Ensures anonymity
-            usersUUID = UUID.randomUUID().toString();
+            usersUUID = java.util.UUID.randomUUID().toString();
         }
         googleAnalyticsTracker.set("&cid", usersUUID);
         return googleAnalyticsTracker;
     }
 
+    @Provides
+    @Singleton
+    protected RequestQueue providesRequestQueue() {
+        //return Volley.newRequestQueue(mApplication, new MockHttpStack(mApplication));
+        return Volley.newRequestQueue(mApplication, new OkHttp3Stack());
+    }
 }

@@ -7,8 +7,9 @@
     android:gravity="center"
     android:orientation="vertical" >
 
-    <com.objectivetruth.uoitlibrarybooking.app.userinterfaceUI.RobotoTextView
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
         android:id="@android:id/text1"
+        android:text="HELLO WORLD"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
