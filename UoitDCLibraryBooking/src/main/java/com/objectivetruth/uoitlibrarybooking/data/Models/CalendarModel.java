@@ -156,6 +156,11 @@ public class CalendarModel {
         Gson gson = new Gson();
         String userDataJSON = calendarSharedPreferences.getString(CALENDAR_DATA_JSON, EMPTY_JSON);
         CalendarData returnCalendarData = gson.fromJson(userDataJSON, CalendarData.class);
+        if(returnCalendarData == null) {
+            Timber.v("null");
+        }else{
+            Timber.v(returnCalendarData.toString());
+        }
         return returnCalendarData;
     }
 

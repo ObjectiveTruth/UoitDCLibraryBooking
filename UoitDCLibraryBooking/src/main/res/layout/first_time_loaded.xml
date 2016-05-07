@@ -1,0 +1,13 @@
+<ScrollView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:fillViewport="true"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitEnd"
+            android:id="@+id/imageView"
+            android:src="@drawable/ic_book_confused" />
+</ScrollView>

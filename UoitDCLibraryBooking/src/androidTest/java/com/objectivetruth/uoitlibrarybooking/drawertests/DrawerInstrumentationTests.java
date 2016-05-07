@@ -30,7 +30,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
-import static org.hamcrest.CoreMatchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -73,6 +72,7 @@ public class DrawerInstrumentationTests {
 
         onView(withId(android.R.id.button1)).perform(click());
         Spoon.screenshot(mActivity, "after_dismiss_dialog");
+        onView(withId(R.id.calendar_content_frame)).check(matches((isDisplayed())));
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
         Spoon.screenshot(mActivity, "after_open_drawer");
@@ -100,7 +100,6 @@ public class DrawerInstrumentationTests {
 
         onView(withText("Calendar")).perform(click());
         Spoon.screenshot(mActivity, "after_open_calendar");
-        onView(withId(R.id.calendar_page_grid)).
-                check(matches(allOf(isDisplayed(), hasDescendant(withId(R.id.calendar_item_layout)))));
+        onView(withId(R.id.calendar_content_frame)).check(matches((isDisplayed())));
     }
 }

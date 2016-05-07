@@ -24,6 +24,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBook
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarloaded.CalendarLoaded;
+import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.firsttimeloaded.FirstTimeLoaded;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.sorrycartoon.SorryCartoon;
 import rx.Observer;
@@ -80,7 +81,10 @@ public class Calendar extends Fragment {
     private void _showCalendarWithDataFromStorage() {
         Timber.d("Showing Calendar screen with data from storage");
         CalendarData storedCalendarData = calendarModel.getCalendarDataFromStorage();
-        if(storedCalendarData == null ) {
+        if(_isFirstTimeLoaded(storedCalendarData)) {
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.calendar_content_frame, FirstTimeLoaded.newInstance()).commit();
+        }else if(storedCalendarData == null) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
         }else{
@@ -241,6 +245,10 @@ public class Calendar extends Fragment {
                 })
                 .setIcon(R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    private boolean _isFirstTimeLoaded(CalendarData calendarData) {
+        return calendarData != null && calendarData.days == null;
     }
 
     public static class RefreshActivateEvent {}
