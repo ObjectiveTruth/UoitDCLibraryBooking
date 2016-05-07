@@ -109,6 +109,7 @@ public class Calendar extends Fragment {
                     @Override
                     public void onError(Throwable e) {
                         Timber.e(e, "Error getting the data required to show the calendar");
+                        swipeRefreshLayout.setRefreshing(false);
                         if(e instanceof TimeoutError) {
                             Toast.makeText(getContext(), "Server timeout, try again", Toast.LENGTH_SHORT).show();
                         }else{

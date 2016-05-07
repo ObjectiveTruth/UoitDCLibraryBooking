@@ -96,6 +96,7 @@ public class MyAccountLoaded extends Fragment {
 
                             @Override
                             public void onError(Throwable e) {
+                                swipeRefreshLayout.setRefreshing(false);
                                 Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
 
