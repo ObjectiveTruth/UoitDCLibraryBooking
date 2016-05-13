@@ -47,20 +47,24 @@ notifications:
     secure: mYIFi0udue0C8Oh0vZ54B89aNYyoD5Y5R92SrtNDYWeZMgjL2U3EEHpnyKZpJ5fjMFF9UIt2dKi2otr1xMc3UQmVfMWmv5ikVk/x1SuhkfJ85b3BId1TqbJGoRvpzRAE3E6HaZQAnWCM1HWziZs8ShhWuNo56FcbK8JWD7evcsdsgQnVLsdj9ktBX6NgYRCTjZX3UZ8bS864twAkm4SJwkxmmRvGt7nX5nU9MQ9Pj4N+w0lnzkdRc4kLiKhoMJOoyJRfSv3/w9APece1LhdBfPGsxbWOkdAq/ZjwGXvVN6DARMjVrZzEVfLxBHV+pqRcnK+eFolOr47M4L2APCB51b1fFn6gpMQzi2vJ8GAGCYCqLuxKu0LdWJjaT+1whrS4yWajFOBxEwBxUfb7Cs31bDWVrtwJ5c68YJTPKmkm8RAIjectlkM+QJcbKmvUBw5qhZzSndI/2nl7S57/SuDlHIXXjZNKGpRoV/WbvaAZuiYIxwrNL+l2fKGTAWXHY6Agsf8sUoofoqru1U58WpimJhftzqkXohIFXnBR412W8oBdY5xpf97WR83poKwsu0dlHmXpAZ3hfeR+oSL9QUamZ86mCzmstNwJqxi6bUut+6iBb/JnzEc+4o/9/pGXLEUA31KJFV363yGsT5Yx+oc8hyUB4qeFnwze6F4bdeXqlOs=
 after_success:
   # Create Git Tag
-  - ./scripts/set_release_track_env_variable_based_on_ci_branch.sh
   - git config --global user.email "uoitdclibrarybooking@objectivetruth.ca"
   - git config --global user.name "Travis CI"
+  # Reset the ANDROID_APK_RELEASE_TRACK env variable since its wiped when after_success starts
+  - export ANDROID_APK_RELEASE_TRACK=`cat .travis_branch_name`
   - echo -n $GIT_TAG > version.txt
   - git commit -m "Set build VERSION number" version.txt
   - export GIT_TAG=v1.$(expr 20020 + ${TRAVIS_BUILD_NUMBER})-${ANDROID_APK_RELEASE_TRACK}
   - git tag $GIT_TAG -a -m "Generated tag from TravisCI build $TRAVIS_BUILD_NUMBER"
   - git push --quiet https://$GH_TOKEN@github.com/ObjectiveTruth/UoitDCLibraryBooking.git $GIT_TAG > /dev/null 2>&1
+  # Rename release apk file
+  - mv UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-release.apk
+    UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking_${GIT_TAG}.apk
 
 deploy:
   provider: releases
   api_key:
     secure: goZT2pPYFPu2+vYafTqPwXeTd6TDOd2TzRv4c5zdh8Z6hS2G45Fr0ACAOApLNeB0eCur9qthbWQPNF1rQRGg0ghlRHJCkruFi0wg0CwzSFBkdXAEYjptbcpP7hYcVWq4bRb9v53ISA0+cbhOIAWvexhHuJq/d1s68aA1llLLWWJhdVXo8i1VWMBSbAHMBmzyIKmoiX1QYKBgMNP8tpG1cxpG6MdEwHKVd+KFsSYYECv25Ak5pJCe2zcORej+PeuXs3FT6+jp/zc86qrx/LiiAdKJS7o7ZBoFYKtP6w2qq56CUDW3EdzdwBMwTFZalP3zQHR04cwatBgDscAzsEqapRiOXv6KL9yh6vB65T7uwyVMrX7BvXdG1vcCDzSAaFjBkSGcXcTOoDscvSuz7+q68XgFU9m2zZQZMjydArY6mxXV5rgdgDtyOvvBwu1kqswH4qJgiOyUbIpt9Tuvki2LcZYaEN67LriYx7QYf1Bqt6bg9ACuuzY5MRxX772abBMlrdJZwmg8aGMrb/Rr19VSsymxwX08fe5YvMCjSoDmZ//kFdPkEmw7milFlO0WkCLHW34z3W5XgcpkIlSK1oFBmtO0sHxeys8cXpUKtR8Nnf70Vgh4Qr5EUd6bAnq/zdDwtLkf5R6KjZN0VZjRgWKbwv3KE1sFT40YRQkYvlGctR8=
-  file: "UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-release.apk"
+  file: "UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking_v*.apk"
   file_glob: true
   skip_cleanup: true
   on:
