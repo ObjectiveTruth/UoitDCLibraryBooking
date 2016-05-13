@@ -12,8 +12,10 @@
 
 if [ "$TRAVIS_BRANCH" == "master" ]; then
     export ANDROID_APK_RELEASE_TRACK=beta
+    echo ${ANDROID_APK_RELEASE_TRACK} > .travis_branch_name
 elif [ "$TRAVIS_BRANCH" == "prod" ]; then
     export ANDROID_APK_RELEASE_TRACK=prod
+    echo ${ANDROID_APK_RELEASE_TRACK} > .travis_branch_name
 else
     echo "TRAVIS_BRANCH env variable not set"
     exit 1
