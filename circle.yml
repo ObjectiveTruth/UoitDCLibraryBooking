@@ -1,6 +1,8 @@
 machine:
   node:
     version: 5.5.0
+  java:
+    version: openjdk8
   environment:
     ADB_INSTALL_TIMEOUT: "10"
     GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx3072m -XX:+HeapDumpOnOutOfMemoryError"'
