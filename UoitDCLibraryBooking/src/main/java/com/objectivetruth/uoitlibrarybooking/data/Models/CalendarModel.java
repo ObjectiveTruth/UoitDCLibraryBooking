@@ -6,14 +6,13 @@ import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
 import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.*;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.FuncN;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 import timber.log.Timber;
 
 import java.util.ArrayList;
@@ -22,10 +21,12 @@ import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREF
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCE_NAMES.CALENDAR_SHARED_PREFERENCES_NAME;
 
 public class CalendarModel {
+    private static final String EMPTY_JSON = "{}";
+
     private SharedPreferences calendarSharedPreferences;
     private SharedPreferences.Editor calendarSharedPreferencesEditor;
-    private static final String EMPTY_JSON = "{}";
-    CalendarWebService calendarWebService;
+    private BehaviorSubject<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubject;
+    private CalendarWebService calendarWebService;
 
     @SuppressLint("CommitPrefEdits")
     public CalendarModel(UOITLibraryBookingApp mApplication, CalendarWebService calendarWebService) {
@@ -33,6 +34,16 @@ public class CalendarModel {
                 Context.MODE_PRIVATE);
         calendarSharedPreferencesEditor = calendarSharedPreferences.edit();
         this.calendarWebService = calendarWebService;
+    }
+
+    public BehaviorSubject<CalendarDataRefreshState> getCalendarDataRefreshBehaviourSubject() {
+        if(calendarDataRefreshStateBehaviorSubject == null) {
+            CalendarDataRefreshState initialState = new CalendarDataRefreshState(CalendarDataRefreshStateType.INITIAL,
+                    _getCalendarDataFromStorage(), null);
+            return BehaviorSubject.create(initialState);
+        }else {
+            return calendarDataRefreshStateBehaviorSubject;
+        }
     }
 
     public Observable<CalendarData> getCalendarDataObs() {
@@ -141,7 +152,7 @@ public class CalendarModel {
     }
 
     private void _storeCalendarDataResultsInStorage(CalendarData calendarData) {
-        Timber.d("Storing claendar Data in storage");
+        Timber.d("Storing calendar Data in storage");
         Gson gson = new Gson();
         String calendarDataJson = gson.toJson(calendarData);
         Timber.v(calendarDataJson);
@@ -150,7 +161,7 @@ public class CalendarModel {
                 .apply();
     }
 
-    public CalendarData getCalendarDataFromStorage() {
+    private CalendarData _getCalendarDataFromStorage() {
         Timber.d("Getting Calendar Data from Storage");
         Gson gson = new Gson();
         String userDataJSON = calendarSharedPreferences.getString(CALENDAR_DATA_JSON, EMPTY_JSON);

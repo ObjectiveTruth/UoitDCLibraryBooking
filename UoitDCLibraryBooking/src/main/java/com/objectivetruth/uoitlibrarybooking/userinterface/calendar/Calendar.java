@@ -81,7 +81,9 @@ public class Calendar extends Fragment {
 
     private void _showCalendarWithDataFromStorage() {
         Timber.d("Showing Calendar screen with data from storage");
-        CalendarData storedCalendarData = calendarModel.getCalendarDataFromStorage();
+        //CalendarData storedCalendarData = calendarModel.getCalendarDataFromStorage();
+        //TODO fixme
+        CalendarData storedCalendarData = null;
         if(_isFirstTimeLoaded(storedCalendarData)) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, FirstTimeLoaded.newInstance()).commit();
