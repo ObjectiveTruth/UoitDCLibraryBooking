@@ -123,7 +123,7 @@ def getVersionFromContinuousIntegrationEnvironment() {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "24.0.0"
 
     // Required for OkHttp/Volley Integration.
     // Apache was taken out in v23. See https://gist.github.com/bryanstern/4e8f1cb5a8e14c202750 for more
