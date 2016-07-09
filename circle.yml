@@ -20,7 +20,7 @@ dependencies:
         pwd:
           device_farm_receive_server
   pre:
-    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23
+    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-24
     - echo y | android update sdk --no-ui --all --filter "build-tools-24.0.0"
   post:
     # Copy the standard debug keystore to the CI, ensuring all app have the same certificate
