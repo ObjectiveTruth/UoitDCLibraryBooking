@@ -1,11 +1,12 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.data.models;
 
+import com.objectivetruth.uoitlibrarybooking.SillyNameValuePairClass;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 
-public class ApplicationTest {
+public class CalendarModelTest {
     private SillyNameValuePairClass mSillyNameValuePairClass;
 
     @Before
@@ -19,4 +20,3 @@ public class ApplicationTest {
         assertFalse(mSillyNameValuePairClass.toString().isEmpty());
     }
 }
-
