@@ -1,11 +1,11 @@
 package com.objectivetruth.uoitlibrarybooking.data.models;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
 import com.google.gson.Gson;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
@@ -19,21 +19,20 @@ import timber.log.Timber;
 import java.util.ArrayList;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.CALENDAR_DATA_JSON;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCE_NAMES.CALENDAR_SHARED_PREFERENCES_NAME;
 
 public class CalendarModel {
     private SharedPreferences calendarSharedPreferences;
     private SharedPreferences.Editor calendarSharedPreferencesEditor;
-    final static private String CALENDAR_SHARED_PREFERENCES_NAME = "CALENDAR";
-    private CalendarWebService calendarWebService;
     private static final String EMPTY_JSON = "{}";
+    CalendarWebService calendarWebService;
 
     @SuppressLint("CommitPrefEdits")
-    public CalendarModel(Application mApplication) {
+    public CalendarModel(UOITLibraryBookingApp mApplication, CalendarWebService calendarWebService) {
         calendarSharedPreferences = mApplication.getSharedPreferences(CALENDAR_SHARED_PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
         calendarSharedPreferencesEditor = calendarSharedPreferences.edit();
-
-        calendarWebService = new CalendarWebService(mApplication);
+        this.calendarWebService = calendarWebService;
     }
 
     public Observable<CalendarData> getCalendarDataObs() {

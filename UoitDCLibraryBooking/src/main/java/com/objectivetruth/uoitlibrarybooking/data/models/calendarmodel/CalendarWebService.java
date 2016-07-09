@@ -1,6 +1,5 @@
 package com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel;
 
-import android.app.Application;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -12,7 +11,6 @@ import rx.functions.Func0;
 import rx.functions.FuncN;
 import timber.log.Timber;
 
-import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -21,12 +19,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class CalendarWebService {
-    @Inject RequestQueue requestQueue;
+    RequestQueue requestQueue;
     final private static String UOIT_LIBRARY_MAIN_CALENDAR_URL =
             "https://rooms.library.dc-uoit.ca/dc_studyrooms/calendar.aspx";
 
-    public CalendarWebService(Application mApplication) {
-        ((UOITLibraryBookingApp) mApplication).getComponent().inject(this);
+    public CalendarWebService(UOITLibraryBookingApp mApplication, RequestQueue requestQueue) {
+        this.requestQueue = requestQueue;
     }
 
     public Observable<String> getRawInitialWebPageObs() {
