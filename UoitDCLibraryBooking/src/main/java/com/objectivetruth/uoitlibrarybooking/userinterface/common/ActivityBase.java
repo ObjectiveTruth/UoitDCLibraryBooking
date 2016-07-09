@@ -15,8 +15,8 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import com.google.android.gms.analytics.GoogleAnalytics;
+import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.userinterface.about.About;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesAndPolicies;
@@ -45,7 +45,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle bundleExtras) {
         super.onCreate(bundleExtras);
-        if (UOITLibraryBookingApp.IS_DEBUG_MODE) {
+        if (BuildConfig.DEBUG) {
             // Programmatically unlock the screen for testing
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);

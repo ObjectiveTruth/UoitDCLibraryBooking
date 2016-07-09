@@ -56,7 +56,7 @@ public class MainActivity extends ActivityBase {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        if(UOITLibraryBookingApp.IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL) {
+        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {
             WhatsNewDialog.show(this);
         }
     }

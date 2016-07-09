@@ -15,7 +15,6 @@ import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREF
 public class UOITLibraryBookingApp extends Application {
     private AppComponent mComponent;
     public static boolean IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = false;
-    public static boolean IS_DEBUG_MODE = false;
 
 	public UOITLibraryBookingApp() {
 			super();
@@ -72,12 +71,14 @@ public class UOITLibraryBookingApp extends Application {
         }
     }
 
+    public static boolean isFirstTimeLaunchSinceUpgradeOrInstall() {
+        return IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL;
+    }
+
     private void _checkIfIsDebugMode() {
         if (BuildConfig.DEBUG) {
-            IS_DEBUG_MODE = true;
             Timber.plant(new Timber.DebugTree());
         } else {
-            IS_DEBUG_MODE = false;
             Timber.plant(new CrashReportingTree());
             String mUUID = PreferenceManager.getDefaultSharedPreferences(this).getString(UUID, null);
             if(mUUID == null){
