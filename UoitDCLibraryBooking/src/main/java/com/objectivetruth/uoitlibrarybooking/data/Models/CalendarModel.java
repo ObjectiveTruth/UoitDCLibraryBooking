@@ -91,6 +91,7 @@ public class CalendarModel {
                     _getCalendarDataRefreshStateBehaviorSubject().onNext(runningState);
 
                     _startRefreshAndGetObservable()
+                            .observeOn(Schedulers.computation())
                             .subscribe(new Observer<CalendarData>() {
                         @Override
                         public void onCompleted() {
@@ -133,6 +134,7 @@ public class CalendarModel {
     private Observable<CalendarData> _startRefreshAndGetObservable() {
         return calendarWebService.getRawInitialWebPageObs() // Get the initial raw Webpage of the site
                 .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
 
                 // Transform it into CalendarData by Parsing the raw Webpage
                 .flatMap(new Func1<String, Observable<CalendarData>>() {
@@ -184,7 +186,6 @@ public class CalendarModel {
                                         calendarDataPair.second);
                     }
                 })
-                .observeOn(Schedulers.computation())
 
                 // Make more webcalls based on the Parsing information from previous step. Return those raw webpages
                 .flatMap(new Func1<CalendarData, Observable<Pair<CalendarData, String[]>>>() {
@@ -224,7 +225,7 @@ public class CalendarModel {
                         return Observable.just(calendarData);
                     }
                 })
-                .observeOn(Schedulers.computation());
+                .subscribeOn(Schedulers.computation());
     }
 
     private void _storeCalendarDataResultsInStorage(CalendarData calendarData) {

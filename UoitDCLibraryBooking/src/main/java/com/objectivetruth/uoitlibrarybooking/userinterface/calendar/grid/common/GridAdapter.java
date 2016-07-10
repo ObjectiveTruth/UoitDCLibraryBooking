@@ -23,6 +23,15 @@ public class GridAdapter extends FixedTableAdapter {
         this.calendarDay = calendarDay;
     }
 
+    /**
+     * Settter for the calendarDay info, will NOT update the UI. Useful, if you want to update the info inside without
+     * for example, an onclick on a timecell
+     * @param calendarDay
+     */
+    public void saveNewCalendarDayWontUpdateUI(CalendarDay calendarDay) {
+        this.calendarDay = calendarDay;
+    }
+
     @Override
     public String getCellString(int row, int column) {
         return new Random().nextInt() + "";

@@ -148,7 +148,7 @@ public class Calendar extends Fragment {
         }else if(calendarData == null) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
-        }else{
+        }else {
             _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(calendarData);
         }
     }
@@ -175,9 +175,9 @@ public class Calendar extends Fragment {
 
         if(currentFragmentInContentFrame instanceof CalendarLoaded) {
             Timber.d("Calendar content frame already contains CalendarLoaded, will tell it to redraw/refresh itself");
-            ((CalendarLoaded) currentFragmentInContentFrame).refreshPagerFragmentsAndViews(calendarData);
+            ((CalendarLoaded) currentFragmentInContentFrame).refreshPagerFragmentsAndViewsIfDataDiffers(calendarData);
         }else{
-            Timber.d("Calendar content frame contains Sorry Cartoon, will replace with CalendarLoaded");
+            Timber.d("Calendar content frame doesn't contain CalendarLoaded, will replace with CalendarLoaded");
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame,
                             CalendarLoaded.newInstance(calendarData),

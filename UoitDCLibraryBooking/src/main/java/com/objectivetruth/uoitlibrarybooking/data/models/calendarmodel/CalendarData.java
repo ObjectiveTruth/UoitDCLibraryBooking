@@ -37,4 +37,13 @@ public class CalendarData {
     private boolean _notEmpty(List<CalendarDay> calendarDays) {
         return !calendarDays.isEmpty();
     }
+
+    public boolean isEqualTo(CalendarData calendarData) {
+        return this.toString().contentEquals(calendarData.toString());
+    }
+
+    public boolean isNOTEqualTo(CalendarData calendarData) {
+        return !isEqualTo(calendarData);
+    }
+
 }
