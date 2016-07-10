@@ -10,6 +10,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.*;
+import android.widget.Toast;
+import com.android.volley.TimeoutError;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
@@ -31,6 +33,8 @@ import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.H
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.sorrycartoon.SorryCartoon;
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.internal.util.SubscriptionList;
 import timber.log.Timber;
 
@@ -44,8 +48,8 @@ public class Calendar extends Fragment {
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
-    SubscriptionList subscriptionList = new SubscriptionList();
-    private final static String SAVED_BUNDLE_KEY_IS_FIRST_LOAD = "IS_FIRST_LOAD";
+    private SubscriptionList subscriptionList = new SubscriptionList();
+    private SwipeRefreshLayout _mSwipeLayout;
 
     @Nullable
     @Override
@@ -61,49 +65,82 @@ public class Calendar extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        _bindRefreshStateToView(calendarModel.getCalendarDataRefreshObservable());
-
-        SwipeRefreshLayout _mSwipeLayout =
-                (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
-
-        _bindSwipeLayoutToCalendarRefreshEvent(_mSwipeLayout);
+        _mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
+        _setupViewBindings(_mSwipeLayout, calendarModel.getCalendarDataRefreshObservable());
     }
 
-    private void _bindSwipeLayoutToCalendarRefreshEvent(final SwipeRefreshLayout swipeRefreshLayout) {
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-            }
-        });
+    /**
+     * Undoes all the bindings to the view, this is important so events don't get fired when the view is no longer
+     * visible, or "in-view"
+     */
+    private void _teardownViewBindings(SwipeRefreshLayout swipeRefreshLayout) {
+        subscriptionList.unsubscribe();
+
+        if(swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(null);
+        }
     }
 
-    private void _bindRefreshStateToView(Observable<CalendarDataRefreshState> calendarDataRefreshStateObservable) {
-        subscriptionList.add(
-                calendarDataRefreshStateObservable.subscribe(new Observer<CalendarDataRefreshState>() {
-            @Override
-            public void onCompleted() {
-                // Do nothing
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(CalendarDataRefreshState calendarDataRefreshState) {
-                switch(calendarDataRefreshState.type) {
-                    case INITIAL:
-                        _doInitialCase(calendarDataRefreshState.calendarData);
-                        break;
+    /**
+     * Creates all the bindings from the View to the ViewModel. Good to do this when the View first is created
+     * and if the view ever has to leave, its important to call this when it comes back into "view"
+     * @param swipeRefreshLayout
+     * @param calendarDataRefreshStateObservable
+     */
+    private void _setupViewBindings(final SwipeRefreshLayout swipeRefreshLayout,
+                                Observable<CalendarDataRefreshState> calendarDataRefreshStateObservable) {
+        if(_mSwipeLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
                 }
-            }
-        }));
+            });
+        }
+
+        Subscription calendarDataRefreshStateObservableSubscription =
+                calendarDataRefreshStateObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<CalendarDataRefreshState>() {
+                    @Override
+                    public void onCompleted() {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(CalendarDataRefreshState calendarDataRefreshState) {
+                        Timber.i("On next called: " + calendarDataRefreshState.type.name());
+                        switch(calendarDataRefreshState.type) {
+                            case RUNNING:
+                                if(!swipeRefreshLayout.isRefreshing()) {
+                                    swipeRefreshLayout.setRefreshing(true);
+                                }
+                                _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
+                                break;
+                            case ERROR:
+                                swipeRefreshLayout.setRefreshing(false);
+                                _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
+                                _handleRefreshError(calendarDataRefreshState.exception);
+                                break;
+                            case INITIAL:
+                            case SUCCESS:
+                            default:
+                                swipeRefreshLayout.setRefreshing(false);
+                                _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
+                                break;
+                        }
+                    }
+                });
+        subscriptionList.add(calendarDataRefreshStateObservableSubscription);
     }
 
-    private void _doInitialCase(CalendarData calendarData) {
-        Timber.d("Showing Calendar screen with data from storage");
+    private void _doViewUpdatedBasedOnCalendarData(CalendarData calendarData) {
+        Timber.d("Changing Calendar screen based on calendardata received");
         if(_isFirstTimeLoaded(calendarData)) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, FirstTimeLoaded.newInstance()).commit();
@@ -111,63 +148,29 @@ public class Calendar extends Fragment {
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
         }else{
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.calendar_content_frame, CalendarLoaded.newInstance(calendarData)).commit();
+            _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(calendarData);
         }
     }
 
-/*    public void fetchLatestDataAndRefreshCalendarUI(final SwipeRefreshLayout swipeRefreshLayout) {
-        Timber.i("Calendar loading starting...");
-
-        calendarModel.getCalendarDataObs()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<CalendarData>() {
-                    @Override
-                    public void onCompleted() {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e, "Error getting the data required to show the calendar");
-                        swipeRefreshLayout.setRefreshing(false);
-                        if(e instanceof TimeoutError) {
-                            Toast.makeText(getContext(), "Server timeout, try again", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(getContext(), "Something went wrong, try again",
-                                    Toast.LENGTH_SHORT).show();
-                            getFragmentManager().beginTransaction()
-                                    .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
-                        }
-                    }
-
-                    @Override
-                    public void onNext(CalendarData calendarData) {
-                        Timber.i("Calendar loading complete");
-                        Toast.makeText(getContext(), "Refresh Successful",
-                                Toast.LENGTH_SHORT).show();
-                        if (calendarData == null) {
-                            Timber.d("Calendar Data request is empty, showing sorry cartoon");
-                            getFragmentManager().beginTransaction()
-                                    .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
-                        }else {
-                            Timber.d("CalendarData has data, showing calendar");
-                            _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(calendarData);
-                        }
-                    }
-                });
-    }*/
+    private void _handleRefreshError(Throwable throwable) {
+        if(throwable instanceof TimeoutError) {
+            Toast.makeText(getContext(), "Server timeout, try again", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(getContext(), "Something went wrong, try again",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
 
     /**
      * Checks the currently loaded fragment in the calendar_content_frame. If calendar loaded is there
      * it will tell it to refresh with new calendarData, otherwise it will make a new CalendarData fragment
-     * @param calendarData
+     * @param calendarData must have data in it(not null)
      */
     private void _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(CalendarData calendarData) {
         String CALENDAR_LOADED_FRAGMENT_TAG = "SINGLETON_CALENDAR_LOADED_FRAGMENT_TAG";
         Fragment currentFragmentInContentFrame = getFragmentManager().findFragmentById(R.id.calendar_content_frame);
-        if(currentFragmentInContentFrame instanceof SorryCartoon) {
+        if(currentFragmentInContentFrame instanceof SorryCartoon ||
+                currentFragmentInContentFrame instanceof FirstTimeLoaded) {
             Timber.d("Calendar content frame contains Sorry Cartoon, will replace with CalendarLoaded");
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame,
@@ -279,5 +282,19 @@ public class Calendar extends Fragment {
 
     private boolean _isFirstTimeLoaded(CalendarData calendarData) {
         return calendarData != null && calendarData.days == null;
+    }
+
+    @Override
+    public void onPause() {
+        Timber.v("Calendar Paused");
+        //_teardownViewBindings();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        Timber.v("Calendar Resumed");
+        //_setupViewBindings(_mSwipeLayout, calendarModel.getCalendarDataRefreshObservable());
+        super.onResume();
     }
 }

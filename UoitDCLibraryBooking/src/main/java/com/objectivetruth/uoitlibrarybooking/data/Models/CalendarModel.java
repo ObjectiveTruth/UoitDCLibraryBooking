@@ -28,7 +28,9 @@ public class CalendarModel {
 
     private SharedPreferences calendarSharedPreferences;
     private SharedPreferences.Editor calendarSharedPreferencesEditor;
+    // Keep a reference to both so we send back the same when a client asks
     private BehaviorSubject<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubject;
+    private Observable<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubjectAsObservable;
     private PublishSubject<RefreshActivateEvent> refreshActivateEventPublishSubject;
     private CalendarWebService calendarWebService;
 
@@ -46,7 +48,8 @@ public class CalendarModel {
      * @return
      */
     public Observable<CalendarDataRefreshState> getCalendarDataRefreshObservable() {
-        return _getCalendarDataRefreshStateBehaviorSubject().asObservable();
+        _getCalendarDataRefreshStateBehaviorSubject(); // Sets up all the references before we return
+        return calendarDataRefreshStateBehaviorSubjectAsObservable;
     }
 
     private BehaviorSubject<CalendarDataRefreshState> _getCalendarDataRefreshStateBehaviorSubject() {
@@ -54,6 +57,9 @@ public class CalendarModel {
             CalendarDataRefreshState initialState = new CalendarDataRefreshState(CalendarDataRefreshStateType.INITIAL,
                     _getCalendarDataFromStorage(), null);
             calendarDataRefreshStateBehaviorSubject = BehaviorSubject.create(initialState);
+            calendarDataRefreshStateBehaviorSubjectAsObservable = calendarDataRefreshStateBehaviorSubject
+                    .subscribeOn(Schedulers.computation())
+                    .asObservable();
             return calendarDataRefreshStateBehaviorSubject;
         }else {
             return calendarDataRefreshStateBehaviorSubject;
@@ -73,16 +79,18 @@ public class CalendarModel {
     private void _bindRefreshActivateEventPublishSubjectToGettingCalendarData(PublishSubject<RefreshActivateEvent>
                                                                                  refreshActivateEventPublishSubject) {
         refreshActivateEventPublishSubject
+                .observeOn(Schedulers.computation())
                 .subscribe(new Action1<RefreshActivateEvent>() {
             @Override
             public void call(RefreshActivateEvent refreshActivateEvent) {
                 if(isARefreshRequestNOTRunning()) {
+                    Timber.d("Running a new request for Refresh Data since none are running");
                     CalendarDataRefreshState runningState =
-                            new CalendarDataRefreshState(CalendarDataRefreshStateType.RUNNING, null, null);
+                            new CalendarDataRefreshState(CalendarDataRefreshStateType.RUNNING,
+                                    _getCalendarDataFromStorage(), null);
                     _getCalendarDataRefreshStateBehaviorSubject().onNext(runningState);
 
                     _startRefreshAndGetObservable()
-                            .subscribeOn(Schedulers.computation())
                             .subscribe(new Observer<CalendarData>() {
                         @Override
                         public void onCompleted() {
@@ -91,8 +99,10 @@ public class CalendarModel {
 
                         @Override
                         public void onError(Throwable e) {
+                            Timber.v("Error when completing the Refresh request, passing into to the view");
                             CalendarDataRefreshState errorState =
-                                    new CalendarDataRefreshState(CalendarDataRefreshStateType.ERROR, null, e);
+                                    new CalendarDataRefreshState(CalendarDataRefreshStateType.ERROR,
+                                            _getCalendarDataFromStorage(), e);
                             _getCalendarDataRefreshStateBehaviorSubject().onNext(errorState);
                         }
 
@@ -104,6 +114,8 @@ public class CalendarModel {
                             _getCalendarDataRefreshStateBehaviorSubject().onNext(successState);
                         }
                     });
+                }else {
+                    Timber.d("Refresh is already running, ignorning request");
                 }
             }
         });
@@ -120,6 +132,8 @@ public class CalendarModel {
 
     private Observable<CalendarData> _startRefreshAndGetObservable() {
         return calendarWebService.getRawInitialWebPageObs() // Get the initial raw Webpage of the site
+                .subscribeOn(Schedulers.computation())
+
                 // Transform it into CalendarData by Parsing the raw Webpage
                 .flatMap(new Func1<String, Observable<CalendarData>>() {
                     @Override
@@ -170,6 +184,7 @@ public class CalendarModel {
                                         calendarDataPair.second);
                     }
                 })
+                .observeOn(Schedulers.computation())
 
                 // Make more webcalls based on the Parsing information from previous step. Return those raw webpages
                 .flatMap(new Func1<CalendarData, Observable<Pair<CalendarData, String[]>>>() {
@@ -209,7 +224,6 @@ public class CalendarModel {
                         return Observable.just(calendarData);
                     }
                 })
-                .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation());
     }
 
@@ -229,7 +243,7 @@ public class CalendarModel {
         String userDataJSON = calendarSharedPreferences.getString(CALENDAR_DATA_JSON, EMPTY_JSON);
         CalendarData returnCalendarData = gson.fromJson(userDataJSON, CalendarData.class);
         if(returnCalendarData == null) {
-            Timber.v("null");
+            Timber.v("Stored CalendarData JSON is null");
         }else{
             Timber.v(returnCalendarData.toString());
         }
