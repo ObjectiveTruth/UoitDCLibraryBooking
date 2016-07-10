@@ -133,8 +133,6 @@ public class CalendarModel {
 
     private Observable<CalendarData> _startRefreshAndGetObservable() {
         return calendarWebService.getRawInitialWebPageObs() // Get the initial raw Webpage of the site
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
 
                 // Transform it into CalendarData by Parsing the raw Webpage
                 .flatMap(new Func1<String, Observable<CalendarData>>() {
@@ -217,7 +215,18 @@ public class CalendarModel {
                     }
                 })
 
-                // Store the final result in Storage
+                // Compute the hash so its faster to compare for changes
+                .flatMap(new Func1<CalendarData, Observable<CalendarData>>() {
+                    @Override
+                    public Observable<CalendarData> call(CalendarData calendarData) {
+                        // Pass it through if there's no days
+                        if(calendarData == null) {return Observable.just(null);}
+
+                        return Observable.just(_addComputedHashCodeToCalendarData(calendarData));
+                    }
+                })
+
+                // Compute the hash and Store the final result in Storage
                 .flatMap(new Func1<CalendarData, Observable<CalendarData>>() {
                     @Override
                     public Observable<CalendarData> call(CalendarData calendarData) {
@@ -226,6 +235,12 @@ public class CalendarModel {
                     }
                 })
                 .subscribeOn(Schedulers.computation());
+    }
+
+    private CalendarData _addComputedHashCodeToCalendarData(CalendarData calendarData) {
+        calendarData.computedHashCode = calendarData.toString().hashCode();
+        Timber.d("Adding hash to calendarData based on ToString: " + calendarData.computedHashCode);
+        return calendarData;
     }
 
     private void _storeCalendarDataResultsInStorage(CalendarData calendarData) {

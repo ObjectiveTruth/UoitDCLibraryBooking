@@ -36,7 +36,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.internal.util.SubscriptionList;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -49,7 +48,7 @@ public class Calendar extends Fragment {
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
-    private SubscriptionList subscriptionList = new SubscriptionList();
+    private Subscription calendarDataRefreshStateObservableSubscription;
     private SwipeRefreshLayout _mSwipeLayout;
 
     @Nullable
@@ -61,13 +60,23 @@ public class Calendar extends Fragment {
 
         setHasOptionsMenu(true); // Notifies activity that this fragment will interact with the action/options menu
 
-        return inflater.inflate(R.layout.calendar, container, false);
+        View view = inflater.inflate(R.layout.calendar, container, false);
+        _mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
+        return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        _mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
+    public void onStart() {
+        Timber.d("Calendar onStart");
         _setupViewBindings(_mSwipeLayout, calendarModel.getCalendarDataRefreshObservable());
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        Timber.d("Calendar Stopped");
+        _teardownViewBindings(_mSwipeLayout);
+        super.onStop();
     }
 
     /**
@@ -75,10 +84,13 @@ public class Calendar extends Fragment {
      * visible, or "in-view"
      */
     private void _teardownViewBindings(SwipeRefreshLayout swipeRefreshLayout) {
-        subscriptionList.unsubscribe();
+        if(calendarDataRefreshStateObservableSubscription != null) {
+            calendarDataRefreshStateObservableSubscription.unsubscribe();
+        }
 
         if(swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(null);
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -99,7 +111,7 @@ public class Calendar extends Fragment {
             });
         }
 
-        Subscription calendarDataRefreshStateObservableSubscription =
+        calendarDataRefreshStateObservableSubscription =
                 calendarDataRefreshStateObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<CalendarDataRefreshState>() {
@@ -137,16 +149,15 @@ public class Calendar extends Fragment {
                         }
                     }
                 });
-        subscriptionList.add(calendarDataRefreshStateObservableSubscription);
     }
 
     private void _doViewUpdatedBasedOnCalendarData(CalendarData calendarData) {
         Timber.d("Changing Calendar screen based on calendardata received");
         if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {
-            getFragmentManager().beginTransaction()
+            getChildFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, FirstTimeLoaded.newInstance()).commit();
         }else if(calendarData == null) {
-            getFragmentManager().beginTransaction()
+            getChildFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
         }else {
             _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(calendarData);
@@ -171,14 +182,14 @@ public class Calendar extends Fragment {
      */
     private void _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(CalendarData calendarData) {
         String CALENDAR_LOADED_FRAGMENT_TAG = "SINGLETON_CALENDAR_LOADED_FRAGMENT_TAG";
-        Fragment currentFragmentInContentFrame = getFragmentManager().findFragmentById(R.id.calendar_content_frame);
+        Fragment currentFragmentInContentFrame = getChildFragmentManager().findFragmentById(R.id.calendar_content_frame);
 
         if(currentFragmentInContentFrame instanceof CalendarLoaded) {
             Timber.d("Calendar content frame already contains CalendarLoaded, will tell it to redraw/refresh itself");
             ((CalendarLoaded) currentFragmentInContentFrame).refreshPagerFragmentsAndViewsIfDataDiffers(calendarData);
         }else{
             Timber.d("Calendar content frame doesn't contain CalendarLoaded, will replace with CalendarLoaded");
-            getFragmentManager().beginTransaction()
+            getChildFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame,
                             CalendarLoaded.newInstance(calendarData),
                             CALENDAR_LOADED_FRAGMENT_TAG)
@@ -267,7 +278,7 @@ public class Calendar extends Fragment {
             mDefaultSharedPreferencesEditor.putBoolean(HAS_LEARNED_HELP, true).commit();
         }
         new HelpDialogFragment()
-                .show(getFragmentManager(), HELP_DIALOG_FRAGMENT_TAG);
+                .show(getChildFragmentManager(), HELP_DIALOG_FRAGMENT_TAG);
     }
 
     private void _showNetworkErrorAlertDialog(Context context) {
@@ -281,23 +292,5 @@ public class Calendar extends Fragment {
                 })
                 .setIcon(R.drawable.ic_dialog_alert)
                 .show();
-    }
-
-    private boolean _isFirstTimeLoaded(CalendarData calendarData) {
-        return calendarData != null && calendarData.days == null;
-    }
-
-    @Override
-    public void onPause() {
-        Timber.v("Calendar Paused");
-        //_teardownViewBindings();
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        Timber.v("Calendar Resumed");
-        //_setupViewBindings(_mSwipeLayout, calendarModel.getCalendarDataRefreshObservable());
-        super.onResume();
     }
 }

@@ -101,9 +101,13 @@ public class UOITLibraryBookingApp extends Application {
     private static class CrashReportingTree extends Timber.DebugTree {
         @Override
         public void v(String message, Object... args) {
-            Crashlytics.log(message);
+            // Don't log Verbose messages
         }
 
+        @Override
+        public void d(String message, Object... args) {
+            Crashlytics.log(String.format(message, args));
+        }
 
         @Override
         public void i(String message, Object... args) {

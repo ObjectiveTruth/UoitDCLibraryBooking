@@ -52,12 +52,12 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
-    protected final void configureAndSetupLayoutAndDrawer(int layoutIdToLoad,
+    protected NavigationView configureAndSetupLayoutAndDrawer(int layoutIdToLoad,
                                                 int drawerLayoutIdToLoad,
                                                 int toolbarLayoutIdToLoad) {
         setContentView(layoutIdToLoad);
         _configureAndSetupToolbar(toolbarLayoutIdToLoad);
-        _configureAndSetupDrawer(drawerLayoutIdToLoad);
+        return _configureAndSetupDrawer(drawerLayoutIdToLoad);
     }
 
     private void _configureAndSetupToolbar(int toolbarLayoutIdToLoad) {
@@ -72,23 +72,21 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
-    private void _configureAndSetupDrawer(int drawerLayoutIdToLoad) {
+    private NavigationView _configureAndSetupDrawer(int drawerLayoutIdToLoad) {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         _mDrawerLayout = (DrawerLayout) findViewById(drawerLayoutIdToLoad);
 
-        if (navigationView != null) {
-            // In Android support 23.2.1, there is a bug where you can't inflate the menu in XML, must be done manually
-            navigationView.inflateMenu(R.menu.drawer_menu_items);
-            navigationView.inflateHeaderView(R.layout.drawer_header);
-            navigationView.
-                    setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                // This method will trigger on item Click of navigation menu
-                @Override
-                public boolean onNavigationItemSelected(MenuItem menuItem) {
-                    return _selectDrawerItem(menuItem, _mDrawerLayout);
-                }
-            });
-        }
+        // In Android support 23.2.1, there is a bug where you can't inflate the menu in XML, must be done manually
+        navigationView.inflateMenu(R.menu.drawer_menu_items);
+        navigationView.inflateHeaderView(R.layout.drawer_header);
+        navigationView.
+                setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            // This method will trigger on item Click of navigation menu
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                return selectDrawerItem(menuItem);
+            }
+        });
         _mDrawerToggle = new ActionBarDrawerToggle(
                 this,                               // Host Activity
                 _mDrawerLayout,                     // DrawerLayout object
@@ -96,6 +94,8 @@ public abstract class ActivityBase extends AppCompatActivity {
                 R.string.navigation_drawer_close    // Description for accessibility
         );
         _mDrawerLayout.addDrawerListener(_mDrawerToggle);
+
+        return navigationView;
     }
 
     private Pair<Fragment, String> _findFragmentByTagOrReturnNewInstance(String fragmentTag, Class fragmentClass) {
@@ -118,10 +118,9 @@ public abstract class ActivityBase extends AppCompatActivity {
     /**
      * Create a new fragment and specify the fragment to show based on nav item clicked
      * @param menuItem
-     * @param mDrawerLayout
      * @return
      */
-    private boolean _selectDrawerItem(MenuItem menuItem, DrawerLayout mDrawerLayout) {
+    protected boolean selectDrawerItem(MenuItem menuItem) {
         String CALENDAR_FRAGMENT_TAG = "SINGLETON_CALENDAR_FRAGMENT_TAG";
         String GUIDELINES_POLICIES_FRAGMENT_TAG = "SINGLETON_GUIDELINES_POLICIES_FRAGMENT_TAG";
         String ABOUT_FRAGMENT_TAG = "SINGLETON_ABOUT_FRAGMENT_TAG";
@@ -158,14 +157,14 @@ public abstract class ActivityBase extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.mainactivity_content_frame, fragmentTagPair.first, fragmentTagPair.second)
-                .addToBackStack(null)
+                .addToBackStack(fragmentTagPair.second)
                 .commit();
 
         // Highlight the selected item
         menuItem.setChecked(true);
         // Set action bar title
         if(getSupportActionBar() != null) {getSupportActionBar().setTitle(menuItem.getTitle());};
-        mDrawerLayout.closeDrawers();
+        _mDrawerLayout.closeDrawers();
         return true;
     }
 
@@ -177,15 +176,6 @@ public abstract class ActivityBase extends AppCompatActivity {
                     "This Activity did not initialize the ActionBarDrawerToggle, did you forget to call " +
                             "configureAndSetupLayoutAndDrawer()?");
         }
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Insert the default fragment once the view has been created
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.mainactivity_content_frame, new Calendar()).commit();
-        _mDrawerToggle.syncState();
     }
 
     @Override
