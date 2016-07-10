@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -141,7 +142,7 @@ public class Calendar extends Fragment {
 
     private void _doViewUpdatedBasedOnCalendarData(CalendarData calendarData) {
         Timber.d("Changing Calendar screen based on calendardata received");
-        if(_isFirstTimeLoaded(calendarData)) {
+        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, FirstTimeLoaded.newInstance()).commit();
         }else if(calendarData == null) {
@@ -153,10 +154,12 @@ public class Calendar extends Fragment {
     }
 
     private void _handleRefreshError(Throwable throwable) {
-        if(throwable instanceof TimeoutError) {
-            Toast.makeText(getContext(), "Server timeout, try again", Toast.LENGTH_LONG).show();
+        Resources resources = Resources.getSystem();
+        if(throwable.getCause() instanceof TimeoutError) {
+            Toast.makeText(getContext(), resources.getString(R.string.TIMEOUT_ERROR_FROM_SERVER),
+                    Toast.LENGTH_LONG).show();
         }else{
-            Toast.makeText(getContext(), "Something went wrong, try again",
+            Toast.makeText(getContext(), resources.getString(R.string.GENERAL_ERROR),
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -169,17 +172,17 @@ public class Calendar extends Fragment {
     private void _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(CalendarData calendarData) {
         String CALENDAR_LOADED_FRAGMENT_TAG = "SINGLETON_CALENDAR_LOADED_FRAGMENT_TAG";
         Fragment currentFragmentInContentFrame = getFragmentManager().findFragmentById(R.id.calendar_content_frame);
-        if(currentFragmentInContentFrame instanceof SorryCartoon ||
-                currentFragmentInContentFrame instanceof FirstTimeLoaded) {
+
+        if(currentFragmentInContentFrame instanceof CalendarLoaded) {
+            Timber.d("Calendar content frame already contains CalendarLoaded, will tell it to redraw/refresh itself");
+            ((CalendarLoaded) currentFragmentInContentFrame).refreshPagerFragmentsAndViews(calendarData);
+        }else{
             Timber.d("Calendar content frame contains Sorry Cartoon, will replace with CalendarLoaded");
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame,
                             CalendarLoaded.newInstance(calendarData),
                             CALENDAR_LOADED_FRAGMENT_TAG)
                     .commit();
-        }else if(currentFragmentInContentFrame instanceof CalendarLoaded){
-            Timber.d("Calendar content frame already contains CalendarLoaded, will tell it to redraw/refresh itself");
-            ((CalendarLoaded) currentFragmentInContentFrame).refreshPagerFragmentsAndViews(calendarData);
         }
     }
 
