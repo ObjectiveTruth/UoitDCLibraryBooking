@@ -20,6 +20,8 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDataRefreshState;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.RefreshActivateEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBooking;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
@@ -27,6 +29,9 @@ import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarload
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.firsttimeloaded.FirstTimeLoaded;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.sorrycartoon.SorryCartoon;
+import rx.Observable;
+import rx.Observer;
+import rx.internal.util.SubscriptionList;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -39,6 +44,7 @@ public class Calendar extends Fragment {
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
+    SubscriptionList subscriptionList = new SubscriptionList();
     private final static String SAVED_BUNDLE_KEY_IS_FIRST_LOAD = "IS_FIRST_LOAD";
 
     @Nullable
@@ -55,7 +61,7 @@ public class Calendar extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        _showCalendarWithDataFromStorage();
+        _bindRefreshStateToView(calendarModel.getCalendarDataRefreshObservable());
 
         SwipeRefreshLayout _mSwipeLayout =
                 (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
@@ -67,25 +73,46 @@ public class Calendar extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //fetchLatestDataAndRefreshCalendarUI(swipeRefreshLayout);
+                calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
             }
         });
     }
 
-    private void _showCalendarWithDataFromStorage() {
+    private void _bindRefreshStateToView(Observable<CalendarDataRefreshState> calendarDataRefreshStateObservable) {
+        subscriptionList.add(
+                calendarDataRefreshStateObservable.subscribe(new Observer<CalendarDataRefreshState>() {
+            @Override
+            public void onCompleted() {
+                // Do nothing
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(CalendarDataRefreshState calendarDataRefreshState) {
+                switch(calendarDataRefreshState.type) {
+                    case INITIAL:
+                        _doInitialCase(calendarDataRefreshState.calendarData);
+                        break;
+                }
+            }
+        }));
+    }
+
+    private void _doInitialCase(CalendarData calendarData) {
         Timber.d("Showing Calendar screen with data from storage");
-        //CalendarData storedCalendarData = calendarModel.getCalendarDataFromStorage();
-        //TODO fixme
-        CalendarData storedCalendarData = null;
-        if(_isFirstTimeLoaded(storedCalendarData)) {
+        if(_isFirstTimeLoaded(calendarData)) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, FirstTimeLoaded.newInstance()).commit();
-        }else if(storedCalendarData == null) {
+        }else if(calendarData == null) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
         }else{
             getFragmentManager().beginTransaction()
-                    .replace(R.id.calendar_content_frame, CalendarLoaded.newInstance(storedCalendarData)).commit();
+                    .replace(R.id.calendar_content_frame, CalendarLoaded.newInstance(calendarData)).commit();
         }
     }
 
