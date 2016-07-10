@@ -8,11 +8,14 @@ import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.*;
 import rx.Observable;
+import rx.Observer;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.FuncN;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ public class CalendarModel {
     private SharedPreferences calendarSharedPreferences;
     private SharedPreferences.Editor calendarSharedPreferencesEditor;
     private BehaviorSubject<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubject;
+    private PublishSubject<RefreshActivateEvent> refreshActivateEventPublishSubject;
     private CalendarWebService calendarWebService;
 
     @SuppressLint("CommitPrefEdits")
@@ -36,20 +40,86 @@ public class CalendarModel {
         this.calendarWebService = calendarWebService;
     }
 
-    public BehaviorSubject<CalendarDataRefreshState> getCalendarDataRefreshBehaviourSubject() {
-        if(calendarDataRefreshStateBehaviorSubject == null) {
+    /**
+     * An Observable that is always updated with the latest state of the Refresh system.
+     * @see CalendarDataRefreshState
+     * @return
+     */
+    public Observable<CalendarDataRefreshState> getCalendarDataRefreshObservable() {
+        return _getCalendarDataRefreshStateBehaviorSubject().asObservable();
+    }
+
+    private BehaviorSubject<CalendarDataRefreshState> _getCalendarDataRefreshStateBehaviorSubject() {
+        if(calendarDataRefreshStateBehaviorSubject == null || calendarDataRefreshStateBehaviorSubject.hasCompleted()) {
             CalendarDataRefreshState initialState = new CalendarDataRefreshState(CalendarDataRefreshStateType.INITIAL,
                     _getCalendarDataFromStorage(), null);
-            return BehaviorSubject.create(initialState);
+            calendarDataRefreshStateBehaviorSubject = BehaviorSubject.create(initialState);
+            return calendarDataRefreshStateBehaviorSubject;
         }else {
             return calendarDataRefreshStateBehaviorSubject;
         }
     }
 
-    public Observable<CalendarData> getCalendarDataObs() {
-        return calendarWebService.getRawInitialWebPageObs() // Get the initial raw Webpage of the site
-                .observeOn(Schedulers.computation())
+    public PublishSubject<RefreshActivateEvent> getRefreshActivatePublishSubject() {
+        if(refreshActivateEventPublishSubject == null || refreshActivateEventPublishSubject.hasCompleted()) {
+            refreshActivateEventPublishSubject = PublishSubject.create();
+            _bindRefreshActivateEventPublishSubjectToGettingCalendarData(refreshActivateEventPublishSubject);
+            return refreshActivateEventPublishSubject;
+        }else {
+            return refreshActivateEventPublishSubject;
+        }
+    }
 
+    private void _bindRefreshActivateEventPublishSubjectToGettingCalendarData(PublishSubject<RefreshActivateEvent>
+                                                                                 refreshActivateEventPublishSubject) {
+        refreshActivateEventPublishSubject
+                .subscribe(new Action1<RefreshActivateEvent>() {
+            @Override
+            public void call(RefreshActivateEvent refreshActivateEvent) {
+                if(isARefreshRequestNOTRunning()) {
+                    CalendarDataRefreshState runningState =
+                            new CalendarDataRefreshState(CalendarDataRefreshStateType.RUNNING, null, null);
+                    _getCalendarDataRefreshStateBehaviorSubject().onNext(runningState);
+
+                    _startRefreshAndGetObservable()
+                            .subscribeOn(Schedulers.computation())
+                            .subscribe(new Observer<CalendarData>() {
+                        @Override
+                        public void onCompleted() {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            CalendarDataRefreshState errorState =
+                                    new CalendarDataRefreshState(CalendarDataRefreshStateType.ERROR, null, e);
+                            _getCalendarDataRefreshStateBehaviorSubject().onNext(errorState);
+                        }
+
+                        @Override
+                        public void onNext(CalendarData calendarData) {
+                            CalendarDataRefreshState successState =
+                                    new CalendarDataRefreshState(CalendarDataRefreshStateType.SUCCESS,
+                                            calendarData, null);
+                            _getCalendarDataRefreshStateBehaviorSubject().onNext(successState);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public boolean isARefreshRequestRunning() {
+        CalendarDataRefreshState currentState = _getCalendarDataRefreshStateBehaviorSubject().getValue();
+        return currentState.type == CalendarDataRefreshStateType.RUNNING;
+    }
+
+    public boolean isARefreshRequestNOTRunning() {
+        return !isARefreshRequestRunning();
+    }
+
+    private Observable<CalendarData> _startRefreshAndGetObservable() {
+        return calendarWebService.getRawInitialWebPageObs() // Get the initial raw Webpage of the site
                 // Transform it into CalendarData by Parsing the raw Webpage
                 .flatMap(new Func1<String, Observable<CalendarData>>() {
                     @Override
@@ -59,8 +129,6 @@ public class CalendarModel {
                         return CalendarParser.parseDataToFindNumberOfDaysInfoObs(rawWebPage);
                     }
                 })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
 
                 // Because we need a unique ViewStateMain value and ViewStateValidation, we need to do the above process
                 // again if there is more than 1 day
@@ -88,7 +156,6 @@ public class CalendarModel {
                         });
                     }
                 })
-                .observeOn(Schedulers.computation())
 
                 // We now have the raw web pages with fresh ViewStateMain and ViewStateValidation values we can use
                 // If there was more than 1 page (from previous step)
@@ -103,8 +170,6 @@ public class CalendarModel {
                                         calendarDataPair.second);
                     }
                 })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
 
                 // Make more webcalls based on the Parsing information from previous step. Return those raw webpages
                 .flatMap(new Func1<CalendarData, Observable<Pair<CalendarData, String[]>>>() {
@@ -124,7 +189,6 @@ public class CalendarModel {
                                 });
                     }
                 })
-                .observeOn(Schedulers.computation())
 
                 // Store the results of those webcalls into the CalendarData before returning it
                 .flatMap(new Func1<Pair<CalendarData, String[]>, Observable<CalendarData>>() {
@@ -136,8 +200,6 @@ public class CalendarModel {
                         return CalendarParser.parseDataToGetClickableDateDetailsObs(calendarDataPair);
                     }
                 })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
 
                 // Store the final result in Storage
                 .flatMap(new Func1<CalendarData, Observable<CalendarData>>() {

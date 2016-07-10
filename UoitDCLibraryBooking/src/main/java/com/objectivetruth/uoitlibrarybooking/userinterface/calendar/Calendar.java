@@ -10,8 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.*;
-import android.widget.Toast;
-import com.android.volley.TimeoutError;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
@@ -29,10 +27,6 @@ import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarload
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.firsttimeloaded.FirstTimeLoaded;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.sorrycartoon.SorryCartoon;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -45,7 +39,6 @@ public class Calendar extends Fragment {
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
-    private PublishSubject<RefreshActivateEvent> refreshActivateSubject;
     private final static String SAVED_BUNDLE_KEY_IS_FIRST_LOAD = "IS_FIRST_LOAD";
 
     @Nullable
@@ -74,7 +67,7 @@ public class Calendar extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetchLatestDataAndRefreshCalendarUI(swipeRefreshLayout);
+                //fetchLatestDataAndRefreshCalendarUI(swipeRefreshLayout);
             }
         });
     }
@@ -96,7 +89,7 @@ public class Calendar extends Fragment {
         }
     }
 
-    public void fetchLatestDataAndRefreshCalendarUI(final SwipeRefreshLayout swipeRefreshLayout) {
+/*    public void fetchLatestDataAndRefreshCalendarUI(final SwipeRefreshLayout swipeRefreshLayout) {
         Timber.i("Calendar loading starting...");
 
         calendarModel.getCalendarDataObs()
@@ -137,7 +130,7 @@ public class Calendar extends Fragment {
                         }
                     }
                 });
-    }
+    }*/
 
     /**
      * Checks the currently loaded fragment in the calendar_content_frame. If calendar loaded is there
@@ -260,6 +253,4 @@ public class Calendar extends Fragment {
     private boolean _isFirstTimeLoaded(CalendarData calendarData) {
         return calendarData != null && calendarData.days == null;
     }
-
-    public static class RefreshActivateEvent {}
 }

@@ -7,6 +7,11 @@ public enum CalendarDataRefreshStateType {
     INITIAL,
 
     /**
+     * When a request is in flight
+     */
+    RUNNING,
+
+    /**
      * If an error happens during refresh, check the other fields for more info on the exact error
      */
     ERROR,
@@ -14,5 +19,5 @@ public enum CalendarDataRefreshStateType {
     /**
      * Refresh suceeded and will be in the payload
      */
-    COMPLETED
+    SUCCESS
 }
