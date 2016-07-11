@@ -73,6 +73,18 @@ public class Calendar extends Fragment {
     }
 
     @Override
+    public void onHiddenChanged(boolean isNowHidden) {
+        if(isNowHidden) {
+            Timber.d("Calendar isNowHidden");
+            _teardownViewBindings(_mSwipeLayout);
+        }else {
+            Timber.d("Calendar isNowVisible");
+            _setupViewBindings(_mSwipeLayout, calendarModel.getCalendarDataRefreshObservable());
+        }
+        super.onHiddenChanged(isNowHidden);
+    }
+
+    @Override
     public void onStop() {
         Timber.d("Calendar Stopped");
         _teardownViewBindings(_mSwipeLayout);
@@ -81,7 +93,7 @@ public class Calendar extends Fragment {
 
     /**
      * Undoes all the bindings to the view, this is important so events don't get fired when the view is no longer
-     * visible, or "in-view"
+     * visible, or "in-view". This function is idempotent
      */
     private void _teardownViewBindings(SwipeRefreshLayout swipeRefreshLayout) {
         if(calendarDataRefreshStateObservableSubscription != null) {
@@ -96,13 +108,15 @@ public class Calendar extends Fragment {
 
     /**
      * Creates all the bindings from the View to the ViewModel. Good to do this when the View first is created
-     * and if the view ever has to leave, its important to call this when it comes back into "view"
+     * and if the view ever has to leave, its important to call this when it comes back into "view". This function is
+     * idempotent
      * @param swipeRefreshLayout
      * @param calendarDataRefreshStateObservable
      */
     private void _setupViewBindings(final SwipeRefreshLayout swipeRefreshLayout,
                                 Observable<CalendarDataRefreshState> calendarDataRefreshStateObservable) {
         if(_mSwipeLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(null);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
@@ -111,44 +125,50 @@ public class Calendar extends Fragment {
             });
         }
 
-        calendarDataRefreshStateObservableSubscription =
+        // To ensure this is idempotent, need to ONLY subscribe if there is no current subscription, or the subscription
+        // has been unsubscribed from
+        if(calendarDataRefreshStateObservableSubscription == null ||
+                calendarDataRefreshStateObservableSubscription.isUnsubscribed()) {
+
+            calendarDataRefreshStateObservableSubscription =
                 calendarDataRefreshStateObservable
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<CalendarDataRefreshState>() {
-                    @Override
-                    public void onCompleted() {
-                        // Do nothing
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(CalendarDataRefreshState calendarDataRefreshState) {
-                        Timber.i("On next called: " + calendarDataRefreshState.type.name());
-                        switch(calendarDataRefreshState.type) {
-                            case RUNNING:
-                                if(!swipeRefreshLayout.isRefreshing()) {
-                                    swipeRefreshLayout.setRefreshing(true);
-                                }
-                                _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
-                                break;
-                            case ERROR:
-                                swipeRefreshLayout.setRefreshing(false);
-                                _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
-                                _handleRefreshError(calendarDataRefreshState.exception);
-                                break;
-                            case INITIAL:
-                            case SUCCESS:
-                            default:
-                                swipeRefreshLayout.setRefreshing(false);
-                                _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
-                                break;
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<CalendarDataRefreshState>() {
+                        @Override
+                        public void onCompleted() {
+                            // Do nothing
                         }
-                    }
-                });
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onNext(CalendarDataRefreshState calendarDataRefreshState) {
+                            Timber.i("On next called: " + calendarDataRefreshState.type.name());
+                            switch(calendarDataRefreshState.type) {
+                                case RUNNING:
+                                    if(!swipeRefreshLayout.isRefreshing()) {
+                                        swipeRefreshLayout.setRefreshing(true);
+                                    }
+                                    _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
+                                    break;
+                                case ERROR:
+                                    swipeRefreshLayout.setRefreshing(false);
+                                    _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
+                                    _handleRefreshError(calendarDataRefreshState.exception);
+                                    break;
+                                case INITIAL:
+                                case SUCCESS:
+                                default:
+                                    swipeRefreshLayout.setRefreshing(false);
+                                    _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
+                                        break;
+                                }
+                            }
+                        });
+        }
     }
 
     private void _doViewUpdatedBasedOnCalendarData(CalendarData calendarData) {
