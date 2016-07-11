@@ -1,30 +1,45 @@
 machine:
   node:
     version: 5.5.0
+  java:
+    version: openjdk8
   environment:
     ADB_INSTALL_TIMEOUT: "10"
-    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx3072m -XX:+HeapDumpOnOutOfMemoryError"'
+    # GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
   post:
-    # Creates a random introspective tunnel to the CircleCI container
-    - wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-    - unzip ngrok-stable-linux-amd64.zip
-    - ./ngrok http -log $CIRCLE_ARTIFACTS/ngrok.log -log-level debug -log-format json 9292:
-        background: true
-    - sleep 2
-    # Save the NGROK URL by using the API on the ngrok server and appending the desired callback url
-    - echo "$(curl 127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url' -r)"/reply > UoitDCLibraryBooking/ngrok_url.txt
+    ## Creates a random introspective tunnel to the CircleCI container
+    #- wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+    #- unzip ngrok-stable-linux-amd64.zip
+    #- ./ngrok http -log $CIRCLE_ARTIFACTS/ngrok.log -log-level debug -log-format json 9292:
+    #    background: true
+    #- sleep 2
+    ## Save the NGROK URL by using the API on the ngrok server and appending the desired callback url
+    #- echo "$(curl 127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url' -r)"/reply > UoitDCLibraryBooking/ngrok_url.txt
 
 dependencies:
   override:
-    - npm install:
-        pwd:
-          device_farm_receive_server
+    #- npm install:
+    #    pwd:
+    #      device_farm_receive_server
+    - ./gradlew
   pre:
-    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23
-    - echo y | android update sdk --no-ui --all --filter "build-tools-23.0.2"
+    - if ! $(grep -q "Revision=25.1.7" $ANDROID_HOME/tools/source.properties); then echo y | android update sdk --no-ui --all --filter "tools"; fi
+    - if ! $(grep -q "Pkg.Revision=33.0.0" $ANDROID_HOME/extras/android/m2repository/source.properties); then echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"; fi
+    - if ! $(grep -q "Pkg.Revision=29.0.0" $ANDROID_HOME/extras/google/m2repository/source.properties); then echo y | android update sdk --no-ui --all --filter "extra-google-m2repository"; fi
+    - if ! $(grep -q "Pkg.Revision=31.0.0" $ANDROID_HOME/extras/google/google_play_services/source.properties); then echo y | android update sdk --no-ui --all --filter "extra-google-google_play_services"; fi
+    - if ! $(grep -q "Revision=25.1.7" $ANDROID_HOME/tools/source.properties); then echo y | android update sdk --no-ui --all --filter "tools"; fi
+    - if [ ! -e $ANDROID_HOME/build-tools/24.0.0 ]; then echo y | android update sdk --no-ui --all --filter "build-tools-24.0.0"; fi
+    - if [ ! -e $ANDROID_HOME/platforms/android-24 ]; then echo y | android update sdk --no-ui --all --filter "android-24"; fi
   post:
     # Copy the standard debug keystore to the CI, ensuring all app have the same certificate
     - cp UoitDCLibraryBooking/debug.keystore ~/.android/
+  cache_directories:
+    - /usr/local/android-sdk-linux/tools
+    - /usr/local/android-sdk-linux/build-tools/24.0.0
+    - /usr/local/android-sdk-linux/platforms/android-24
+    - /usr/local/android-sdk-linux/extras/android/m2repository
+    - /usr/local/android-sdk-linux/extras/google/m2repository
+    - /usr/local/android-sdk-linux/extras/google/google_play_services
 
 test:
   override:

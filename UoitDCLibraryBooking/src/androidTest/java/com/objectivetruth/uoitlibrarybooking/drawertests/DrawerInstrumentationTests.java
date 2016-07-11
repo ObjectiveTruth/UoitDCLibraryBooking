@@ -52,13 +52,14 @@ public class DrawerInstrumentationTests {
                 .getApplicationContext();
 
         MockAppComponent testComponent = DaggerMockAppComponent.builder()
-                .appModule(new AppModule(mApplication) {
+                .appModule(new AppModule(mApplication))
+                .dataModule(new DataModule(mApplication) {
                     @Override
                     protected RequestQueue providesRequestQueue() {
                         return Volley.newRequestQueue(mApplication, new MockHttpStack(mApplication));
                     }
+
                 })
-                .dataModule(new DataModule(mApplication))
                 .build();
 
         mApplication.setComponent(testComponent);

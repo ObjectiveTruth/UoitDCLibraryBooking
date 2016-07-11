@@ -9,5 +9,5 @@
             android:layout_height="match_parent"
             android:scaleType="fitEnd"
             android:id="@+id/imageView"
-            android:src="@drawable/ic_book_confused" />
+            android:src="@drawable/ic_freddie_success" />
 </ScrollView>

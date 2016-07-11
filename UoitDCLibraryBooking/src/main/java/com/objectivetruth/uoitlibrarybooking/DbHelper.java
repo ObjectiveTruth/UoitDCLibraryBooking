@@ -126,8 +126,8 @@ public class DbHelper extends SQLiteOpenHelper {
 	    } catch (Exception e) {
 			shouldCopyDatabase = true;
 	    }
-	
-		if (UOITLibraryBookingApp.IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL) {
+
+		if (UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {
 			shouldCopyDatabase = true;
 		}
 	    return shouldCopyDatabase;

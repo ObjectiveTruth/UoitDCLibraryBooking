@@ -14,6 +14,7 @@ import timber.log.Timber;
 
 public class Grid extends Fragment {
     private CalendarDay calendarDay;
+    private GridAdapter gridAdapter;
 
     @Nullable
     @Override
@@ -25,7 +26,8 @@ public class Grid extends Fragment {
         View gridView = inflater.inflate(R.layout.calendar_page_grid, container, false);
 
         TableFixHeaders _mTableFixheaders = (TableFixHeaders) gridView.findViewById(R.id.calendar_page_grid);
-        _mTableFixheaders.setAdapter(new GridAdapter(getActivity(), calendarDay));
+        gridAdapter = new GridAdapter(getActivity(), calendarDay);
+        _mTableFixheaders.setAdapter(gridAdapter);
 
         return gridView;
     }
@@ -35,5 +37,14 @@ public class Grid extends Fragment {
         grid.calendarDay = calendarDay;
 
         return grid;
+    }
+
+    /**
+     * Saves new CalendarDay and propagates it down to the adapters
+     * @param calendarDay
+     */
+    public void saveNewCalendarDayWontUpdateUI(CalendarDay calendarDay) {
+        this.calendarDay = calendarDay;
+        gridAdapter.saveNewCalendarDayWontUpdateUI(calendarDay);
     }
 }

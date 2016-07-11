@@ -1,44 +1,138 @@
 package com.objectivetruth.uoitlibrarybooking.data.models;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
 import com.google.gson.Gson;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.*;
 import rx.Observable;
+import rx.Observer;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.FuncN;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import java.util.ArrayList;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.CALENDAR_DATA_JSON;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCE_NAMES.CALENDAR_SHARED_PREFERENCES_NAME;
 
 public class CalendarModel {
-    private SharedPreferences calendarSharedPreferences;
-    private SharedPreferences.Editor calendarSharedPreferencesEditor;
-    final static private String CALENDAR_SHARED_PREFERENCES_NAME = "CALENDAR";
-    private CalendarWebService calendarWebService;
     private static final String EMPTY_JSON = "{}";
 
+    private SharedPreferences calendarSharedPreferences;
+    private SharedPreferences.Editor calendarSharedPreferencesEditor;
+    // Keep a reference to both so we send back the same when a client asks
+    private BehaviorSubject<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubject;
+    private Observable<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubjectAsObservable;
+    private PublishSubject<RefreshActivateEvent> refreshActivateEventPublishSubject;
+    private CalendarWebService calendarWebService;
+
     @SuppressLint("CommitPrefEdits")
-    public CalendarModel(Application mApplication) {
+    public CalendarModel(UOITLibraryBookingApp mApplication, CalendarWebService calendarWebService) {
         calendarSharedPreferences = mApplication.getSharedPreferences(CALENDAR_SHARED_PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
         calendarSharedPreferencesEditor = calendarSharedPreferences.edit();
-
-        calendarWebService = new CalendarWebService(mApplication);
+        this.calendarWebService = calendarWebService;
     }
 
-    public Observable<CalendarData> getCalendarDataObs() {
-        return calendarWebService.getRawInitialWebPageObs() // Get the initial raw Webpage of the site
+    /**
+     * An Observable that is always updated with the latest state of the Refresh system.
+     * @see CalendarDataRefreshState
+     * @return
+     */
+    public Observable<CalendarDataRefreshState> getCalendarDataRefreshObservable() {
+        _getCalendarDataRefreshStateBehaviorSubject(); // Sets up all the references before we return
+        return calendarDataRefreshStateBehaviorSubjectAsObservable;
+    }
+
+    private BehaviorSubject<CalendarDataRefreshState> _getCalendarDataRefreshStateBehaviorSubject() {
+        if(calendarDataRefreshStateBehaviorSubject == null || calendarDataRefreshStateBehaviorSubject.hasCompleted()) {
+            CalendarDataRefreshState initialState = new CalendarDataRefreshState(CalendarDataRefreshStateType.INITIAL,
+                    _getCalendarDataFromStorage(), null);
+            calendarDataRefreshStateBehaviorSubject = BehaviorSubject.create(initialState);
+            calendarDataRefreshStateBehaviorSubjectAsObservable = calendarDataRefreshStateBehaviorSubject
+                    .subscribeOn(Schedulers.computation())
+                    .asObservable();
+            return calendarDataRefreshStateBehaviorSubject;
+        }else {
+            return calendarDataRefreshStateBehaviorSubject;
+        }
+    }
+
+    public PublishSubject<RefreshActivateEvent> getRefreshActivatePublishSubject() {
+        if(refreshActivateEventPublishSubject == null || refreshActivateEventPublishSubject.hasCompleted()) {
+            refreshActivateEventPublishSubject = PublishSubject.create();
+            _bindRefreshActivateEventPublishSubjectToGettingCalendarData(refreshActivateEventPublishSubject);
+            return refreshActivateEventPublishSubject;
+        }else {
+            return refreshActivateEventPublishSubject;
+        }
+    }
+
+    private void _bindRefreshActivateEventPublishSubjectToGettingCalendarData(PublishSubject<RefreshActivateEvent>
+                                                                                 refreshActivateEventPublishSubject) {
+        refreshActivateEventPublishSubject
                 .observeOn(Schedulers.computation())
+                .subscribe(new Action1<RefreshActivateEvent>() {
+            @Override
+            public void call(RefreshActivateEvent refreshActivateEvent) {
+                if(isARefreshRequestNOTRunning()) {
+                    Timber.d("Running a new request for Refresh Data since none are running");
+                    CalendarDataRefreshState runningState =
+                            new CalendarDataRefreshState(CalendarDataRefreshStateType.RUNNING,
+                                    _getCalendarDataFromStorage(), null);
+                    _getCalendarDataRefreshStateBehaviorSubject().onNext(runningState);
+
+                    _startRefreshAndGetObservable()
+                            .observeOn(Schedulers.computation())
+                            .subscribe(new Observer<CalendarData>() {
+                        @Override
+                        public void onCompleted() {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Timber.v("Error when completing the Refresh request, passing into to the view");
+                            CalendarDataRefreshState errorState =
+                                    new CalendarDataRefreshState(CalendarDataRefreshStateType.ERROR,
+                                            _getCalendarDataFromStorage(), e);
+                            _getCalendarDataRefreshStateBehaviorSubject().onNext(errorState);
+                        }
+
+                        @Override
+                        public void onNext(CalendarData calendarData) {
+                            CalendarDataRefreshState successState =
+                                    new CalendarDataRefreshState(CalendarDataRefreshStateType.SUCCESS,
+                                            calendarData, null);
+                            _getCalendarDataRefreshStateBehaviorSubject().onNext(successState);
+                        }
+                    });
+                }else {
+                    Timber.d("Refresh is already running, ignorning request");
+                }
+            }
+        });
+    }
+
+    public boolean isARefreshRequestRunning() {
+        CalendarDataRefreshState currentState = _getCalendarDataRefreshStateBehaviorSubject().getValue();
+        return currentState.type == CalendarDataRefreshStateType.RUNNING;
+    }
+
+    public boolean isARefreshRequestNOTRunning() {
+        return !isARefreshRequestRunning();
+    }
+
+    private Observable<CalendarData> _startRefreshAndGetObservable() {
+        return calendarWebService.getRawInitialWebPageObs() // Get the initial raw Webpage of the site
 
                 // Transform it into CalendarData by Parsing the raw Webpage
                 .flatMap(new Func1<String, Observable<CalendarData>>() {
@@ -49,8 +143,6 @@ public class CalendarModel {
                         return CalendarParser.parseDataToFindNumberOfDaysInfoObs(rawWebPage);
                     }
                 })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
 
                 // Because we need a unique ViewStateMain value and ViewStateValidation, we need to do the above process
                 // again if there is more than 1 day
@@ -78,7 +170,6 @@ public class CalendarModel {
                         });
                     }
                 })
-                .observeOn(Schedulers.computation())
 
                 // We now have the raw web pages with fresh ViewStateMain and ViewStateValidation values we can use
                 // If there was more than 1 page (from previous step)
@@ -93,8 +184,6 @@ public class CalendarModel {
                                         calendarDataPair.second);
                     }
                 })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
 
                 // Make more webcalls based on the Parsing information from previous step. Return those raw webpages
                 .flatMap(new Func1<CalendarData, Observable<Pair<CalendarData, String[]>>>() {
@@ -114,7 +203,6 @@ public class CalendarModel {
                                 });
                     }
                 })
-                .observeOn(Schedulers.computation())
 
                 // Store the results of those webcalls into the CalendarData before returning it
                 .flatMap(new Func1<Pair<CalendarData, String[]>, Observable<CalendarData>>() {
@@ -126,10 +214,19 @@ public class CalendarModel {
                         return CalendarParser.parseDataToGetClickableDateDetailsObs(calendarDataPair);
                     }
                 })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
 
-                // Store the final result in Storage
+                // Compute the hash so its faster to compare for changes
+                .flatMap(new Func1<CalendarData, Observable<CalendarData>>() {
+                    @Override
+                    public Observable<CalendarData> call(CalendarData calendarData) {
+                        // Pass it through if there's no days
+                        if(calendarData == null) {return Observable.just(null);}
+
+                        return Observable.just(_addComputedHashCodeToCalendarData(calendarData));
+                    }
+                })
+
+                // Compute the hash and Store the final result in Storage
                 .flatMap(new Func1<CalendarData, Observable<CalendarData>>() {
                     @Override
                     public Observable<CalendarData> call(CalendarData calendarData) {
@@ -137,12 +234,17 @@ public class CalendarModel {
                         return Observable.just(calendarData);
                     }
                 })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation());
+                .subscribeOn(Schedulers.computation());
+    }
+
+    private CalendarData _addComputedHashCodeToCalendarData(CalendarData calendarData) {
+        calendarData.computedHashCode = calendarData.toString().hashCode();
+        Timber.d("Adding hash to calendarData based on ToString: " + calendarData.computedHashCode);
+        return calendarData;
     }
 
     private void _storeCalendarDataResultsInStorage(CalendarData calendarData) {
-        Timber.d("Storing claendar Data in storage");
+        Timber.d("Storing calendar Data in storage");
         Gson gson = new Gson();
         String calendarDataJson = gson.toJson(calendarData);
         Timber.v(calendarDataJson);
@@ -151,13 +253,13 @@ public class CalendarModel {
                 .apply();
     }
 
-    public CalendarData getCalendarDataFromStorage() {
+    private CalendarData _getCalendarDataFromStorage() {
         Timber.d("Getting Calendar Data from Storage");
         Gson gson = new Gson();
         String userDataJSON = calendarSharedPreferences.getString(CALENDAR_DATA_JSON, EMPTY_JSON);
         CalendarData returnCalendarData = gson.fromJson(userDataJSON, CalendarData.class);
         if(returnCalendarData == null) {
-            Timber.v("null");
+            Timber.v("Stored CalendarData JSON is null");
         }else{
             Timber.v(returnCalendarData.toString());
         }

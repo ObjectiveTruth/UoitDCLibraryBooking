@@ -4,6 +4,7 @@ import java.util.List;
 
 public class CalendarData {
     public List<CalendarDay> days;
+    public int computedHashCode;
 
     @Override
     public String toString() {
@@ -36,5 +37,13 @@ public class CalendarData {
 
     private boolean _notEmpty(List<CalendarDay> calendarDays) {
         return !calendarDays.isEmpty();
+    }
+
+    public boolean isEqualTo(CalendarData calendarData) {
+        return this.computedHashCode == calendarData.computedHashCode;
+    }
+
+    public boolean isNOTEqualTo(CalendarData calendarData) {
+        return !isEqualTo(calendarData);
     }
 }

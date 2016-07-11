@@ -9,8 +9,8 @@ public class SHARED_PREFERENCES_KEYS {
     public static final String UUID = "shared_pref_uuid" ;
     public static final String HAS_LEARNED_REFRESH = "has_learned_refresh";
 
-    public final static String USER_USERNAME = "username";
-    public final static String USER_PASSWORD = "password";
+    public static final String USER_USERNAME = "username";
+    public static final String USER_PASSWORD = "password";
     public static final String USER_INSTITUTION = "shared_pref_institution";
     public static final String USER_DATA_JSON = "user_data_json";
     public static final String CALENDAR_DATA_JSON = "user_data_json";

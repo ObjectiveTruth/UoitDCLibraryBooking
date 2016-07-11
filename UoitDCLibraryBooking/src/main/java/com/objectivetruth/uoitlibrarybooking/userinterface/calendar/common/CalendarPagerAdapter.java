@@ -17,18 +17,22 @@ import java.util.Locale;
 public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
     private CalendarData calendarData;
     private boolean[] arrayCopyToTellWhichViewsToRefresh;
+    private Grid[] listOfGridsUnderThisAdapter;
 
     public CalendarPagerAdapter(FragmentManager fragmentManager, CalendarData calendarData) {
         super(fragmentManager);
         this.calendarData = calendarData;
         arrayCopyToTellWhichViewsToRefresh = new boolean[calendarData.days.size()];
+        listOfGridsUnderThisAdapter = new Grid[calendarData.days.size()];
         Arrays.fill(arrayCopyToTellWhichViewsToRefresh, false);
     }
 
     @Override
     public Fragment getItem(int position) {
         CalendarDay calendarDayAtThisPosition = calendarData.days.get(position);
-        return Grid.newInstance(calendarDayAtThisPosition);
+        Grid newlyCreatedGrid = Grid.newInstance(calendarDayAtThisPosition);
+        listOfGridsUnderThisAdapter[position] = newlyCreatedGrid;
+        return newlyCreatedGrid;
     }
 
     @Override
@@ -78,11 +82,25 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
         }
     }
 
-    public void refreshPagerFragmentsAndViews(CalendarData calendarData) {
+    public void saveInformationAndUpdatePagerFragmentUI(CalendarData calendarData) {
         this.calendarData = calendarData;
         arrayCopyToTellWhichViewsToRefresh = new boolean[calendarData.days.size()];
+        listOfGridsUnderThisAdapter = new Grid[calendarData.days.size()];
         Arrays.fill(arrayCopyToTellWhichViewsToRefresh, true);
         notifyDataSetChanged(); // Will set off a call to getItemPosition to refresh the views
+    }
+
+    public void saveInformationAndDONTUpdatePagerFragmentUI(CalendarData calendarData) {
+        this.calendarData = calendarData;
+        int i = 0;
+        for(Grid grid: listOfGridsUnderThisAdapter) {
+            grid.saveNewCalendarDayWontUpdateUI(calendarData.days.get(i));
+            i++;
+        }
+        if(calendarData.days.size() != this.calendarData.days.size()) {
+            throw new IllegalStateException("Called saveInformationAndDONTUpdatePagerFragmentUI but the information " +
+                    "has changed. Are you sure you didn't mean to call saveInformationAndUpdatePagerFragmentUI?");
+        }
     }
 
     @Override

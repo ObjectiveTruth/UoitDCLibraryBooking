@@ -15,7 +15,6 @@ import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREF
 public class UOITLibraryBookingApp extends Application {
     private AppComponent mComponent;
     public static boolean IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = false;
-    public static boolean IS_DEBUG_MODE = false;
 
 	public UOITLibraryBookingApp() {
 			super();
@@ -32,10 +31,9 @@ public class UOITLibraryBookingApp extends Application {
                 .dataModule(new DataModule(this))
                 .build();
 
+        _initializeLogger();
         _checkIfFirstTimeAppLaunchedSinceInstall();
         _checkIfFirstTimeAppLaunchedSinceVersionUpgradeOrInstall();
-        _checkIfIsDebugMode();
-
     }
 
     public void setComponent(AppComponent mComponent) {
@@ -53,31 +51,30 @@ public class UOITLibraryBookingApp extends Application {
         if(oldAppVersion < 0){
             Crashlytics.setBool("Upgradeing" , false);
             IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = true;
-            Timber.i("Previous version number not found, saving current app version as " + BuildConfig.VERSION_CODE);
+            Timber.i("App Version NOT found, saving current app version as " + BuildConfig.VERSION_CODE);
             sharedPreferences.edit().putInt(APPVERSION, BuildConfig.VERSION_CODE).apply();
         }
         else if(oldAppVersion != BuildConfig.VERSION_CODE){
             Crashlytics.setBool("Upgradeing" , true);
             IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = true;
-            Timber.i("Previous version (" + oldAppVersion +
-                    ") is different than this version (" + BuildConfig.VERSION_CODE +
-                    "), updating the saved code");
+            Timber.i("App Version has CHANGED: " + BuildConfig.VERSION_CODE + " (previously: " +  oldAppVersion + ")");
             sharedPreferences.edit().putInt(APPVERSION, BuildConfig.VERSION_CODE).apply();
         }
         else{
             IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = false;
             Crashlytics.setBool("Upgradeing" , false);
-            Timber.i("Version number (" + oldAppVersion + ") is the same as the current version, " +
-                    "will keep saved values the same");
+            Timber.i("App Version has NOT changed: " + oldAppVersion);
         }
     }
 
-    private void _checkIfIsDebugMode() {
+    public static boolean isFirstTimeLaunchSinceUpgradeOrInstall() {
+        return IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL;
+    }
+
+    private void _initializeLogger() {
         if (BuildConfig.DEBUG) {
-            IS_DEBUG_MODE = true;
             Timber.plant(new Timber.DebugTree());
         } else {
-            IS_DEBUG_MODE = false;
             Timber.plant(new CrashReportingTree());
             String mUUID = PreferenceManager.getDefaultSharedPreferences(this).getString(UUID, null);
             if(mUUID == null){
@@ -104,9 +101,13 @@ public class UOITLibraryBookingApp extends Application {
     private static class CrashReportingTree extends Timber.DebugTree {
         @Override
         public void v(String message, Object... args) {
-            Crashlytics.log(message);
+            // Don't log Verbose messages
         }
 
+        @Override
+        public void d(String message, Object... args) {
+            Crashlytics.log(String.format(message, args));
+        }
 
         @Override
         public void i(String message, Object... args) {

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.common.CalendarPagerAdapter;
+import timber.log.Timber;
 
 public class CalendarLoaded extends Fragment {
     private CalendarData calendarData;
@@ -28,7 +29,7 @@ public class CalendarLoaded extends Fragment {
         TabLayout _mTabLayout = (TabLayout) calendarLoadedView.findViewById(R.id.calendar_tab_layout);
 
         // Will supply the ViewPager with what should be displayed
-        _mPagerAdapter = new CalendarPagerAdapter(getFragmentManager(), calendarData);
+        _mPagerAdapter = new CalendarPagerAdapter(getChildFragmentManager(), calendarData);
         _mViewPager.setAdapter(_mPagerAdapter);
 
         // Bind the TabLayout and ViewPager together
@@ -44,7 +45,27 @@ public class CalendarLoaded extends Fragment {
         return calendarLoadedToReturn;
     }
 
-    public void refreshPagerFragmentsAndViews(CalendarData calendarData) {
-        _mPagerAdapter.refreshPagerFragmentsAndViews(calendarData);
+    /**
+     * Compares the data that's being passed in with the data currently stored in the fragment, if its different, then
+     * a redraw/refresh takes place, otherwise, does nothing
+     * @param calendarData
+     */
+    public void refreshPagerFragmentsAndViewsIfDataDiffers(CalendarData calendarData) {
+        // Either this calendarData has to be Not null or the incoming calendarData has to be Not null to proceed
+        // Only other case is if both are null, in which case, do nothing
+        if(this.calendarData != null &&
+                this.calendarData.isNOTEqualTo(calendarData)) {
+
+            _mPagerAdapter.saveInformationAndUpdatePagerFragmentUI(calendarData);
+
+        }else if(calendarData != null &&
+                calendarData.isNOTEqualTo(this.calendarData)) {
+
+            _mPagerAdapter.saveInformationAndUpdatePagerFragmentUI(calendarData);
+        }else{
+            Timber.d("CalendarData for THIS instance has not changed, will NOT update UI");
+            _mPagerAdapter.saveInformationAndDONTUpdatePagerFragmentUI(calendarData);
+        }
+        this.calendarData = calendarData;
     }
 }
