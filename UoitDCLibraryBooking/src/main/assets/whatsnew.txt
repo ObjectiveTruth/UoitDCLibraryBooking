@@ -1,13 +1,13 @@
 ‣ Removed all ads!
     No more premium version
-‣ App is now Open Source!
+‣ App is now Open Source
     See About section for more info
     on how to get involved and learn
     android development
 ‣ Material design
 ‣ Removed QR feature completely
     Nobody was using it
-‣ Lots of bug fixes
+‣ Ridiculous amount of bug fixes
 
 Known Issues:
 ==============
@@ -21,5 +21,5 @@ Dev Stuff:
 ‣ Continuous Integration
     Travis-CI and CircleCI
 ‣ Completely reworked app architecture
-‣ Smoke tests available
+‣ Integration and Unit tests available
 
