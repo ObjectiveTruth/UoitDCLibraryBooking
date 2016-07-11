@@ -15,7 +15,6 @@ android:
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
-    - extra-android-support
 before_cache:
   # Remove the lock file as per https://docs.travis-ci.com/user/languages/android#Caching
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -23,8 +22,7 @@ before_cache:
 cache:
   directories:
     # So we dont have to redownload gradle on each build
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+    - $HOME/.gradle
 
 before_install:
   # Decrypt the release keystore
