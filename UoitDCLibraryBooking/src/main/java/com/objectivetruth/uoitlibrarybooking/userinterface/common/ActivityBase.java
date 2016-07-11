@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.util.Pair;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,16 +17,23 @@ import android.view.WindowManager;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.statelessutilities.Triple;
 import com.objectivetruth.uoitlibrarybooking.userinterface.about.About;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesAndPolicies;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
 import timber.log.Timber;
 
+import java.util.Collection;
+import java.util.HashMap;
+
+import static com.objectivetruth.uoitlibrarybooking.common.constants.FragmentTags.*;
+
 public abstract class ActivityBase extends AppCompatActivity {
     protected abstract String                           getActivityTitle();
-    private ActionBarDrawerToggle _mDrawerToggle        = null;
-    private DrawerLayout _mDrawerLayout                 = null;
+    private ActionBarDrawerToggle _mDrawerToggle;
+    private DrawerLayout _mDrawerLayout;
+    private HashMap<String, Fragment> stringFragmentHashMap = new HashMap<>();
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -57,6 +64,7 @@ public abstract class ActivityBase extends AppCompatActivity {
                                                 int toolbarLayoutIdToLoad) {
         setContentView(layoutIdToLoad);
         _configureAndSetupToolbar(toolbarLayoutIdToLoad);
+        _initializeAllMainFragmentsAndPreloadToView();
         return _configureAndSetupDrawer(drawerLayoutIdToLoad);
     }
 
@@ -98,20 +106,45 @@ public abstract class ActivityBase extends AppCompatActivity {
         return navigationView;
     }
 
-    private Pair<Fragment, String> _findFragmentByTagOrReturnNewInstance(String fragmentTag, Class fragmentClass) {
+    private void _initializeAllMainFragmentsAndPreloadToView() {
+        Calendar calendarFrag = Calendar.newInstance();
+        GuidelinesAndPolicies guidelinesAndPoliciesFrag = GuidelinesAndPolicies.newInstance();
+        About aboutFrag = About.newInstance();
+        MyAccount myAccountFrag = MyAccount.newInstance();
+
+        stringFragmentHashMap.put(CALENDAR_FRAGMENT_TAG, calendarFrag);
+        stringFragmentHashMap.put(GUIDELINES_POLICIES_FRAGMENT_TAG, guidelinesAndPoliciesFrag);
+        stringFragmentHashMap.put(ABOUT_FRAGMENT_TAG, aboutFrag);
+        stringFragmentHashMap.put(MY_ACCOUNT_FRAGMENT_TAG, myAccountFrag);
+
+        // The only one NOT being hidden is the Calendar
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.mainactivity_content_frame, guidelinesAndPoliciesFrag, GUIDELINES_POLICIES_FRAGMENT_TAG)
+                .add(R.id.mainactivity_content_frame, aboutFrag, ABOUT_FRAGMENT_TAG)
+                .add(R.id.mainactivity_content_frame, myAccountFrag, MY_ACCOUNT_FRAGMENT_TAG)
+                .hide(guidelinesAndPoliciesFrag)
+                .hide(aboutFrag)
+                .hide(myAccountFrag)
+                .add(R.id.mainactivity_content_frame, calendarFrag, CALENDAR_FRAGMENT_TAG)
+                .commit();
+    }
+
+    private Triple<Fragment, String, Boolean> _findFragmentByTagOrReturnNewInstance(String fragmentTag,
+                                                                                    Class fragmentClass) {
         Fragment returnFragment = getSupportFragmentManager().findFragmentByTag(fragmentTag);
         if (returnFragment == null) {
             try {
-                Timber.d("Fragment with tag: " + fragmentTag + " not found, instantiating a new one");
+                Timber.d("NOT found Fragment with tag: " + fragmentTag + ", instantiating a new one");
                 returnFragment = (Fragment) fragmentClass.newInstance();
-                return new Pair<Fragment, String>(returnFragment, fragmentTag);
+                stringFragmentHashMap.put(fragmentTag, returnFragment);
+                return new Triple<>(returnFragment, fragmentTag, false);
             } catch (Exception e) {
                 Timber.e("Could not instantiate the Fragment for the menu", e);
                 return null;
             }
         }else {
-            Timber.d("Fragment with tag: " + fragmentTag + " found. retrieving it without creating a new one");
-            return new Pair<Fragment, String>(returnFragment, fragmentTag);
+            Timber.d("FOUND fragment with tag: " + fragmentTag + ", retrieving it without creating a new one");
+            return new Triple<>(returnFragment, fragmentTag, true);
         }
     }
 
@@ -121,44 +154,49 @@ public abstract class ActivityBase extends AppCompatActivity {
      * @return
      */
     protected boolean selectDrawerItem(MenuItem menuItem) {
-        String CALENDAR_FRAGMENT_TAG = "SINGLETON_CALENDAR_FRAGMENT_TAG";
-        String GUIDELINES_POLICIES_FRAGMENT_TAG = "SINGLETON_GUIDELINES_POLICIES_FRAGMENT_TAG";
-        String ABOUT_FRAGMENT_TAG = "SINGLETON_ABOUT_FRAGMENT_TAG";
-        String MY_ACCOUNT_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_FRAGMENT_TAG";
-
-        Pair<Fragment, String> fragmentTagPair = null;
+        Triple<Fragment, String, Boolean> fragmentTagIsFoundTriple = null;
 
         switch(menuItem.getItemId()) {
             case R.id.drawer_menu_item_calendar:
                 Timber.i("Calendar selected from Drawer");
-                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(CALENDAR_FRAGMENT_TAG, Calendar.class);
+                fragmentTagIsFoundTriple = _findFragmentByTagOrReturnNewInstance(CALENDAR_FRAGMENT_TAG, Calendar.class);
                 break;
             case R.id.drawer_menu_item_guidelines_and_policies:
                 Timber.i("Guidelines And Policies selected from Drawer");
-                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(GUIDELINES_POLICIES_FRAGMENT_TAG,
+                fragmentTagIsFoundTriple = _findFragmentByTagOrReturnNewInstance(GUIDELINES_POLICIES_FRAGMENT_TAG,
                         GuidelinesAndPolicies.class);
                 break;
             case R.id.drawer_menu_item_about:
                 Timber.i("About selected from Drawer");
-                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(ABOUT_FRAGMENT_TAG, About.class);
+                fragmentTagIsFoundTriple = _findFragmentByTagOrReturnNewInstance(ABOUT_FRAGMENT_TAG, About.class);
                 break;
             case R.id.drawer_menu_item_my_account:
                 Timber.i("My Account selected from Drawer");
-                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(MY_ACCOUNT_FRAGMENT_TAG, MyAccount.class);
+                fragmentTagIsFoundTriple = _findFragmentByTagOrReturnNewInstance(MY_ACCOUNT_FRAGMENT_TAG, MyAccount.class);
                 break;
             default:
                 Timber.w("No layout mapped to the menu item requested, moving to the default, Calendar");
-                fragmentTagPair = _findFragmentByTagOrReturnNewInstance(CALENDAR_FRAGMENT_TAG, Calendar.class);
+                fragmentTagIsFoundTriple = _findFragmentByTagOrReturnNewInstance(CALENDAR_FRAGMENT_TAG, Calendar.class);
         }
-        if(fragmentTagPair == null) {return false;}
+        if(fragmentTagIsFoundTriple == null) {return false;}
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        // If the fragment was already created(isFound), just show it. If not,
         // Insert the fragment by replacing any existing fragment.
         // Don't forget to tag it so it can be retrieved later without loading it again
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.mainactivity_content_frame, fragmentTagPair.first, fragmentTagPair.second)
-                .addToBackStack(fragmentTagPair.second)
-                .commit();
+
+        if(fragmentTagIsFoundTriple.getRight()) {
+            _hideAllVisibleFragments(stringFragmentHashMap); // Do this before showing the one requested;
+            fragmentManager.beginTransaction()
+                    .show(fragmentTagIsFoundTriple.getLeft())
+                    .commit();
+        }else {
+            fragmentManager.beginTransaction()
+                    .add(R.id.mainactivity_content_frame,
+                            fragmentTagIsFoundTriple.getLeft(),
+                            fragmentTagIsFoundTriple.getMiddle())
+                    .commit();
+        }
 
         // Highlight the selected item
         menuItem.setChecked(true);
@@ -166,6 +204,18 @@ public abstract class ActivityBase extends AppCompatActivity {
         if(getSupportActionBar() != null) {getSupportActionBar().setTitle(menuItem.getTitle());};
         _mDrawerLayout.closeDrawers();
         return true;
+    }
+
+    private void _hideAllVisibleFragments(HashMap<String, Fragment> stringFragmentHashMap) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+        Collection<Fragment> fragmentCollection = stringFragmentHashMap.values();
+        for(Fragment fragment: fragmentCollection) {
+            if(fragment != null && fragment.isVisible()) {
+                fragmentTransaction = fragmentTransaction.hide(fragment);
+            }
+        }
+        fragmentTransaction.commit();
     }
 
     protected ActionBarDrawerToggle getActionBarDrawerToggle() {

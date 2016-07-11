@@ -98,4 +98,8 @@ public class About extends Fragment{
         Intent libIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         element.setIntent(libIntent);
     }
+
+    public static About newInstance() {
+        return new About();
+    }
 }

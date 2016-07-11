@@ -293,4 +293,8 @@ public class Calendar extends Fragment {
                 .setIcon(R.drawable.ic_dialog_alert)
                 .show();
     }
+
+    public static Calendar newInstance() {
+        return new Calendar();
+    }
 }

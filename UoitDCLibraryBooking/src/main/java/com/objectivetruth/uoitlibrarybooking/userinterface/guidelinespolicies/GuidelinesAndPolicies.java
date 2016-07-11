@@ -16,4 +16,8 @@ public class GuidelinesAndPolicies extends Fragment{
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.guidelines_policies, container, false);
     }
+
+    public static GuidelinesAndPolicies newInstance() {
+        return new GuidelinesAndPolicies();
+    }
 }

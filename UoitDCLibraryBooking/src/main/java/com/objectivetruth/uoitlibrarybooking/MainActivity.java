@@ -47,10 +47,6 @@ public class MainActivity extends ActivityBase {
                 R.layout.activity_main,
                 R.id.drawer_layout,
                 R.id.toolbar);
-
-        // Loads the fragment we want to show by default
-        MenuItem calendarItem = drawerView.getMenu().findItem(R.id.drawer_menu_item_calendar);
-        selectDrawerItem(calendarItem);
     }
 
     @Override
@@ -65,6 +61,7 @@ public class MainActivity extends ActivityBase {
             WhatsNewDialog.show(this);
         }
     }
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
