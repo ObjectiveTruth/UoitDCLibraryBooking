@@ -29,7 +29,7 @@ public class CalendarLoaded extends Fragment {
         TabLayout _mTabLayout = (TabLayout) calendarLoadedView.findViewById(R.id.calendar_tab_layout);
 
         // Will supply the ViewPager with what should be displayed
-        _mPagerAdapter = new CalendarPagerAdapter(getFragmentManager(), calendarData);
+        _mPagerAdapter = new CalendarPagerAdapter(getChildFragmentManager(), calendarData);
         _mViewPager.setAdapter(_mPagerAdapter);
 
         // Bind the TabLayout and ViewPager together

@@ -90,7 +90,7 @@ public class MyAccount extends Fragment {
     private void _showMyAccountLoadedFragment() {
         String MY_ACCOUNT_LOADED_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOADED_FRAGMENT_TAG";
         getActivity().invalidateOptionsMenu();
-        getFragmentManager().beginTransaction()
+        getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
                         MyAccountLoaded.newInstance(userModel.getUserDataFromStorage(), this),
                         MY_ACCOUNT_LOADED_FRAGMENT_TAG)
@@ -100,7 +100,7 @@ public class MyAccount extends Fragment {
 
     private void _showLoginFragment(PublishSubject<UserCredentials> signInClickedSubject) {
         String MY_ACCOUNT_LOGIN_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOGIN_FRAGMENT_TAG";
-/*        Fragment mLoginFragment = getFragmentManager()
+/*        Fragment mLoginFragment = getChildFragmentManager()
                 .findFragmentByTag(MY_ACCOUNT_LOGIN_FRAGMENT_TAG);
         if(mLoginFragment == null){
             Timber.d("Fragment with tag: " + MY_ACCOUNT_LOGIN_FRAGMENT_TAG + " not found, instantiating a new one");
@@ -110,7 +110,7 @@ public class MyAccount extends Fragment {
                     " found. retrieving it without creating a new one");
         }*/
         _bindSignInClickedSubjectToSignInFlow(signInClickedSubject);
-        getFragmentManager().beginTransaction()
+        getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
                         LoginFragment.newInstance(signInClickedSubject, _getLoginErrorSubject()),
                         MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
