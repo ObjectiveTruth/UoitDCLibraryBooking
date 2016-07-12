@@ -176,7 +176,7 @@ public class Calendar extends Fragment {
         if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, FirstTimeLoaded.newInstance()).commit();
-        }else if(calendarData == null) {
+        }else if(calendarData == null || calendarData.days == null) {
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
         }else {
