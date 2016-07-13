@@ -25,9 +25,9 @@ public class CalendarParser {
                                                                                        calendarDataStringPair) {
         try {
             return Observable.just(_parseDataToGetClickableDateDetails(calendarDataStringPair));
-        } catch (ParseException e) {
-            Timber.e(e, "Error parsing the Clickable Date pages for Grid info");
-            return Observable.error(e);
+        } catch (Throwable t) {
+            Timber.e(t, "Error parsing the Clickable Date pages for Grid info");
+            return Observable.error(t);
         }
     }
 
@@ -220,8 +220,8 @@ public class CalendarParser {
                 int hrefStart = currentTableDataElement.indexOf("href=");
                 timeCellToBeAdded.hrefSource =
                         currentTableDataElement.substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
-                beginningWord = currentTableDataElement.indexOf("color=\"Black\">");
-                endWord = currentTableDataElement.lastIndexOf("</font>");
+                beginningWord = currentTableDataElement.indexOf("color:Black;\">");
+                endWord = currentTableDataElement.lastIndexOf("</a>");
                 timeCellToBeAdded.groupNameForWhenFullyBookedRoom =
                         (String) currentTableDataElement.subSequence(beginningWord+14, endWord);
                 timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_CONFIRMED;
