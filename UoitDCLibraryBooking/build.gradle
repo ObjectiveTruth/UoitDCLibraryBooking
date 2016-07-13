@@ -132,12 +132,17 @@ android {
         }
 
         applicationId "com.objectivetruth.uoitlibrarybooking"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 24
         versionCode getVersionFromContinuousIntegrationEnvironment()
         versionName versionMajor + "." + getVersionFromContinuousIntegrationEnvironment()
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    dexOptions {
+        maxProcessCount 4
+        javaMaxHeapSize "2g"
+    }
+
 
     lintOptions {
         abortOnError false
