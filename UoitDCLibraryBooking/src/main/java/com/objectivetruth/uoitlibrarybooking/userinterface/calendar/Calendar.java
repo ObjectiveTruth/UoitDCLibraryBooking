@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -185,13 +184,10 @@ public class Calendar extends Fragment {
     }
 
     private void _handleRefreshError(Throwable throwable) {
-        Resources resources = Resources.getSystem();
         if(throwable.getCause() instanceof TimeoutError) {
-            Toast.makeText(getContext(), resources.getString(R.string.TIMEOUT_ERROR_FROM_SERVER),
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.ERROR_TIMEOUT_FROM_SERVER, Toast.LENGTH_LONG).show();
         }else{
-            Toast.makeText(getContext(), resources.getString(R.string.GENERAL_ERROR),
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();
         }
     }
 

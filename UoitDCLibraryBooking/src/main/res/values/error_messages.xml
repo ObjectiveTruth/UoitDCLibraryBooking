@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="TIMEOUT_ERROR_FROM_SERVER">Server took too long to respond, try again</string>
-    <string name="GENERAL_ERROR">Something unexpected went wrong(maybe file a bug?)</string>
+    <string name="ERROR_TIMEOUT_FROM_SERVER">Server took too long to respond, try again</string>
+    <string name="ERROR_GENERAL">Something unexpected went wrong</string>
 </resources>

@@ -99,11 +99,11 @@ public class CalendarModel {
                         }
 
                         @Override
-                        public void onError(Throwable e) {
-                            Timber.v("Error when completing the Refresh request, passing into to the view");
+                        public void onError(Throwable t) {
+                            Timber.w("Error when completing the Refresh request, passing into to the view");
                             CalendarDataRefreshState errorState =
                                     new CalendarDataRefreshState(CalendarDataRefreshStateType.ERROR,
-                                            _getCalendarDataFromStorage(), e);
+                                            _getCalendarDataFromStorage(), t);
                             _getCalendarDataRefreshStateBehaviorSubject().onNext(errorState);
                         }
 

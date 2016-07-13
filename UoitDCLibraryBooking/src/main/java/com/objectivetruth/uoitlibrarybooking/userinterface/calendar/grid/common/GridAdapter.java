@@ -1,6 +1,7 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.common;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -10,6 +11,8 @@ import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
 
 import java.util.Random;
+
+import static com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCellType.BOOKING_CONFIRMED;
 
 public class GridAdapter extends FixedTableAdapter {
     private int _width_of_cell_in_pixels;
@@ -113,8 +116,14 @@ public class GridAdapter extends FixedTableAdapter {
             case BOOKING_COMPETING:
                 holder.textViewOnly.setText("Open"); break;
 
-            case BOOKING_LOCKED:
+            case BOOKING_CONFIRMED:
                 holder.textViewOnly.setText(currentTimeCellForThisViewCall.groupNameForWhenFullyBookedRoom); break;
+
+            case BOOKING_LOCKED:
+                TimeCell parentTimeCell = _getTimeCellWithGroupNameAboutThisOne(row, column);
+                if(parentTimeCell == null) {
+                    parentTimeCell = new TimeCell(); parentTimeCell.groupNameForWhenFullyBookedRoom = "";}
+                holder.textViewOnly.setText(parentTimeCell.groupNameForWhenFullyBookedRoom); break;
 
             default:
                 holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeCellType.name());
@@ -128,17 +137,46 @@ public class GridAdapter extends FixedTableAdapter {
         TextView textViewOnly;
     }
 
+    /**
+     * Accounts for the rows and columns coming in a format that is not supported by FixedTableHeaders Library
+     * Example of topleft most area of the grid (this is how the row/columns come in, -1 are the headers):
+     * | -1,-1 | -1,0 | -1,1 | -->
+     * | 0,-1  |  0,0 |  0,1 | -->
+     * | 1,-1  |  1,0 |  1,1 | -->
+     * |   ||  |  ||  |  ||  |
+     * |   ↓↓  |  ↓↓  |  ↓↓  |
+     *
+     * @param row
+     * @param column
+     * @return
+     */
     private int _convertRowAndColumnToTimeCellIndex(int row, int column) {
-        // Example of topleft most area of the grid (this is how the row/columns come in):
-        // | -1,-1 | -1,0 | -1,1 | -->
-        // |  0,-1 |  0,0 |  0,1 | -->
-        // |  1,-1 |  1,0 |  1,1 | -->
-        // |   ||  |  ||  |  ||  |
-        // |   \/  |  \/  |  \/  |
         int normalizedRow = row + 1; // Account for the rows starting at -1
         int normalizedColumn = column + 1; // Account for the columns starting at -1
         int totalColumns = getColumnCount() + 1; // Accounts for the extra row header
         return normalizedColumn + (totalColumns * normalizedRow);
+    }
+
+    /**
+     * In the calendar, a fully booked room displays the name of the group making the booking, but if its more than
+     * a 30 minute slot, each slot below it, just has two quotes (""). This function is useful if you're the time cell
+     * with nothing in it, and you gotta find who the parent is. It will keep searching above until it finds a
+     * BOOKING_CONFIRMED {@code TimeCell}
+     * @see TimeCell
+     * @param row row of the locked timeCell for which to look up parent for
+     * @param column row of the locked timeCell for which to look up parent for
+     * @return if null, it means it wasn't found
+     */
+    @Nullable
+    private TimeCell _getTimeCellWithGroupNameAboutThisOne(int row, int column) {
+        for(int irow = row; irow > 0; irow--) {
+            TimeCell suspect = calendarDay.timeCells.get(_convertRowAndColumnToTimeCellIndex(irow, column));
+            if(suspect.timeCellType == BOOKING_CONFIRMED) {
+                // Quit early once we find the first BookingConfirmed TimeCell above this one
+                return suspect;
+            }
+        }
+        return null; // Incase the correct TimeCell is not found
     }
 
     private boolean _isTopLeftCell(int row, int column) {
