@@ -11,8 +11,8 @@
 
 | branch | tests | deployment | coverage |
 | --- | --- | --- | --- |
-| master(beta): | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master) | ![master_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=master) | [![Coverage Master Branch](https://img.shields.io/codecov/c/github/ObjectiveTruth/UoitDCLibraryBooking/master.svg?maxAge=2592000)](https://codecov.io/gh/ObjectiveTruth/UoitDCLibraryBooking/branch/master) |
-| prod: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/prod.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/prod/beta) | ![prod_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=prod)  | [![Codecov Prod Branch](https://img.shields.io/codecov/c/github/ObjectiveTruth/UoitDCLibraryBooking/prod.svg?maxAge=2592000)](https://codecov.io/gh/ObjectiveTruth/UoitDCLibraryBooking/branch/prod) |
+| master(beta): | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/master) | [![master_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=master)](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking/branches) | [![Coverage Master Branch](https://img.shields.io/codecov/c/github/ObjectiveTruth/UoitDCLibraryBooking/master.svg)](https://codecov.io/gh/ObjectiveTruth/UoitDCLibraryBooking/branch/master) |
+| prod: | [![Circle CI](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/tree/prod.svg?style=shield)](https://circleci.com/gh/ObjectiveTruth/UoitDCLibraryBooking/prod/beta) | [![prod_branch_badge_travis](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking.svg?branch=prod)](https://travis-ci.org/ObjectiveTruth/UoitDCLibraryBooking/branches)  | [![Codecov Prod Branch](https://img.shields.io/codecov/c/github/ObjectiveTruth/UoitDCLibraryBooking/prod.svg)](https://codecov.io/gh/ObjectiveTruth/UoitDCLibraryBooking/branch/prod) |
 
 [Join Beta(Android)](https://play.google.com/apps/testing/com.objectivetruth.uoitlibrarybooking)
 
@@ -79,23 +79,23 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
 
     Ensure the following are installed to the latest:
 
-    * Android SDK-Platform-tools
+    * Android SDK-Platform-tools (latest)
 
-    * Android SDK Build-tools
+    * Android SDK Build-tools (latest)
 
-    * Android 6.0 (API 23) 
+    * Android N (API 24) 
 
-        >All Components
+        >SDK Platform (required)
+        
+        >Rest of components (recommended)
 
-    * Local Maven repositories for Support Libraries
+    * Extras/Android Support Repository
+
+    * Extras/Google Play Services
     
-    * Android Support Library
+    * Extras/Google Repository
 
-    * Google Play Services
-    
-    * Google Repository
-
-    * Intel x86 Emulator Accelerator (HAXM)
+    * Extras/Intel x86 Emulator Accelerator (HAXM)
     
         >If your OS supports it
 
