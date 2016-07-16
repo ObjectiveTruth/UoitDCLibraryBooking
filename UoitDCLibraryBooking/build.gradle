@@ -24,6 +24,7 @@ buildscript {
         // Prints the dexcount when making new apks, useful for keeping under the 65k limit
         // See more info here http://developer.android.com/tools/building/multidex.html
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'
+        // Integrates Jacoco with android unit tests
         classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
     }
 }
@@ -46,8 +47,9 @@ spoon {
 
 jacocoAndroidUnitTestReport {
     csv.enabled false
-    html.enabled false
+    html.enabled true
     xml.enabled true
+    excludes += ['**/userinterface*']
 }
 
 /**

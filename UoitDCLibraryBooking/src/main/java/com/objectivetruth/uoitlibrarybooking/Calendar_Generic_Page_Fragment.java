@@ -72,7 +72,6 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
         Timber.i("Page position " + pageNumberStr);
 		mCalendarAdapter = new CalendarAdapter(getActivity());
         if(hasRooms){
-            OttoBusSingleton.getInstance().post(new ToggleActionBarVisibilityEvent(false));
             rootView = inflater.inflate(R.layout.calendar_home_fragment, container, false);
             tableFixHeaders = (TableFixHeaders) rootView.findViewById(R.id.calendar_table);
             int CAN_BE_ANY_NUMBER = 0;
@@ -95,7 +94,6 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
         }
         //if no rooms
         else{
-            OttoBusSingleton.getInstance().post(new ToggleActionBarVisibilityEvent(true));
             rootView = inflater.inflate(R.layout.calendar_home_fragment, container, false);
             tableFixHeaders = (TableFixHeaders) rootView.findViewById(R.id.calendar_table);
             hListView = (it.sephiroth.android.library.widget.HListView) rootView.findViewById(R.id.roomsListHorizontal);
