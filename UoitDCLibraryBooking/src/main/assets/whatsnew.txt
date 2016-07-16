@@ -1,3 +1,5 @@
+Major Updates:
+=============
 ‣ Removed all ads!
     No more premium version
 ‣ App is now Open Source
@@ -22,4 +24,3 @@ Dev Stuff:
     Travis-CI and CircleCI
 ‣ Completely reworked app architecture
 ‣ Integration and Unit tests available
-
