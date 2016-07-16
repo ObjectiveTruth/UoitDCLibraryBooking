@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import com.google.android.gms.analytics.Tracker;
@@ -33,7 +32,6 @@ public class MainActivity extends ActivityBase {
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
-    static LoginAsynkTask mLoginAsyncTask = null;
     //TODO put this in savedinstancestate
     public static String errorMessageFromLogin = "";
 
@@ -43,7 +41,7 @@ public class MainActivity extends ActivityBase {
 
         ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
 
-        NavigationView drawerView = configureAndSetupLayoutAndDrawer(
+        configureAndSetupLayoutAndDrawer(
                 R.layout.activity_main,
                 R.id.drawer_layout,
                 R.id.toolbar);

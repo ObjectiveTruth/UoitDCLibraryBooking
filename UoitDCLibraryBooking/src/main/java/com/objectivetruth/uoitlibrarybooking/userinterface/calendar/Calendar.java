@@ -12,6 +12,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.*;
 import android.widget.Toast;
 import com.android.volley.TimeoutError;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
@@ -158,16 +160,24 @@ public class Calendar extends Fragment {
                                     _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
                                     _handleRefreshError(calendarDataRefreshState.exception);
                                     break;
-                                case INITIAL:
                                 case SUCCESS:
+                                    _playCalendarAnimation(swipeRefreshLayout);
+                                case INITIAL:
                                 default:
                                     swipeRefreshLayout.setRefreshing(false);
                                     _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
-                                        break;
                                 }
                             }
                         });
         }
+    }
+
+    private void _playCalendarAnimation(SwipeRefreshLayout swipeRefreshLayout) {
+        if(swipeRefreshLayout == null) {return;}
+
+        YoYo.with(Techniques.FadeIn)
+                .duration(300)
+                .playOn(swipeRefreshLayout);
     }
 
     private void _doViewUpdatedBasedOnCalendarData(CalendarData calendarData) {
