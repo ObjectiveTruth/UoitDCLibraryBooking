@@ -84,16 +84,19 @@ test:
     - ./gradlew spoon:
         timeout: 900
 
-    # Copy all the build outputs and spoon site to artifacts
-    - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
+    # Copy spoon html output
+    - cp -rv UoitDCLibraryBooking/build/outputs/debug $CIRCLE_ARTIFACTS/spoon-results
+
+    # Copy dex count information
+    - cp -rv UoitDCLibraryBooking/build/outputs/dexcount $CIRCLE_ARTIFACTS
 
     # Copy the Jacoco test coverage report
     - cp -rv UoitDCLibraryBooking/build/reports/jacoco/jacocoTestDebugUnitTestReport $CIRCLE_ARTIFACTS
 
-    # copy the test results to the test results directory
-    - cp -rv UoitDCLibraryBooking/build/outputs/debug/junit-reports $CIRCLE_TEST_REPORTS/junit || true
+    # Copy the test results to the test results directory
+    - cp -rv UoitDCLibraryBooking/build/outputs/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
   post:
-    # Code Coverage report see codecov.io
+    # Post test coverage results to codecov.io
     - bash <(curl -s https://codecov.io/bash)
 
 notify:

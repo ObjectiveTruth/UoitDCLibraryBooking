@@ -17,10 +17,6 @@
 [Join Beta(Android)](https://play.google.com/apps/testing/com.objectivetruth.uoitlibrarybooking)
 
 
-[View Current Test Report with ScreenShots](http://testreports.uoitdclibrarybooking.objectivetruth.ca/)
-
-
-
 Have a question? join our
 [![Slack Status](https://uoitlibrarybooking-slackin.herokuapp.com/badge.svg)](https://uoitlibrarybooking-slackin.herokuapp.com/)
 
