@@ -185,12 +185,16 @@ public abstract class ActivityBase extends AppCompatActivity {
         // Insert the fragment by replacing any existing fragment.
         // Don't forget to tag it so it can be retrieved later without loading it again
 
-        if(fragmentTagIsFoundTriple.getRight()) {
-            _hideAllVisibleFragments(stringFragmentHashMap); // Do this before showing the one requested;
+        if(_isFragmentFoundAndVisible(fragmentTagIsFoundTriple)) {
+            Timber.d("Drawer Item: " + menuItem.getTitle() + " already being shown. Not changing screen");
+        }else if(!_isFragmentFoundAndVisible(fragmentTagIsFoundTriple)) {
+            _hideAllVisibleFragments(stringFragmentHashMap);
             fragmentManager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .show(fragmentTagIsFoundTriple.getLeft())
                     .commit();
         }else {
+            _hideAllVisibleFragments(stringFragmentHashMap);
             fragmentManager.beginTransaction()
                     .add(R.id.mainactivity_content_frame,
                             fragmentTagIsFoundTriple.getLeft(),
@@ -204,6 +208,10 @@ public abstract class ActivityBase extends AppCompatActivity {
         if(getSupportActionBar() != null) {getSupportActionBar().setTitle(menuItem.getTitle());};
         _mDrawerLayout.closeDrawers();
         return true;
+    }
+
+    private boolean _isFragmentFoundAndVisible(Triple<Fragment, String, Boolean> fragmentTagIsFoundTriple) {
+        return fragmentTagIsFoundTriple.getRight() && fragmentTagIsFoundTriple.getLeft().isVisible();
     }
 
     private void _hideAllVisibleFragments(HashMap<String, Fragment> stringFragmentHashMap) {

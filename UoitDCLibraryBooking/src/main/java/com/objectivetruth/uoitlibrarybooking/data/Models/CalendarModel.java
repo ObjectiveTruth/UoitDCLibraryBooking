@@ -1,6 +1,5 @@
 package com.objectivetruth.uoitlibrarybooking.data.models;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
@@ -34,7 +33,6 @@ public class CalendarModel {
     private PublishSubject<RefreshActivateEvent> refreshActivateEventPublishSubject;
     private CalendarWebService calendarWebService;
 
-    @SuppressLint("CommitPrefEdits")
     public CalendarModel(UOITLibraryBookingApp mApplication, CalendarWebService calendarWebService) {
         calendarSharedPreferences = mApplication.getSharedPreferences(CALENDAR_SHARED_PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
