@@ -55,7 +55,7 @@ after_success:
   - git commit -m "Set build VERSION number" version.txt
   - export GIT_TAG=v1.$(expr 20020 + ${TRAVIS_BUILD_NUMBER})-${ANDROID_APK_RELEASE_TRACK}
   - echo ${GIT_TAG}
-  - git tag $GIT_TAG -a -m "`cat UoitDCLibraryBooking/src/main/assets/whatsnew_thisversion.txt`"
+  - git tag -a --file="UoitDCLibraryBooking/src/main/assets/whatsnew_thisversion.txt" $GIT_TAG
   - git push --quiet https://$GH_TOKEN@github.com/ObjectiveTruth/UoitDCLibraryBooking.git $GIT_TAG > /dev/null 2>&1
   # Rename release apk file
   - mv UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-release.apk
