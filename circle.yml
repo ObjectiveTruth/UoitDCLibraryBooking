@@ -21,7 +21,8 @@ dependencies:
     #- npm install:
     #    pwd:
     #      device_farm_receive_server
-    - ./gradlew
+    # Ensures gradle is running well before starting the tests
+    - ./gradlew tasks
   pre:
     - if ! $(grep -q "Revision=25.1.7" $ANDROID_HOME/tools/source.properties); then echo y | android update sdk --no-ui --all --filter "tools"; fi
     - if ! $(grep -q "Pkg.Revision=33.0.0" $ANDROID_HOME/extras/android/m2repository/source.properties); then echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"; fi
@@ -43,6 +44,8 @@ dependencies:
 
 test:
   override:
+    # NO DEVICE FARM
+    # ==============
     # Assemble the AndroidTest Instrumentation build in build/outputs/apk
     # - ./gradlew assembleAndroidTest
     # Assemble the debug build in build/outputs/apk
@@ -56,37 +59,42 @@ test:
 
     #- ./scripts/circle_ci_emulator_tests.sh:
     #    timeout: 900
-
-
-    # NO DEVICE FARM
+    #
     # ==============
+
+    # Run unit tests
+    - ./gradlew jacocoTestDebugUnitTestReport:
+        timeout: 900
+
+    # Mount SD card into Linux
     - mksdcard -l e 512M mysdcard.img
 
-    # Start the emulator
+    # Start the emulator and attach SD card volume
     - emulator -avd circleci-android22 -no-audio -no-window -sdcard mysdcard.img:
         background: true
 
-    # Wait for it to have booted
+    # Wait for emulator to boot
     - circle-android wait-for-boot
 
     # Wait a moment before Unlocking the emulator screen
     - sleep 15
     - adb shell input keyevent 82
 
+    # Run the instrumentation tests on the emulator
     - ./gradlew spoon:
         timeout: 900
-    # Will be turned on for coverage reports once this is fixed:
-    # https://github.com/kt3k/coveralls-gradle-plugin/issues/61
-    #- ./gradlew coveralls:
-    #    timeout: 900
-    # ==============
 
-
-    # Copy the build outputs and spoon to artifacts
+    # Copy all the build outputs and spoon site to artifacts
     - cp -rv UoitDCLibraryBooking/build/outputs $CIRCLE_ARTIFACTS
 
-    # copy the test results to the test results directory if any. (dont fail the build if they don't exist)
+    # Copy the Jacoco test coverage report
+    - cp -rv UoitDCLibraryBooking/build/reports/jacoco/jacocoTestDebugUnitTestReport $CIRCLE_ARTIFACTS
+
+    # copy the test results to the test results directory
     - cp -rv UoitDCLibraryBooking/build/outputs/debug/junit-reports $CIRCLE_TEST_REPORTS/junit || true
+  post:
+    # Code Coverage report see codecov.io
+    - bash <(curl -s https://codecov.io/bash)
 
 notify:
   webhooks:

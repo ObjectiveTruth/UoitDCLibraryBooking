@@ -1,10 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'com.github.triplet.play'
-apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'spoon'
-
+apply plugin: 'jacoco-android'
 
 def versionMajor = "1"
 
@@ -22,11 +21,10 @@ buildscript {
         classpath 'com.github.triplet.gradle:play-publisher:1.1.4'
         // Spoon is a fantastic testing hardness for logging tests easily
         classpath 'com.stanfy.spoon:spoon-gradle-plugin:1.2.0'
-        // Coveralls repository for test coverage reports integration with gradle
-        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
         // Prints the dexcount when making new apks, useful for keeping under the 65k limit
         // See more info here http://developer.android.com/tools/building/multidex.html
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.4.4'
+        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
     }
 }
 
@@ -36,25 +34,21 @@ play {
     track = 'beta' //Default track if none is specific in the commandline
 }
 
-// Options for spoon.
-// Timeout added because of this issue http://stackoverflow.com/questions/34775440/spoon-timeout-getting-device-list
+/**
+ * Options for spoon, test reporter for android
+ * Timeout added because of this issue http://stackoverflow.com/questions/34775440/spoon-timeout-getting-device-list
+ */
 spoon {
     adbTimeout = 60 * 3
     debug = true
     baseOutputDir = file("$buildDir/outputs")
 }
 
-/**
- * Options for Coveralls test reporting
- */
-coveralls {
-    jacocoReportPath = "${buildDir}/reports/coverage/debug/report.xml"
+jacocoAndroidUnitTestReport {
+    csv.enabled false
+    html.enabled false
+    xml.enabled true
 }
-tasks.coveralls {
-    //dependsOn 'createDebugCoverageReport'
-    onlyIf { System.env.'CI' }
-}
-
 
 /**
  * Gives the system permission on this package to disable the animations during instrumentation testing
