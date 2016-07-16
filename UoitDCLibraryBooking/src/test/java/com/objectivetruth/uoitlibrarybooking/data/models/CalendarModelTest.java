@@ -21,7 +21,9 @@ import java.util.concurrent.TimeUnit;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.CALENDAR_DATA_JSON;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCE_NAMES.CALENDAR_SHARED_PREFERENCES_NAME;
 import static com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDataRefreshStateType.*;
-import static org.junit.Assert.assertSame;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 
@@ -30,6 +32,10 @@ public class CalendarModelTest {
     private SharedPreferences.Editor sharedPreferencesEditorMock;
     private UOITLibraryBookingApp applicationMock;
     private CalendarWebService calendarWebServiceMock;
+    private TestSubscriber<CalendarDataRefreshState> testSubscriber;
+    private static final int INDEX_OF_FIRST_EVENT = 0;
+    private static final int INDEX_OF_SECOND_EVENT = 1;
+    private static final int INDEX_OF_THIRD_EVENT = 2;
 
     @Before
     public void setUp() throws Exception {
@@ -38,6 +44,7 @@ public class CalendarModelTest {
         sharedPreferencesEditorMock = Mockito.mock(SharedPreferences.Editor.class);
         applicationMock = Mockito.mock(UOITLibraryBookingApp.class);
         calendarWebServiceMock = Mockito.mock(CalendarWebService.class);
+        testSubscriber = new TestSubscriber<>();
 
         Mockito.when(sharedPreferencesMock.edit()).thenReturn(sharedPreferencesEditorMock);
         Mockito.when(sharedPreferencesEditorMock.putString(CALENDAR_DATA_JSON, nullJSON))
@@ -47,76 +54,97 @@ public class CalendarModelTest {
     }
 
     @Test
-    public void whenNoCalendarDataIsStoredReturnsDefaultState() {
-        int INDEX_OF_CURRENT_EVENT = 0;
+    public void whenNoCalendarDataIsStoredReturnsDefaultState() throws Exception {
         // Shared Prefs returns null if its the first time the app loads and has no default data
         Mockito.when(sharedPreferencesMock.getString(eq(CALENDAR_DATA_JSON), anyString()))
                 .thenReturn(null);
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
 
-        TestSubscriber<CalendarDataRefreshState> testSubscriber = new TestSubscriber<>();
-        calendarModel.getCalendarDataRefreshObservable().subscribe(testSubscriber);
-        List<CalendarDataRefreshState> calendarDataRefreshStateList = testSubscriber.getOnNextEvents();
-        CalendarDataRefreshState initialEvent = calendarDataRefreshStateList.get(INDEX_OF_CURRENT_EVENT);
+        Observable<CalendarDataRefreshState> calendarDataRefreshStateObservable =
+                calendarModel.getCalendarDataRefreshObservable();
+        calendarDataRefreshStateObservable.subscribe(testSubscriber);
+        List<CalendarDataRefreshState> calendarDataRefreshStateListTestResults = calendarDataRefreshStateObservable
+                .buffer(300, TimeUnit.MILLISECONDS)
+                .toBlocking().next().iterator().next();
+        CalendarDataRefreshState firstItem = calendarDataRefreshStateListTestResults.get(INDEX_OF_FIRST_EVENT);
 
-        testSubscriber.assertNoTerminalEvent();
-        assertSame(INITIAL, initialEvent.type);
-        assertSame(null, initialEvent.exception);
-        assertSame(null, initialEvent.calendarData);
+        testSubscriber.assertNoTerminalEvent(); // Sequence has not ended
+        assertThat(calendarDataRefreshStateListTestResults.size(), is(1)); // Sequence should contain right # items
+        assertThat(firstItem.type, is(INITIAL));
+        assertNull(firstItem.exception);
+        assertNull(firstItem.calendarData);
     }
 
     @Test
     public void whenCalendarDataisBeingRefreshedReturnsRunningState() {
-        int INDEX_OF_CURRENT_EVENT = 0;
         // Shared Prefs returns null if its the first time the app loads and has no default data
         Mockito.when(sharedPreferencesMock.getString(eq(CALENDAR_DATA_JSON), anyString()))
                 .thenReturn(null);
         Mockito.when(calendarWebServiceMock.getRawInitialWebPageObs())
                 .thenReturn(Observable.<String>never());
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
+
+        Observable<CalendarDataRefreshState> calendarDataRefreshStateObservable =
+                calendarModel.getCalendarDataRefreshObservable();
+        calendarDataRefreshStateObservable.subscribe(testSubscriber);
+        Observable<List<CalendarDataRefreshState>> listBlockingObservable = calendarDataRefreshStateObservable
+                .buffer(300, TimeUnit.MILLISECONDS);
+
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
 
-        TestSubscriber<CalendarDataRefreshState> testSubscriber = new TestSubscriber<>();
-        calendarModel.getCalendarDataRefreshObservable().subscribe(testSubscriber);
-        List<CalendarDataRefreshState> calendarDataRefreshStateList = testSubscriber.getOnNextEvents();
-        CalendarDataRefreshState runningEvent = calendarDataRefreshStateList.get(INDEX_OF_CURRENT_EVENT);
+        List<CalendarDataRefreshState> listOfSequenceResults =
+                listBlockingObservable.toBlocking().next().iterator().next();
 
-        testSubscriber.assertNoTerminalEvent();
-        assertSame(RUNNING, runningEvent.type);
-        assertSame(null, runningEvent.exception);
-        assertSame(null, runningEvent.calendarData);
+        testSubscriber.assertNoTerminalEvent(); //Sequence has not ended
+        assertThat(listOfSequenceResults.size(), is(2)); // Sequence should contain right # items
+        assertThat(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).type, is(INITIAL));
+        assertNull(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).exception);
+        assertNull(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).calendarData);
+
+        assertThat(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).type, is(RUNNING));
+        assertNull(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).exception);
+        assertNull(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).calendarData);
     }
 
     @Test
     public void whenErrorOccursDuringRefreshReturnsErrorState() {
-        int INDEX_OF_CURRENT_EVENT = 1;
         // Shared Prefs returns null if its the first time the app loads and has no default data
         Mockito.when(sharedPreferencesMock.getString(eq(CALENDAR_DATA_JSON), anyString()))
                 .thenReturn(null);
         Mockito.when(calendarWebServiceMock.getRawInitialWebPageObs())
                 .thenReturn(Observable.<String>error(new IllegalStateException("Exception For Testing")));
-
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
+
+        Observable<CalendarDataRefreshState> calendarDataRefreshStateObservable =
+                calendarModel.getCalendarDataRefreshObservable();
+        calendarDataRefreshStateObservable.subscribe(testSubscriber);
+        Observable<List<CalendarDataRefreshState>> listBlockingObservable = calendarDataRefreshStateObservable
+                .buffer(300, TimeUnit.MILLISECONDS);
+
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
 
-        TestSubscriber<CalendarDataRefreshState> testSubscriber = new TestSubscriber<>();
-        calendarModel.getCalendarDataRefreshObservable().subscribe(testSubscriber);
-        testSubscriber.awaitTerminalEvent(100, TimeUnit.MILLISECONDS);
+        List<CalendarDataRefreshState> listOfSequenceResults =
+                listBlockingObservable.toBlocking().next().iterator().next();
 
-        List<CalendarDataRefreshState> calendarDataRefreshStateList = testSubscriber.getOnNextEvents();
-        CalendarDataRefreshState errorEvent = calendarDataRefreshStateList.get(INDEX_OF_CURRENT_EVENT);
+        testSubscriber.assertNoTerminalEvent(); //Sequence has not ended
+        assertThat(listOfSequenceResults.size(), is(3)); // Sequence should contain right # items
+        assertThat(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).type, is(INITIAL));
+        assertNull(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).exception);
+        assertNull(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).calendarData);
 
-        testSubscriber.assertNoTerminalEvent();
-        assertSame(ERROR, errorEvent.type);
-        assertSame("Exception For Testing", errorEvent.exception.getMessage());
-        assertSame(null, errorEvent.calendarData);
+        assertThat(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).type, is(RUNNING));
+        assertNull(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).exception);
+        assertNull(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).calendarData);
+
+        assertThat(listOfSequenceResults.get(INDEX_OF_THIRD_EVENT).type, is(ERROR));
+        assertThat(listOfSequenceResults.get(INDEX_OF_THIRD_EVENT).exception.getMessage(), is("Exception For Testing"));
+        assertNull(listOfSequenceResults.get(INDEX_OF_THIRD_EVENT).calendarData);
     }
 
     @Test
     public void whenRefreshEventCompletesSuccessfullyReturnsSuccessWithCalendarData() {
-        int INDEX_OF_CURRENT_EVENT = 1;
         // Shared Prefs returns null if its the first time the app loads and has no default data
         Mockito.when(sharedPreferencesMock.getString(eq(CALENDAR_DATA_JSON), anyString()))
                 .thenReturn(null);
@@ -124,20 +152,32 @@ public class CalendarModelTest {
                 .thenReturn(Observable.<String>just(_getRawInitialWebpageWithNoDaysAvailableFromTestResources()));
 
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
+
+        Observable<CalendarDataRefreshState> calendarDataRefreshStateObservable =
+                calendarModel.getCalendarDataRefreshObservable();
+        calendarDataRefreshStateObservable.subscribe(testSubscriber);
+        Observable<List<CalendarDataRefreshState>> listBlockingObservable = calendarDataRefreshStateObservable
+                .buffer(300, TimeUnit.MILLISECONDS);
+
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
 
-        TestSubscriber<CalendarDataRefreshState> testSubscriber = new TestSubscriber<>();
-        calendarModel.getCalendarDataRefreshObservable().subscribe(testSubscriber);
-        testSubscriber.awaitTerminalEvent(100, TimeUnit.MILLISECONDS);
+        List<CalendarDataRefreshState> listOfSequenceResults =
+                listBlockingObservable.toBlocking().next().iterator().next();
 
-        List<CalendarDataRefreshState> calendarDataRefreshStateList = testSubscriber.getOnNextEvents();
-        CalendarDataRefreshState successEvent = calendarDataRefreshStateList.get(INDEX_OF_CURRENT_EVENT);
+        testSubscriber.assertNoTerminalEvent(); //Sequence has not ended
+        assertThat(listOfSequenceResults.size(), is(3)); // Sequence should contain right # items
+        assertThat(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).type, is(INITIAL));
+        assertNull(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).exception);
+        assertNull(listOfSequenceResults.get(INDEX_OF_FIRST_EVENT).calendarData);
 
-        testSubscriber.assertNoTerminalEvent();
-        assertSame(SUCCESS, successEvent.type);
-        assertSame(null, successEvent.exception);
-        assertSame(null, successEvent.calendarData);
+        assertThat(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).type, is(RUNNING));
+        assertNull(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).exception);
+        assertNull(listOfSequenceResults.get(INDEX_OF_SECOND_EVENT).calendarData);
+
+        assertThat(listOfSequenceResults.get(INDEX_OF_THIRD_EVENT).type, is(SUCCESS));
+        assertNull(listOfSequenceResults.get(INDEX_OF_THIRD_EVENT).exception);
+        assertNull(listOfSequenceResults.get(INDEX_OF_THIRD_EVENT).calendarData);
     }
 
     private String _getRawInitialWebpageWithNoDaysAvailableFromTestResources() {
