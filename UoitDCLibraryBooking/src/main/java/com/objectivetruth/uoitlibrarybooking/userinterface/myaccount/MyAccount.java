@@ -118,21 +118,36 @@ public class MyAccount extends Fragment {
 
     private void _showMyAccountLoadedFragment(MyAccountDataLoginState myAccountDataLoginState) {
         String MY_ACCOUNT_LOADED_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOADED_FRAGMENT_TAG";
-        getActivity().invalidateOptionsMenu();
+        Fragment myAccountLoadedFragment = getChildFragmentManager().findFragmentByTag(MY_ACCOUNT_LOADED_FRAGMENT_TAG);
+
+        if(myAccountLoadedFragment == null) {
+            myAccountLoadedFragment = MyAccountLoaded.newInstance(myAccountDataLoginState);
+            Timber.d("NOT FOUND fragment with tag: " + MY_ACCOUNT_LOADED_FRAGMENT_TAG + ", creating a new one");
+        }else{
+            Timber.d("FOUND fragment with tag: " + MY_ACCOUNT_LOADED_FRAGMENT_TAG +
+                    ", retrieving it without creating a new one");
+        }
+        //getActivity().invalidateOptionsMenu();
         getChildFragmentManager().beginTransaction()
-                .replace(R.id.my_account_content_frame,
-                        MyAccountLoaded.newInstance(myAccountDataLoginState),
-                        MY_ACCOUNT_LOADED_FRAGMENT_TAG)
+                .replace(R.id.my_account_content_frame, myAccountLoadedFragment, MY_ACCOUNT_LOADED_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
 
     private void _showLoginFragment(MyAccountDataLoginState myAccountDataLoginState) {
         String MY_ACCOUNT_LOGIN_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOGIN_FRAGMENT_TAG";
+        Fragment myAccountLoginFragment = getChildFragmentManager().findFragmentByTag(MY_ACCOUNT_LOGIN_FRAGMENT_TAG);
+
+        if(myAccountLoginFragment == null) {
+            myAccountLoginFragment = LoginFragment.newInstance(myAccountDataLoginState);
+            Timber.d("NOT FOUND fragment with tag: " + MY_ACCOUNT_LOGIN_FRAGMENT_TAG + ", creating a new one");
+        }else{
+            Timber.d("FOUND fragment with tag: " + MY_ACCOUNT_LOGIN_FRAGMENT_TAG +
+                    ", retrieving it without creating a new one");
+        }
+
         getChildFragmentManager().beginTransaction()
-                .replace(R.id.my_account_content_frame,
-                        LoginFragment.newInstance(myAccountDataLoginState),
-                        MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
+                .replace(R.id.my_account_content_frame, myAccountLoginFragment, MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }

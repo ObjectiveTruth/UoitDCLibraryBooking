@@ -18,6 +18,9 @@ import javax.inject.Inject;
 
 public class MyAccountLoaded extends Fragment {
     private UserData userData;
+    private ViewPager _mViewPager;
+    private TabLayout _mTabLayout;
+    private SwipeRefreshLayout _mSwipeLayout;
     @Inject UserModel userModel;
 
     @Nullable
@@ -29,24 +32,10 @@ public class MyAccountLoaded extends Fragment {
         setHasOptionsMenu(true);
         View myBookingsLoadedView = inflater.inflate(R.layout.my_account_loaded, container, false);
 
-        ViewPager _mViewPager = (ViewPager) myBookingsLoadedView.findViewById(R.id.my_account_view_pager);
-        TabLayout _mTabLayout = (TabLayout) myBookingsLoadedView.findViewById(R.id.my_account_tab_layout);
-        SwipeRefreshLayout _mSwipeLayout =
+        _mViewPager = (ViewPager) myBookingsLoadedView.findViewById(R.id.my_account_view_pager);
+        _mTabLayout = (TabLayout) myBookingsLoadedView.findViewById(R.id.my_account_tab_layout);
+        _mSwipeLayout =
                 (SwipeRefreshLayout) myBookingsLoadedView.findViewById(R.id.my_account_loaded_refresh_swipe_layout);
-
-
-        // Disables the viewpager's horizontal swipes from triggering the vertical refresh
-        _disableHorizontalSwipesFromTriggeringVerticalRefresh(_mViewPager, _mSwipeLayout);
-
-        // Will supply the ViewPager with what should be displayed
-        MyAccountPagerAdapter _mPagerAdapter = new MyAccountPagerAdapter(getFragmentManager(), userData, getContext());
-        _mViewPager.setAdapter(_mPagerAdapter);
-
-        // Bind the TabLayout and ViewPager together
-        _mTabLayout.setupWithViewPager(_mViewPager);
-
-        // Bind the swipelayout to the refreshing of the tabs
-        _bindSwipeLayoutToMyAccountRefreshEvent(_mSwipeLayout, _mPagerAdapter);
 
         return myBookingsLoadedView;
     }
@@ -55,6 +44,56 @@ public class MyAccountLoaded extends Fragment {
         MyAccountLoaded returnFragment = new MyAccountLoaded();
         returnFragment.userData = myAccountDataLoginState.userData;
         return returnFragment;
+    }
+
+    @Override
+    public void onStart() {
+        Timber.d(this.getClass().getSimpleName() + " onStart");
+        _setupViewBindings(_mViewPager, _mSwipeLayout, _mTabLayout, userData);
+        super.onStart();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean isNowHidden) {
+        if(isNowHidden) {
+            Timber.d(this.getClass().getSimpleName() + " isNowHidden");
+            _teardownViewBindings(_mViewPager, _mSwipeLayout);
+        }else {
+            Timber.d(this.getClass().getSimpleName() + " isNowVisible");
+            _setupViewBindings(_mViewPager, _mSwipeLayout, _mTabLayout, userData);
+        }
+        super.onHiddenChanged(isNowHidden);
+    }
+
+    @Override
+    public void onStop() {
+        Timber.d(this.getClass().getSimpleName() + " onStop");
+        _teardownViewBindings(_mViewPager, _mSwipeLayout);
+        super.onStop();
+    }
+
+    private void _teardownViewBindings(ViewPager _mViewPager, SwipeRefreshLayout _mSwipeLayout) {
+        _mViewPager.clearOnPageChangeListeners();
+        _mSwipeLayout.setOnRefreshListener(null);
+    }
+
+    private void _setupViewBindings(ViewPager _mViewPager, SwipeRefreshLayout _mSwipeLayout,
+                                    TabLayout _mTabLayout, UserData userData) {
+        if(_mViewPager == null || _mSwipeLayout == null) {return;} //quit early if state is inconsistent
+
+        // Disables the viewpager's horizontal swipes from triggering the vertical refresh
+        _disableHorizontalSwipesFromTriggeringVerticalRefresh(_mViewPager, _mSwipeLayout);
+
+        // Will supply the ViewPager with what should be displayed
+        MyAccountPagerAdapter _mPagerAdapter = new MyAccountPagerAdapter(getChildFragmentManager(),
+                userData, getContext());
+        _mViewPager.setAdapter(_mPagerAdapter);
+
+        // Bind the TabLayout and ViewPager together
+        _mTabLayout.setupWithViewPager(_mViewPager);
+
+        // Bind the swipelayout to the refreshing of the tabs
+        _bindSwipeLayoutToMyAccountRefreshEvent(_mSwipeLayout, _mPagerAdapter);
     }
 
     @Override
@@ -81,6 +120,9 @@ public class MyAccountLoaded extends Fragment {
 
     private void _disableHorizontalSwipesFromTriggeringVerticalRefresh(ViewPager viewPager,
                                                                        final SwipeRefreshLayout swipeRefreshLayout) {
+        if(viewPager == null || swipeRefreshLayout == null) {return;} //quit early if incorrect state
+
+        viewPager.clearOnPageChangeListeners();
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -101,6 +143,7 @@ public class MyAccountLoaded extends Fragment {
 
     private void _bindSwipeLayoutToMyAccountRefreshEvent(final SwipeRefreshLayout swipeRefreshLayout,
                                                          final MyAccountPagerAdapter myAccountPagerAdapter) {
+        swipeRefreshLayout.setOnRefreshListener(null);
 /*        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
