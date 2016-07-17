@@ -142,7 +142,7 @@ public class Calendar extends Fragment {
 
                         @Override
                         public void onError(Throwable e) {
-
+                            // Do nothing
                         }
 
                         @Override

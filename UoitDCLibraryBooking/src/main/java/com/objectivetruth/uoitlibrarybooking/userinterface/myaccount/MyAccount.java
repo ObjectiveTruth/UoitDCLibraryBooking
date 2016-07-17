@@ -3,29 +3,28 @@ package com.objectivetruth.uoitlibrarybooking.userinterface.myaccount;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.view.*;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountSignoutEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
-import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
+import com.objectivetruth.uoitlibrarybooking.userinterface.loading.Loading;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.LoginFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.myaccountloaded.MyAccountLoaded;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import javax.inject.Inject;
 
 public class MyAccount extends Fragment {
-    private PublishSubject<String> loginErrorSubject;
     private Subscription currentLogoutSubscription;
-    private Subscription currentSignInSubscription;
+    private Subscription myAccountDataLoginStateObservableSubscription;
     private PublishSubject<UserCredentials> signInClickedSubject;
     public @Inject UserModel userModel;
 
@@ -43,21 +42,77 @@ public class MyAccount extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onStart() {
+        Timber.d("MyAccount onStart");
+        _setupViewBindings(userModel.getLoginStateObservable());
+        super.onStart();
+    }
 
-        if(userModel.isUserSignedIn()) {
-            Timber.i("User is already signed in, showing his details");
-            _showMyAccountLoadedFragment();
+    @Override
+    public void onHiddenChanged(boolean isNowHidden) {
+        if(isNowHidden) {
+            Timber.d("MyAccount isNowHidden");
+            _teardownViewBindings();
         }else {
-            Timber.i("User isn't signed in, showing login screen");
-            _showLoginFragment(_getSignInClickedSubject());
+            Timber.d("MyAccount isNowVisible");
+            _setupViewBindings(userModel.getLoginStateObservable());
+        }
+        super.onHiddenChanged(isNowHidden);
+    }
+
+    private void _teardownViewBindings() {
+        if(myAccountDataLoginStateObservableSubscription != null &&
+                !myAccountDataLoginStateObservableSubscription.isUnsubscribed()) {
+            myAccountDataLoginStateObservableSubscription.unsubscribe();
         }
     }
 
-    private static void _sendErrorMessageToLoginErrorSubject(String errorMessage,
-                                                             PublishSubject<String> loginErrorSubject) {
-        loginErrorSubject.onNext(errorMessage);
+    private void _setupViewBindings(Observable<MyAccountDataLoginState> myAccountDataLoginStateObservable) {
+        // if the subscription is still active, don't setup new bindings
+        if(myAccountDataLoginStateObservableSubscription != null &&
+                !myAccountDataLoginStateObservableSubscription.isUnsubscribed()) {
+            return;
+        }
+        myAccountDataLoginStateObservableSubscription =
+            myAccountDataLoginStateObservable
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<MyAccountDataLoginState>() {
+                        @Override
+                        public void onCompleted() {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            // Do nothing
+                        }
+
+                        @Override
+                        public void onNext(MyAccountDataLoginState myAccountDataLoginState) {
+                            Timber.i("On next called: " + myAccountDataLoginState.type.name());
+                            switch(myAccountDataLoginState.type) {
+                                case RUNNING:
+                                    _showFullscreenLoading();
+                                    break;
+                                case SIGNED_IN:
+                                    _showMyAccountLoadedFragment(userModel.getSignoutActivatePublishSubject(),
+                                            myAccountDataLoginState);
+                                    break;
+                                case SIGNED_OUT:
+                                case ERROR:
+                                default:
+                                    _showLoginFragment(userModel.getSigninActivatePublishSubject(),
+                                            myAccountDataLoginState);
+                            }
+                        }
+                    });
+    }
+
+    private void _showFullscreenLoading() {
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.my_account_content_frame, Loading.newInstance())
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
@@ -73,8 +128,7 @@ public class MyAccount extends Fragment {
         switch(id) {
             case R.id.my_account_menu_item_logout:
                 Timber.i("Logout clicked");
-                userModel.getLogoutSubject().onNext(new UserModel.LogoutEvent());
-                _showLoginFragment(_getSignInClickedSubject());
+                userModel.getSignoutActivatePublishSubject().onNext(new MyAccountSignoutEvent());
                 return true;
             default:
                 getActivity().onOptionsItemSelected(item);
@@ -82,82 +136,32 @@ public class MyAccount extends Fragment {
         }
     }
 
-
-    public static MyAccount newInstance() {
-        return new MyAccount();
-    }
-
-    private void _showMyAccountLoadedFragment() {
+    private void _showMyAccountLoadedFragment(PublishSubject<MyAccountSignoutEvent> signoutEventPublishSubject,
+                                              MyAccountDataLoginState myAccountDataLoginState) {
         String MY_ACCOUNT_LOADED_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOADED_FRAGMENT_TAG";
         getActivity().invalidateOptionsMenu();
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        MyAccountLoaded.newInstance(userModel.getUserDataFromStorage(), this),
+                        MyAccountLoaded.newInstance(userModel, myAccountDataLoginState, this),
                         MY_ACCOUNT_LOADED_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
 
-    private void _showLoginFragment(PublishSubject<UserCredentials> signInClickedSubject) {
+    private void _showLoginFragment(PublishSubject<UserCredentials> signInPublishSubject,
+                                    MyAccountDataLoginState myAccountDataLoginState) {
         String MY_ACCOUNT_LOGIN_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOGIN_FRAGMENT_TAG";
-/*        Fragment mLoginFragment = getChildFragmentManager()
-                .findFragmentByTag(MY_ACCOUNT_LOGIN_FRAGMENT_TAG);
-        if(mLoginFragment == null){
-            Timber.d("Fragment with tag: " + MY_ACCOUNT_LOGIN_FRAGMENT_TAG + " not found, instantiating a new one");
-            mLoginFragment = LoginFragment.newInstance();
-        }else {
-            Timber.d("Fragment with tag: " + MY_ACCOUNT_LOGIN_FRAGMENT_TAG +
-                    " found. retrieving it without creating a new one");
-        }*/
-        _bindSignInClickedSubjectToSignInFlow(signInClickedSubject);
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        LoginFragment.newInstance(signInClickedSubject, _getLoginErrorSubject()),
+                        LoginFragment.newInstance(signInPublishSubject, myAccountDataLoginState),
                         MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
 
-    private PublishSubject<String> _getLoginErrorSubject() {
-        if(loginErrorSubject == null) {
-            Timber.d("Current loginErrorSubject is NULL, making new one");
-            return loginErrorSubject = PublishSubject.create();
-        }else if (loginErrorSubject.hasCompleted()) {
-            Timber.d("Current loginErrorSubject hasCompleted, making new one");
-            return loginErrorSubject = PublishSubject.create();
-        }else {
-            Timber.d("Current loginErrorSubject is still valid, passing it back");
-            return loginErrorSubject;
-        }
-    }
-
-    public Observable<Pair<UserData, UserCredentials>> getSignInObs() {
-        Observable<Pair<UserData, UserCredentials>> returnObservable = userModel.signInObs();
-        returnObservable
-                .subscribe(new Observer<Pair<UserData, UserCredentials>>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
-                        if(userDataUserCredentialsPair.first.errorMessage != null) {
-                            Timber.w("There was an authentication error in MyAccount, showing Login fragment");
-                            _showLoginFragment(_getSignInClickedSubject());
-                        }
-                    }
-                });
-        return returnObservable;
-    }
-
-    private void _bindSignInClickedSubjectToSignInFlow(PublishSubject<UserCredentials>
+/*    private void _bindSignInClickedSubjectToSignInFlow(PublishSubject<UserCredentials>
                                                                               signInClickSubject) {
-        currentSignInSubscription = signInClickSubject
+         signInClickSubject
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation())
 
@@ -193,35 +197,9 @@ public class MyAccount extends Fragment {
                         }
                     }
                 });
-    }
+    }*/
 
-    private PublishSubject<UserCredentials> _getSignInClickedSubject() {
-        if(signInClickedSubject == null) {
-            Timber.d("Current sigInClickSubject is NULL, making new one");
-            return signInClickedSubject = PublishSubject.create();
-        }else if (signInClickedSubject.hasCompleted()) {
-            Timber.d("Current signInClickSubject has completed already, making new one");
-            return signInClickedSubject = PublishSubject.create();
-        }else {
-            Timber.d("Current signInClickSubject is still valid, passing it back");
-            return signInClickedSubject;
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        _unsubscribeFromAllObservablesAndCompleteAllSubjectsCreated();
-        super.onDestroyView();
-    }
-
-    /**
-     * Prevents memory leaks by unsubscribing to any active subscriptions and completing any
-     * subjects created by MyAccount
-     */
-    private void _unsubscribeFromAllObservablesAndCompleteAllSubjectsCreated() {
-        if(currentLogoutSubscription != null) {currentLogoutSubscription.unsubscribe();}
-        if(currentSignInSubscription != null) {currentSignInSubscription.unsubscribe();}
-        if(signInClickedSubject != null) {signInClickedSubject.onCompleted();}
-        if(loginErrorSubject != null) {loginErrorSubject.onCompleted();}
+    public static MyAccount newInstance() {
+        return new MyAccount();
     }
 }

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
+import com.android.volley.AuthFailureError;
 import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.*;
 import rx.Observable;
@@ -42,7 +43,7 @@ public class UserModel {
      * @see MyAccountDataLoginState
      * @return
      */
-    public Observable<MyAccountDataLoginState> geLoginStateObservable() {
+    public Observable<MyAccountDataLoginState> getLoginStateObservable() {
         _getMyAccountDataLoginStateBehaviourSubject(); // Sets up all the references before we return
         return myAccountDataLoginStateBehaviourSubjectAsObservable;
     }
@@ -63,7 +64,8 @@ public class UserModel {
     }
 
     /**
-     * Can push events to this publish subject to tell the model to attempt to sign the user in
+     * Can push events to this publish subject to tell the model to attempt to sign the user in.
+     * Passing null to the .onNext of the publish subject will attempt to get credentials from storage
      * @see UserCredentials
      * @return
      */
@@ -100,13 +102,16 @@ public class UserModel {
                 .subscribe(new Action1<UserCredentials>() {
             @Override
             public void call(UserCredentials userCredentials) {
+                UserCredentials userCredentialsToUse =
+                        userCredentials == null ? null : _getUserCredentialsFromStorage();
                 if(isASigninRequestRunning()) {Timber.d("Signin request is already running, ignoring request"); return;}
+
                 Timber.d("Running a new request for Signin since none are running");
                 MyAccountDataLoginState runningState =
                         new MyAccountDataLoginState(RUNNING, null, null);
                 _getMyAccountDataLoginStateBehaviourSubject().onNext(runningState);
 
-                _startSigninAndGetObservable(userCredentials)
+                _startSigninAndGetObservable(userCredentialsToUse)
                         .observeOn(Schedulers.computation())
                         .subscribe(new Observer<UserData>() {
                             @Override
@@ -124,9 +129,13 @@ public class UserModel {
 
                             @Override
                             public void onNext(UserData userData) {
-                                MyAccountDataLoginState signedinState =
-                                        new MyAccountDataLoginState(SIGNED_IN, userData, null);
-                                _getMyAccountDataLoginStateBehaviourSubject().onNext(signedinState);
+                                // null on errorMessage means all is good
+                                MyAccountDataLoginState state = userData.errorMessage == null ?
+                                        new MyAccountDataLoginState(SIGNED_IN, userData, null) :
+                                        new MyAccountDataLoginState(ERROR, null,
+                                                new AuthFailureError(userData.errorMessage));
+
+                                _getMyAccountDataLoginStateBehaviourSubject().onNext(state);
                             }
                         });
             }

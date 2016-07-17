@@ -12,6 +12,7 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import rx.Observer;
 import rx.Subscription;
@@ -28,7 +29,7 @@ public class LoginFragment extends Fragment {
     private EditText passwordField;
     private RadioGroup institutionRadio;
     private PublishSubject<UserCredentials> signInClickSubject;
-    private PublishSubject<String> loginErroSubject;
+    private MyAccountDataLoginState myAccountDataLoginState;
     private Subscription currentLoginErrorSubscription;
     @Inject Tracker googleAnalyticsTracker;
 
@@ -39,10 +40,10 @@ public class LoginFragment extends Fragment {
     }
 
     public static LoginFragment newInstance(PublishSubject<UserCredentials> signInClickSubject,
-                                            PublishSubject<String> loginErroSubject) {
+                                            MyAccountDataLoginState myAccountDataLoginState) {
         LoginFragment returnFragment = new LoginFragment();
         returnFragment.signInClickSubject = signInClickSubject;
-        returnFragment.loginErroSubject = loginErroSubject;
+        returnFragment.myAccountDataLoginState = myAccountDataLoginState;
         return returnFragment;
     }
 
@@ -90,7 +91,10 @@ public class LoginFragment extends Fragment {
         errorTextView = (TextView) view.findViewById(R.id.my_account_login_error_notice);
         Button signInButton = (Button) view.findViewById(R.id.my_account_login_sign_in_button);
 
-        _bindLoginErrorSubjectToErrorTextView(loginErroSubject, errorTextView);
+        if(myAccountDataLoginState.exception != null) {
+            String errorMessage = myAccountDataLoginState.exception.getMessage();
+            errorTextView.setText(errorMessage);
+        }
 
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override

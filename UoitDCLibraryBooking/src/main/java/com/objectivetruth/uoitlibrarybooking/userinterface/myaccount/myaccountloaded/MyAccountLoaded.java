@@ -4,24 +4,21 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
+import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import timber.log.Timber;
 
 public class MyAccountLoaded extends Fragment {
     private UserData userData;
     private MyAccount parentMyAccountFragment;
+    private UserModel userModel;
 
     @Nullable
     @Override
@@ -53,10 +50,13 @@ public class MyAccountLoaded extends Fragment {
         return myBookingsLoadedView;
     }
 
-    public static MyAccountLoaded newInstance(UserData userData, MyAccount parentMyAccountFragment) {
+    public static MyAccountLoaded newInstance(UserModel userModel,
+                                              MyAccountDataLoginState myAccountDataLoginState,
+                                              MyAccount parentMyAccountFragment) {
         MyAccountLoaded returnFragment = new MyAccountLoaded();
-        returnFragment.userData = userData;
+        returnFragment.userData = myAccountDataLoginState.userData;
         returnFragment.parentMyAccountFragment = parentMyAccountFragment;
+        returnFragment.userModel = userModel;
         return returnFragment;
     }
 
@@ -82,7 +82,7 @@ public class MyAccountLoaded extends Fragment {
 
     private void _bindSwipeLayoutToMyAccountRefreshEvent(final SwipeRefreshLayout swipeRefreshLayout,
                                                          final MyAccountPagerAdapter myAccountPagerAdapter) {
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+/*        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 parentMyAccountFragment.getSignInObs()
@@ -107,6 +107,6 @@ public class MyAccountLoaded extends Fragment {
                             }
                         });
             }
-        });
+        });*/
     }
 }
