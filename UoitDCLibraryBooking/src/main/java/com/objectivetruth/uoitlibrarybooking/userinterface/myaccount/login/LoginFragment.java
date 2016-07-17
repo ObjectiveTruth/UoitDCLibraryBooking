@@ -17,7 +17,13 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginStateType;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -29,6 +35,7 @@ public class LoginFragment extends Fragment {
     private RadioGroup institutionRadio;
     private MyAccountDataLoginState myAccountDataLoginState;
     private Button signInButton;
+    private Subscription myAccountDataLoginStateERRORObservableSubscription;
     @Inject Tracker googleAnalyticsTracker;
     @Inject UserModel userModel;
 
@@ -62,7 +69,7 @@ public class LoginFragment extends Fragment {
     public void onStart() {
         Timber.d(this.getClass().getSimpleName() + " onStart");
         _setupViewBindings(signInButton, errorTextView, myAccountDataLoginState, usernameField,
-                passwordField, institutionRadio);
+                passwordField, institutionRadio, userModel.getLoginStateObservable());
         super.onStart();
     }
     @Override
@@ -73,7 +80,7 @@ public class LoginFragment extends Fragment {
         }else {
             Timber.d(this.getClass().getSimpleName() + " isNowVisible");
             _setupViewBindings(signInButton, errorTextView, myAccountDataLoginState, usernameField,
-                    passwordField, institutionRadio);
+                    passwordField, institutionRadio, userModel.getLoginStateObservable());
         }
         super.onHiddenChanged(isNowHidden);
     }
@@ -117,12 +124,17 @@ public class LoginFragment extends Fragment {
         if(signInButton == null) {return;} //quit early if doesn't exist
 
         signInButton.setOnClickListener(null);
+        if(myAccountDataLoginStateERRORObservableSubscription != null &&
+                !myAccountDataLoginStateERRORObservableSubscription.isUnsubscribed()) {
+            myAccountDataLoginStateERRORObservableSubscription.unsubscribe();
+        }
     }
 
     private void _setupViewBindings(Button signinButton, final TextView errorTextView,
                                     MyAccountDataLoginState myAccountDataLoginState,
                                     final EditText usernameField, final EditText passwordField,
-                                    final RadioGroup institutionRadio) {
+                                    final RadioGroup institutionRadio,
+                                    Observable<MyAccountDataLoginState> myAccountDataLoginStateObservable) {
         if(myAccountDataLoginState.exception != null && errorTextView != null) {
             String errorMessage = myAccountDataLoginState.exception.getMessage();
             errorTextView.setText(errorMessage);
@@ -131,6 +143,29 @@ public class LoginFragment extends Fragment {
         if(signinButton == null || errorTextView == null || usernameField == null ||
                 passwordField == null || institutionRadio == null) {
             return; //quit early if we can't verify the state
+        }
+
+        if(myAccountDataLoginStateERRORObservableSubscription == null ||
+                myAccountDataLoginStateERRORObservableSubscription.isUnsubscribed()) {
+
+            myAccountDataLoginStateERRORObservableSubscription = myAccountDataLoginStateObservable
+                    .filter(new Func1<MyAccountDataLoginState, Boolean>() {
+                        @Override
+                        public Boolean call(MyAccountDataLoginState myAccountDataLoginState) {
+                            return (myAccountDataLoginState.type == MyAccountDataLoginStateType.ERROR) ||
+                            (myAccountDataLoginState.type == MyAccountDataLoginStateType.SIGNED_OUT);
+                        }
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<MyAccountDataLoginState>() {
+                        @Override
+                        public void call(MyAccountDataLoginState myAccountDataLoginState) {
+                            if(myAccountDataLoginState.exception != null) {
+                                errorTextView.setText(myAccountDataLoginState.exception.getMessage());
+                            }
+                            passwordField.setText("");
+                        }
+                    });
         }
 
         signInButton.setOnClickListener(null); //Ensures the function is idempotent

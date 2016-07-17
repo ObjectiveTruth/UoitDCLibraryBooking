@@ -93,15 +93,19 @@ public class MyAccount extends Fragment {
                         @Override
                         public void onNext(MyAccountDataLoginState myAccountDataLoginState) {
                             Timber.i("On next called: " + myAccountDataLoginState.type.name());
+                            // We check if the AccountLoaded is showing because if it is, we do nothing since it takes
+                            // care of handling the events
                             switch(myAccountDataLoginState.type) {
                                 case RUNNING:
-                                    _showFullscreenLoading();
+                                    if(_isMyAccountLoadedNOTShowing()) { _showFullscreenLoading();}
                                     break;
                                 case SIGNED_IN:
-                                    _showMyAccountLoadedFragment(myAccountDataLoginState);
+                                    if(_isMyAccountLoadedNOTShowing()) {
+                                        _showMyAccountLoadedFragment(myAccountDataLoginState); }
                                     break;
-                                case SIGNED_OUT:
                                 case ERROR:
+                                    if(_isMyAccountLoadedNOTShowing()) {_showLoginFragment(myAccountDataLoginState);}
+                                case SIGNED_OUT:
                                 default:
                                     _showLoginFragment(myAccountDataLoginState);
                             }
@@ -114,6 +118,16 @@ public class MyAccount extends Fragment {
                 .replace(R.id.my_account_content_frame, Loading.newInstance())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private boolean _isMyAccountLoadedShowing() {
+        Fragment currentFragmentInContentFrame = getChildFragmentManager()
+                .findFragmentById(R.id.my_account_content_frame);
+        return currentFragmentInContentFrame instanceof MyAccountLoaded && currentFragmentInContentFrame.isVisible();
+    }
+
+    private boolean _isMyAccountLoadedNOTShowing() {
+        return !_isMyAccountLoadedShowing();
     }
 
     private void _showMyAccountLoadedFragment(MyAccountDataLoginState myAccountDataLoginState) {
@@ -136,7 +150,8 @@ public class MyAccount extends Fragment {
 
     private void _showLoginFragment(MyAccountDataLoginState myAccountDataLoginState) {
         String MY_ACCOUNT_LOGIN_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOGIN_FRAGMENT_TAG";
-        Fragment myAccountLoginFragment = getChildFragmentManager().findFragmentByTag(MY_ACCOUNT_LOGIN_FRAGMENT_TAG);
+        LoginFragment myAccountLoginFragment = (LoginFragment) getChildFragmentManager()
+                .findFragmentByTag(MY_ACCOUNT_LOGIN_FRAGMENT_TAG);
 
         if(myAccountLoginFragment == null) {
             myAccountLoginFragment = LoginFragment.newInstance(myAccountDataLoginState);

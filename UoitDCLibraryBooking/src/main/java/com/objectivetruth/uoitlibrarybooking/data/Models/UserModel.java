@@ -123,23 +123,33 @@ public class UserModel {
 
                             @Override
                             public void onError(Throwable t) {
-                                Timber.w("Error when completing the Signin request, passing into to the view");
                                 MyAccountDataLoginState errorState =
                                         new MyAccountDataLoginState(ERROR, null, t);
                                 if(t.getCause() instanceof TimeoutException) {
                                     errorState.exception = new TimeoutException("Server took too long to respond, " +
                                             "try again");
                                 }
+                                Timber.w(errorState.exception,
+                                        "Error when completing the Signin request, passing into to the view");
                                 _getMyAccountDataLoginStateBehaviourSubject().onNext(errorState);
                             }
 
                             @Override
                             public void onNext(UserData userData) {
                                 // null on errorMessage means all is good
-                                MyAccountDataLoginState state = userData.errorMessage == null ?
-                                        new MyAccountDataLoginState(SIGNED_IN, userData, null) :
-                                        new MyAccountDataLoginState(ERROR, null,
-                                                new AuthFailureError(userData.errorMessage));
+                                MyAccountDataLoginState state;
+                                String errorMessage = userData.errorMessage;
+                                if(errorMessage == null) {
+                                    state = new MyAccountDataLoginState(SIGNED_IN, userData, null);
+                                }else if(errorMessage.toLowerCase().contains("id") &&
+                                        errorMessage.toLowerCase().contains("password")) {
+                                    Timber.w("Authenticaiton Error when trying to signin: " + errorMessage);
+                                    state = new MyAccountDataLoginState(SIGNED_OUT, null,
+                                            new AuthFailureError(errorMessage));
+                                }else {
+                                    Timber.w("Business Error when trying to signin: " + errorMessage);
+                                    state = new MyAccountDataLoginState(ERROR, null, new Exception(errorMessage));
+                                }
 
                                 _getMyAccountDataLoginStateBehaviourSubject().onNext(state);
                             }
@@ -250,7 +260,7 @@ public class UserModel {
     }
 
     @Nullable
-    public UserData _getUserDataFromStorage() {
+    private UserData _getUserDataFromStorage() {
         Timber.d("Gettign Users Data from Storage");
         Gson gson = new Gson();
         String userDataJSON = userSharedPreferences.getString(USER_DATA_JSON, EMPTY_JSON);

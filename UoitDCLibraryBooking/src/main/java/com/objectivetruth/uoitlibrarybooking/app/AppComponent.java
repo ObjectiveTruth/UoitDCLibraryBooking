@@ -8,6 +8,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebServic
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.LoginFragment;
+import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.myaccountloaded.MyAccountLoaded;
 import dagger.Component;
 
 import javax.inject.Singleton;
@@ -23,4 +24,5 @@ public interface AppComponent {
     void inject(MyAccount myAccount);
     void inject(LoginFragment loginFragment);
     void inject(UserWebService userWebService);
+    void inject(MyAccountLoaded myAccountLoaded);
 }
