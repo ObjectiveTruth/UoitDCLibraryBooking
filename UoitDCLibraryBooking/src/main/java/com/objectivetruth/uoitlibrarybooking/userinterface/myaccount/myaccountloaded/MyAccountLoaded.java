@@ -8,6 +8,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.*;
 import android.widget.Toast;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
@@ -145,6 +147,7 @@ public class MyAccountLoaded extends Fragment {
                                                 Timber.d("Successfully Refresh MyAccount info");
                                                 _mPagerAdapter.refreshPagerFragmentsAndViews(myAccountDataLoginState
                                                         .userData);
+                                                _playMyAccountLoadedRefreshAnimation(_mSwipeLayout);
                                             }
                                             _mSwipeLayout.setRefreshing(false);
                                             break;
@@ -201,6 +204,14 @@ public class MyAccountLoaded extends Fragment {
                 swipeRefreshLayout.setEnabled(state == ViewPager.SCROLL_STATE_IDLE);
             }
         });
+    }
+
+    private void _playMyAccountLoadedRefreshAnimation(SwipeRefreshLayout swipeRefreshLayout) {
+        if(swipeRefreshLayout == null) {return;}
+
+        YoYo.with(Techniques.FadeIn)
+                .duration(300)
+                .playOn(swipeRefreshLayout);
     }
 
     private void _bindSwipeLayoutToMyAccountSigninEvent(final SwipeRefreshLayout swipeRefreshLayout,
