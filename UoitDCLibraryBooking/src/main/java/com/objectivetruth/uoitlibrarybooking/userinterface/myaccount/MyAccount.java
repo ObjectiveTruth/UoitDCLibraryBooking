@@ -3,13 +3,13 @@ package com.objectivetruth.uoitlibrarybooking.userinterface.myaccount;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
-import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountSignoutEvent;
-import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.userinterface.loading.Loading;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.LoginFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.myaccountloaded.MyAccountLoaded;
@@ -17,15 +17,12 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import javax.inject.Inject;
 
 public class MyAccount extends Fragment {
-    private Subscription currentLogoutSubscription;
     private Subscription myAccountDataLoginStateObservableSubscription;
-    private PublishSubject<UserCredentials> signInClickedSubject;
     public @Inject UserModel userModel;
 
     @Override
@@ -58,6 +55,12 @@ public class MyAccount extends Fragment {
             _setupViewBindings(userModel.getLoginStateObservable());
         }
         super.onHiddenChanged(isNowHidden);
+    }
+    @Override
+    public void onStop() {
+        Timber.d("MyAccount Stopped");
+        _teardownViewBindings();
+        super.onStop();
     }
 
     private void _teardownViewBindings() {
@@ -95,14 +98,12 @@ public class MyAccount extends Fragment {
                                     _showFullscreenLoading();
                                     break;
                                 case SIGNED_IN:
-                                    _showMyAccountLoadedFragment(userModel.getSignoutActivatePublishSubject(),
-                                            myAccountDataLoginState);
+                                    _showMyAccountLoadedFragment(myAccountDataLoginState);
                                     break;
                                 case SIGNED_OUT:
                                 case ERROR:
                                 default:
-                                    _showLoginFragment(userModel.getSigninActivatePublishSubject(),
-                                            myAccountDataLoginState);
+                                    _showLoginFragment(myAccountDataLoginState);
                             }
                         }
                     });
@@ -115,24 +116,22 @@ public class MyAccount extends Fragment {
                 .commit();
     }
 
-    private void _showMyAccountLoadedFragment(PublishSubject<MyAccountSignoutEvent> signoutEventPublishSubject,
-                                              MyAccountDataLoginState myAccountDataLoginState) {
+    private void _showMyAccountLoadedFragment(MyAccountDataLoginState myAccountDataLoginState) {
         String MY_ACCOUNT_LOADED_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOADED_FRAGMENT_TAG";
         getActivity().invalidateOptionsMenu();
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        MyAccountLoaded.newInstance(userModel, myAccountDataLoginState),
+                        MyAccountLoaded.newInstance(myAccountDataLoginState),
                         MY_ACCOUNT_LOADED_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
 
-    private void _showLoginFragment(PublishSubject<UserCredentials> signInPublishSubject,
-                                    MyAccountDataLoginState myAccountDataLoginState) {
+    private void _showLoginFragment(MyAccountDataLoginState myAccountDataLoginState) {
         String MY_ACCOUNT_LOGIN_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOGIN_FRAGMENT_TAG";
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        LoginFragment.newInstance(signInPublishSubject, myAccountDataLoginState),
+                        LoginFragment.newInstance(myAccountDataLoginState),
                         MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();

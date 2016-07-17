@@ -14,9 +14,11 @@ import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountSign
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import timber.log.Timber;
 
+import javax.inject.Inject;
+
 public class MyAccountLoaded extends Fragment {
     private UserData userData;
-    private UserModel userModel;
+    @Inject UserModel userModel;
 
     @Nullable
     @Override
@@ -49,11 +51,9 @@ public class MyAccountLoaded extends Fragment {
         return myBookingsLoadedView;
     }
 
-    public static MyAccountLoaded newInstance(UserModel userModel,
-                                              MyAccountDataLoginState myAccountDataLoginState) {
+    public static MyAccountLoaded newInstance(MyAccountDataLoginState myAccountDataLoginState) {
         MyAccountLoaded returnFragment = new MyAccountLoaded();
         returnFragment.userData = myAccountDataLoginState.userData;
-        returnFragment.userModel = userModel;
         return returnFragment;
     }
 
