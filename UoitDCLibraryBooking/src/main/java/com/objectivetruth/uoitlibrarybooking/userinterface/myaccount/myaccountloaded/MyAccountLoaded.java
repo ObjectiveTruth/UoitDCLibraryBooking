@@ -6,18 +6,16 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountSignoutEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
-import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
+import timber.log.Timber;
 
 public class MyAccountLoaded extends Fragment {
     private UserData userData;
-    private MyAccount parentMyAccountFragment;
     private UserModel userModel;
 
     @Nullable
@@ -26,6 +24,7 @@ public class MyAccountLoaded extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
+        setHasOptionsMenu(true);
         View myBookingsLoadedView = inflater.inflate(R.layout.my_account_loaded, container, false);
 
         ViewPager _mViewPager = (ViewPager) myBookingsLoadedView.findViewById(R.id.my_account_view_pager);
@@ -51,14 +50,34 @@ public class MyAccountLoaded extends Fragment {
     }
 
     public static MyAccountLoaded newInstance(UserModel userModel,
-                                              MyAccountDataLoginState myAccountDataLoginState,
-                                              MyAccount parentMyAccountFragment) {
+                                              MyAccountDataLoginState myAccountDataLoginState) {
         MyAccountLoaded returnFragment = new MyAccountLoaded();
         returnFragment.userData = myAccountDataLoginState.userData;
-        returnFragment.parentMyAccountFragment = parentMyAccountFragment;
         returnFragment.userModel = userModel;
         return returnFragment;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.my_account_loaded_action_icons_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch(id) {
+            case R.id.my_account_menu_item_logout:
+                Timber.i("Logout clicked");
+                userModel.getSignoutActivatePublishSubject().onNext(new MyAccountSignoutEvent());
+                return true;
+            default:
+                getActivity().onOptionsItemSelected(item);
+                return true;
+        }
+    }
+
 
     private void _disableHorizontalSwipesFromTriggeringVerticalRefresh(ViewPager viewPager,
                                                                        final SwipeRefreshLayout swipeRefreshLayout) {

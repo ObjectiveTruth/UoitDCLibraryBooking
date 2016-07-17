@@ -115,34 +115,13 @@ public class MyAccount extends Fragment {
                 .commit();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.my_account_loaded_action_icons_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch(id) {
-            case R.id.my_account_menu_item_logout:
-                Timber.i("Logout clicked");
-                userModel.getSignoutActivatePublishSubject().onNext(new MyAccountSignoutEvent());
-                return true;
-            default:
-                getActivity().onOptionsItemSelected(item);
-                return true;
-        }
-    }
-
     private void _showMyAccountLoadedFragment(PublishSubject<MyAccountSignoutEvent> signoutEventPublishSubject,
                                               MyAccountDataLoginState myAccountDataLoginState) {
         String MY_ACCOUNT_LOADED_FRAGMENT_TAG = "SINGLETON_MY_ACCOUNT_LOADED_FRAGMENT_TAG";
         getActivity().invalidateOptionsMenu();
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame,
-                        MyAccountLoaded.newInstance(userModel, myAccountDataLoginState, this),
+                        MyAccountLoaded.newInstance(userModel, myAccountDataLoginState),
                         MY_ACCOUNT_LOADED_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
@@ -158,46 +137,6 @@ public class MyAccount extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
-
-/*    private void _bindSignInClickedSubjectToSignInFlow(PublishSubject<UserCredentials>
-                                                                              signInClickSubject) {
-         signInClickSubject
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.computation())
-
-                .flatMap(new Func1<UserCredentials, Observable<Pair<UserData, UserCredentials>>>() {
-                    @Override
-                    public Observable<Pair<UserData, UserCredentials>> call(UserCredentials userCredentials) {
-                        return userModel.signInObs(userCredentials);
-                    }
-                })
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.computation())
-
-                .subscribe(new Observer<Pair<UserData, UserCredentials>>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
-                        if(userDataUserCredentialsPair.first.errorMessage != null) {
-                            Timber.d("Received Error Message from Parser, publishing to Subject");
-                            _sendErrorMessageToLoginErrorSubject(userDataUserCredentialsPair.first.errorMessage,
-                                    _getLoginErrorSubject());
-                        }else {
-                            Timber.i("Received UserData");
-                            Timber.v(userDataUserCredentialsPair.first.toString());
-                            _showMyAccountLoadedFragment();
-                        }
-                    }
-                });
-    }*/
 
     public static MyAccount newInstance() {
         return new MyAccount();

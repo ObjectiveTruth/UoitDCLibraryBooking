@@ -6,7 +6,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.Tracker;
@@ -14,10 +17,6 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
-import rx.Observer;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
@@ -30,7 +29,6 @@ public class LoginFragment extends Fragment {
     private RadioGroup institutionRadio;
     private PublishSubject<UserCredentials> signInClickSubject;
     private MyAccountDataLoginState myAccountDataLoginState;
-    private Subscription currentLoginErrorSubscription;
     @Inject Tracker googleAnalyticsTracker;
 
     @Override
@@ -50,6 +48,7 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         return inflater.inflate(R.layout.my_account_login, container, false);
     }
 
@@ -91,7 +90,7 @@ public class LoginFragment extends Fragment {
         errorTextView = (TextView) view.findViewById(R.id.my_account_login_error_notice);
         Button signInButton = (Button) view.findViewById(R.id.my_account_login_sign_in_button);
 
-        if(myAccountDataLoginState.exception != null) {
+        if(myAccountDataLoginState.exception != null && errorTextView != null) {
             String errorMessage = myAccountDataLoginState.exception.getMessage();
             errorTextView.setText(errorMessage);
         }
@@ -125,38 +124,6 @@ public class LoginFragment extends Fragment {
                 Timber.d("My Account Login: DC Selected");
                 return "dc";
         }
-    }
-
-    private void _bindLoginErrorSubjectToErrorTextView(PublishSubject<String> loginErroSubject,
-                                                              final TextView errorTextView) {
-        currentLoginErrorSubscription =  loginErroSubject
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<String>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(String errorMessageToDisplay) {
-                Timber.d("Received new error message to display in Login: " + errorMessageToDisplay);
-                if(errorTextView != null) {
-                    errorTextView.setText(errorMessageToDisplay);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onDestroyView() {
-        if(currentLoginErrorSubscription != null) {currentLoginErrorSubscription.unsubscribe();}
-        super.onDestroyView();
     }
 }
 

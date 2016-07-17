@@ -18,6 +18,8 @@ import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
+import java.util.concurrent.TimeoutException;
+
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 import static com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginStateType.*;
 
@@ -103,7 +105,7 @@ public class UserModel {
             @Override
             public void call(UserCredentials userCredentials) {
                 UserCredentials userCredentialsToUse =
-                        userCredentials == null ? null : _getUserCredentialsFromStorage();
+                        userCredentials == null ?  _getUserCredentialsFromStorage() : userCredentials;
                 if(isASigninRequestRunning()) {Timber.d("Signin request is already running, ignoring request"); return;}
 
                 Timber.d("Running a new request for Signin since none are running");
@@ -124,6 +126,10 @@ public class UserModel {
                                 Timber.w("Error when completing the Signin request, passing into to the view");
                                 MyAccountDataLoginState errorState =
                                         new MyAccountDataLoginState(ERROR, null, t);
+                                if(t.getCause() instanceof TimeoutException) {
+                                    errorState.exception = new TimeoutException("Server took too long to respond, " +
+                                            "try again");
+                                }
                                 _getMyAccountDataLoginStateBehaviourSubject().onNext(errorState);
                             }
 

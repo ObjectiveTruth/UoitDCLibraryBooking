@@ -59,8 +59,6 @@ public class Calendar extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
 
-        setHasOptionsMenu(true); // Notifies activity that this fragment will interact with the action/options menu
-
         View view = inflater.inflate(R.layout.calendar, container, false);
         _mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
         return view;
