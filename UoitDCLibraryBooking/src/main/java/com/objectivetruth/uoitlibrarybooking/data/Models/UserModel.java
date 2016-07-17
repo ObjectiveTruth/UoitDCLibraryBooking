@@ -21,11 +21,11 @@ import timber.log.Timber;
 import java.util.concurrent.TimeoutException;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCE_NAMES.USER_SHARED_PREFERENCES_NAME;
 import static com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginStateType.*;
 
 public class UserModel {
     private SharedPreferences userSharedPreferences;
-    final static private String USER_SHARED_PREFERENCES_NAME = "USER_INFO";
     private UserWebService userWebService;
     private static final String EMPTY_JSON = "{}";
     private BehaviorSubject<MyAccountDataLoginState> myAccountDataLoginStateBehaviorSubject;
@@ -33,11 +33,10 @@ public class UserModel {
     private PublishSubject<MyAccountSignoutEvent> signoutEventPublishSubject;
     private PublishSubject<UserCredentials> signinEventPublishSubject;
 
-    @SuppressLint("CommitPrefEdits")
-    public UserModel(Application mApplication) {
+    public UserModel(Application mApplication, UserWebService userWebService) {
         userSharedPreferences = mApplication.getSharedPreferences(USER_SHARED_PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
-        userWebService = new UserWebService(mApplication);
+        this.userWebService = userWebService;
     }
 
     /**

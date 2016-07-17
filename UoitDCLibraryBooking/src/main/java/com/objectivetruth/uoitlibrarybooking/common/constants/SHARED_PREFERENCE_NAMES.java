@@ -7,4 +7,5 @@ a specific shared preference
  */
 public class SHARED_PREFERENCE_NAMES {
     public static final String CALENDAR_SHARED_PREFERENCES_NAME = "CALENDAR";
+    public static final String USER_SHARED_PREFERENCES_NAME = "USER_INFO";
 }
