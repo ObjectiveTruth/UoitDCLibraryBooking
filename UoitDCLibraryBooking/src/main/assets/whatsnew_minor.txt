@@ -1,0 +1,4 @@
+July 16, 2016
+===
+‣ Calendar Animation on Refresh
+‣ Fade animation when switching screens
