@@ -7,6 +7,7 @@ import com.objectivetruth.uoitlibrarybooking.app.networking.OkHttp3Stack;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebService;
 import dagger.Module;
 import dagger.Provides;
 
@@ -28,14 +29,20 @@ public class DataModule {
 
     @Provides
     @Singleton
-    UserModel providesUserModel() {
-        return new UserModel(mApplication);
+    UserModel providesUserModel(UserWebService userWebService) {
+        return new UserModel(mApplication, userWebService);
     }
 
     @Provides
     @Singleton
     CalendarWebService providesCalendarWebService(RequestQueue requestQueue) {
         return new CalendarWebService(mApplication, requestQueue);
+    }
+
+    @Provides
+    @Singleton
+    UserWebService providesUserWebService() {
+        return new UserWebService(mApplication);
     }
 
     @Provides

@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -82,7 +80,7 @@ public class AsyncRoomInteraction extends AsyncTask<String, int[], String> {
 		long startTime = System.currentTimeMillis();
 		String daySource = "day" + dayNumber + "source";
 		String day = "day" + dayNumber;
-		SQLiteDatabase db = MainActivity.mdbHelper.getReadableDatabase();
+/*		SQLiteDatabase db = MainActivity.mdbHelper.getReadableDatabase();
 		Cursor c = db.query(MainActivity.mdbHelper.CALENDAR_TABLE_NAME, new String[]{daySource, day}, null, null, null, null, null);
         if(c.moveToFirst()){
         	//Log.i(TAG, c.getString(c.getColumnIndex(daySource)));
@@ -110,8 +108,8 @@ public class AsyncRoomInteraction extends AsyncTask<String, int[], String> {
         	}
         }
 
-        c.close();
-        https://rooms.library.dc-uoit.ca/dc_studyrooms/myreservations.aspx
+        c.close();*/
+        //https://rooms.library.dc-uoit.ca/dc_studyrooms/myreservations.aspx
         Log.i(TAG, "DB Reading took " + (System.currentTimeMillis() - startTime));
         Timber.v("LinkString: " + input[0]);
         try{

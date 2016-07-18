@@ -1,4 +1,5 @@
-July 16, 2016
+July 17, 2016
 ===
-‣ Calendar Animation on Refresh
-‣ Fade animation when switching screens
+‣ MyAccount animation on refresh/switch between fragments
+‣ Greately improved memory Management
+‣ Fixed logout icon not appearing/disappearing when expected

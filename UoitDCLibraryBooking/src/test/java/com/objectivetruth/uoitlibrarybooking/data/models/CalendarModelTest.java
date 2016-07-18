@@ -36,8 +36,6 @@ public class CalendarModelTest {
     private CalendarWebService calendarWebServiceMock;
     private TestSubscriber<CalendarDataRefreshState> testSubscriber;
     private static final int INDEX_OF_FIRST_EVENT = 0;
-    private static final int INDEX_OF_SECOND_EVENT = 1;
-    private static final int INDEX_OF_THIRD_EVENT = 2;
 
     @Before
     public void setUp() throws Exception {

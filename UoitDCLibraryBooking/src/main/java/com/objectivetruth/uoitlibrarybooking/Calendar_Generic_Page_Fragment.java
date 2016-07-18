@@ -1,54 +1,11 @@
 package com.objectivetruth.uoitlibrarybooking;
 
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.*;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
-import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.TableFixHeaders;
-import com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView;
-import timber.log.Timber;
-
-import javax.inject.Inject;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
 
 
 public class Calendar_Generic_Page_Fragment extends Fragment {
-	final String TAG = "Calendar_generic_Page_fragment";
+/*	final String TAG = "Calendar_generic_Page_fragment";
 	String pageNumberStr = null;
 	int pageNumberInt;
 	boolean firstTimeRunning = true; //this is to know when to add fragments
@@ -112,12 +69,12 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
             tableFixHeaders.setVisibility(View.INVISIBLE);
 
 
-            /*RelativeLayout.LayoutParams params =  (RelativeLayout.LayoutParams) tableFixHeaders.getLayoutParams();
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);*/
+            *//*RelativeLayout.LayoutParams params =  (RelativeLayout.LayoutParams) tableFixHeaders.getLayoutParams();
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);*//*
 
         }
 
-/*        if(hasRooms){
+*//*        if(hasRooms){
             int CAN_BE_ANY_NUMBER = 0;
             rootView = inflater.inflate(R.layout.calendar_home_fragment, container, false);
             tableFixHeaders = (TableFixHeaders) rootView.findViewById(R.id.calendar_table);
@@ -130,7 +87,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
         }
         else{
             rootView = inflater.inflate(R.layout.guidelines_policies, container, false);
-        }*/
+        }*//*
 
 
 		return rootView;
@@ -186,8 +143,8 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 
                     Timber.i("Hour of day right now is " + hourOfDay);
 					String day = "day" + String.valueOf(pageNumberInt + 1);
-					SQLiteDatabase db = MainActivity.mdbHelper.getReadableDatabase();
-					Cursor c = db.query(MainActivity.mdbHelper.CALENDAR_TABLE_NAME, new String[]{day, day+"source"}, null, null, null, null, null);
+*//*					SQLiteDatabase db = MainActivity.mdbHelper.getReadableDatabase();
+					Cursor c = db.query(MainActivity.mdbHelper.CALENDAR_TABLE_NAME, new String[]{day, day+"source"}, null, null, null, null, null);*//*
 
                     //There's something in the DB
 					if(c.moveToFirst()){
@@ -211,12 +168,12 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
                         //Real entries start after this one
                         correspondingArr[(i/columnCount)][(i%columnCount)] = "";
                         //Replace any invalid entries from null to ""
-                        /*if(currentStringFromDb == null){
+                        *//*if(currentStringFromDb == null){
 
                         }
                         else{
                             correspondingArr[(i/columnCount)][(i%columnCount)] = currentStringFromDb;
-                        }*/
+                        }*//*
 
 						i++;
 						while(c.moveToNext()){
@@ -313,7 +270,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
             Object span;
             boolean isLockIcon = false;
 
-            //***************
+            /*//***************
             //ViewHolder Pattern
             ViewHolder holder;
             View convertView = recycleView;
@@ -328,7 +285,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
                 holder = (ViewHolder) convertView.getTag();
             }
             //End ViewHolder Pattern
-            //***************
+            /*//***************
 
 			String content = getCellString(mRow,mColumn);
 
@@ -352,22 +309,22 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
             SpannableString cellSpanString = new SpannableString(content);
 
 			if((row > -1) && (column > -1)){
-                /*if(column % 2 == 0){
+                *//*if(column % 2 == 0){
                     convertView.setBackgroundResource(R.drawable.top_border_dark);
                 }
                 else if(column% 2 == 1){
                     convertView.setBackgroundResource(R.drawable.top_border_white);
-                }*/
+                }*//*
 
 
                 //Timber.v("mRow: " + mRow + ", mColumn: " + mColumn);
                 if(correspondingArr[mRow][mColumn] == null){
                     //Timber.v("its NULL");
                     correspondingArr[mRow][mColumn] = "";
-                }/*
+                }*//*
                 else{
                     Timber.v("Contents: " + correspondingArr[mRow][mColumn]);
-                }*/
+                }*//*
 
                 //Contains Something that's clickable
 				if(!correspondingArr[mRow][mColumn].isEmpty()){
@@ -457,22 +414,22 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 
                         }
                     });
-                    /*if(column % 2 == 0){
+                    *//*if(column % 2 == 0){
                         convertView.setBackgroundColor(getResources().getColor(R.color.light_gray));
                     }
                     else{
                         convertView.setBackgroundColor(getResources().getColor(android.R.color.white));
-                    }*/
+                    }*//*
                 }
                 else{
                     convertView.setBackgroundResource(R.drawable.top_border_dark);
                     convertView.setOnClickListener(null);
-                    /*if(column % 2 == 0){
+                    *//*if(column % 2 == 0){
                         convertView.setBackgroundResource(R.drawable.top_border_dark);
                     }
                     else{
                         convertView.setBackgroundResource(R.drawable.top_border_white);
-                    }*/
+                    }*//*
                 }
 
 
@@ -480,9 +437,9 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 			}
             holder.onlyTextView.setText(cellSpanString);
             //Timber.v("GetView Outgoing String: " + cellSpanString);
-/*			if(hasRooms == false){
+*//*			if(hasRooms == false){
 				convertView.setBackgroundColor(Color.TRANSPARENT);
-			}*/
+			}*//*
 			
 			return convertView;
 		}
@@ -490,23 +447,23 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 
 
 
-		/**
+		*//**
 		 * Sets the text to the view.
 		 * 
 		 * @param view
 		 * @param text
-		 */
+		 *//*
 		private void setText(View view, String text) {
 			((RobotoTextView) view.findViewById(android.R.id.text1)).setText(text);
 		}
 		@Override
 		public int getRowCount() {
-/*			if(numberOfItems ==4){
+*//*			if(numberOfItems ==4){
 				return 1;
 			}
 			else{
 				return (numberOfItems/columnCount)-1;	
-			}*/
+			}*//*
             int returnInt = (numberOfItems/columnCount)-1;
             //Timber.v("GetRowCount Returns: " + returnInt);
             return returnInt;
@@ -516,14 +473,14 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 
 		@Override
 		public int getColumnCount() {
-/*
+*//*
 			if(numberOfItems == 4){
 				return 1;
 			}
 			else{
 				return columnCount-1;
 			}
-*/
+*//*
             return columnCount -1;
 		}
 
@@ -602,9 +559,9 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 			
 			//confirmationTextView.setText("Room: " + roomDiag + " at " + timeDiag);
 			
-			/*LinearLayout ll=new LinearLayout(mActivity);
+			*//*LinearLayout ll=new LinearLayout(mActivity);
 		        ll.setOrientation(LinearLayout.VERTICAL);
-		        ll.addView(roomPic);*/
+		        ll.addView(roomPic);*//*
 			RoomFragmentDialog roomFragDia = RoomFragmentDialog.newInstance(roomDiag, "Room: " + roomDiag + " at " + timeDiag + "?"
                     , pageNumberInt
                     , linkString
@@ -895,6 +852,6 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
         class ViewHolder{
             TextView textViewOnly;
         }
-    }
+    }*/
 
 }

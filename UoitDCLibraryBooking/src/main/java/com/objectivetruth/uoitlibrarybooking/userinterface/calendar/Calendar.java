@@ -18,7 +18,6 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.ActivityRoomInteraction;
-import com.objectivetruth.uoitlibrarybooking.ActivitySettings;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
@@ -52,15 +51,15 @@ public class Calendar extends Fragment {
     private Subscription calendarDataRefreshStateObservableSubscription;
     private SwipeRefreshLayout _mSwipeLayout;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             @Nullable final ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
+    }
 
-        setHasOptionsMenu(true); // Notifies activity that this fragment will interact with the action/options menu
-
+    @Override
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.calendar, container, false);
         _mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
         return view;
@@ -142,7 +141,7 @@ public class Calendar extends Fragment {
 
                         @Override
                         public void onError(Throwable e) {
-
+                            // Do nothing
                         }
 
                         @Override
@@ -240,8 +239,8 @@ public class Calendar extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(getContext(), ActivitySettings.class);
-            startActivity(intent);
+            //Intent intent = new Intent(getContext(), ActivitySettings.class);
+            //startActivity(intent);
 
         }
         else if(id == R.id.help_calendar){

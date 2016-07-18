@@ -26,7 +26,6 @@ public class CalendarModel {
     private static final String EMPTY_JSON = "{}";
 
     private SharedPreferences calendarSharedPreferences;
-    private SharedPreferences.Editor calendarSharedPreferencesEditor;
     // Keep a reference to both so we send back the same when a client asks
     private BehaviorSubject<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubject;
     private Observable<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubjectAsObservable;
@@ -36,7 +35,6 @@ public class CalendarModel {
     public CalendarModel(UOITLibraryBookingApp mApplication, CalendarWebService calendarWebService) {
         calendarSharedPreferences = mApplication.getSharedPreferences(CALENDAR_SHARED_PREFERENCES_NAME,
                 Context.MODE_PRIVATE);
-        calendarSharedPreferencesEditor = calendarSharedPreferences.edit();
         this.calendarWebService = calendarWebService;
     }
 
@@ -246,7 +244,8 @@ public class CalendarModel {
         Gson gson = new Gson();
         String calendarDataJson = gson.toJson(calendarData);
         Timber.v(calendarDataJson);
-        calendarSharedPreferencesEditor
+        calendarSharedPreferences
+                .edit()
                 .putString(CALENDAR_DATA_JSON, calendarDataJson)
                 .apply();
     }

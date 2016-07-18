@@ -54,8 +54,9 @@ class MyAccountPagerAdapter extends FragmentStatePagerAdapter {
         return NUMBER_OF_PAGES_COMPLETE_INCOMPLETE_PAST;
     }
 
-    public void refreshPagerFragmentsAndViews() {
+    public void refreshPagerFragmentsAndViews(UserData userData) {
         Timber.i("Refreshing My Account pager adapter's Fragments, Data and views");
+        this.userData = userData;
         arrayCopyToTellWhichViewsToRefresh = getArrayWhereAllCorrespondingFragmentsShouldbeRefreshed();
         notifyDataSetChanged();
     }

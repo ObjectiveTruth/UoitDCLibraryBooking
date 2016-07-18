@@ -4,64 +4,190 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.Toast;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountSignoutEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
-import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
 import rx.Observer;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
+import javax.inject.Inject;
+
 public class MyAccountLoaded extends Fragment {
     private UserData userData;
-    private MyAccount parentMyAccountFragment;
+    private ViewPager _mViewPager;
+    private TabLayout _mTabLayout;
+    private SwipeRefreshLayout _mSwipeLayout;
+    private Subscription calendarDataRefreshStateTypeSubscription;
+    @Inject UserModel userModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
+        setHasOptionsMenu(true);
         View myBookingsLoadedView = inflater.inflate(R.layout.my_account_loaded, container, false);
 
-        ViewPager _mViewPager = (ViewPager) myBookingsLoadedView.findViewById(R.id.my_account_view_pager);
-        TabLayout _mTabLayout = (TabLayout) myBookingsLoadedView.findViewById(R.id.my_account_tab_layout);
-        SwipeRefreshLayout _mSwipeLayout =
+        _mViewPager = (ViewPager) myBookingsLoadedView.findViewById(R.id.my_account_view_pager);
+        _mTabLayout = (TabLayout) myBookingsLoadedView.findViewById(R.id.my_account_tab_layout);
+        _mSwipeLayout =
                 (SwipeRefreshLayout) myBookingsLoadedView.findViewById(R.id.my_account_loaded_refresh_swipe_layout);
 
+        return myBookingsLoadedView;
+    }
+
+    public static MyAccountLoaded newInstance(MyAccountDataLoginState myAccountDataLoginState) {
+        MyAccountLoaded returnFragment = new MyAccountLoaded();
+        returnFragment.userData = myAccountDataLoginState.userData;
+        return returnFragment;
+    }
+
+    @Override
+    public void onStart() {
+        Timber.d(this.getClass().getSimpleName() + " onStart");
+        _setupViewBindings(_mViewPager, _mSwipeLayout, _mTabLayout, userData);
+        super.onStart();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean isNowHidden) {
+        if(isNowHidden) {
+            Timber.d(this.getClass().getSimpleName() + " isNowHidden");
+            _teardownViewBindings(_mViewPager, _mSwipeLayout);
+        }else {
+            Timber.d(this.getClass().getSimpleName() + " isNowVisible");
+            _setupViewBindings(_mViewPager, _mSwipeLayout, _mTabLayout, userData);
+        }
+        super.onHiddenChanged(isNowHidden);
+    }
+
+    @Override
+    public void onStop() {
+        Timber.d(this.getClass().getSimpleName() + " onStop");
+        _teardownViewBindings(_mViewPager, _mSwipeLayout);
+        super.onStop();
+    }
+
+    private void _teardownViewBindings(ViewPager _mViewPager, SwipeRefreshLayout _mSwipeLayout) {
+        _mViewPager.clearOnPageChangeListeners();
+        _mSwipeLayout.setOnRefreshListener(null);
+        if(calendarDataRefreshStateTypeSubscription != null) {
+            calendarDataRefreshStateTypeSubscription.unsubscribe(); // Idempotent
+        }
+    }
+
+    private void _setupViewBindings(ViewPager _mViewPager, final SwipeRefreshLayout _mSwipeLayout,
+                                    TabLayout _mTabLayout, UserData userData) {
+        if(_mViewPager == null || _mSwipeLayout == null) {return;} //quit early if state is inconsistent
 
         // Disables the viewpager's horizontal swipes from triggering the vertical refresh
         _disableHorizontalSwipesFromTriggeringVerticalRefresh(_mViewPager, _mSwipeLayout);
 
         // Will supply the ViewPager with what should be displayed
-        MyAccountPagerAdapter _mPagerAdapter = new MyAccountPagerAdapter(getFragmentManager(), userData, getContext());
+        final MyAccountPagerAdapter _mPagerAdapter = new MyAccountPagerAdapter(getChildFragmentManager(),
+                userData, getContext());
         _mViewPager.setAdapter(_mPagerAdapter);
 
         // Bind the TabLayout and ViewPager together
         _mTabLayout.setupWithViewPager(_mViewPager);
 
         // Bind the swipelayout to the refreshing of the tabs
-        _bindSwipeLayoutToMyAccountRefreshEvent(_mSwipeLayout, _mPagerAdapter);
+        _bindSwipeLayoutToMyAccountSigninEvent(_mSwipeLayout, _mPagerAdapter);
 
-        return myBookingsLoadedView;
+        if(calendarDataRefreshStateTypeSubscription == null ||
+                calendarDataRefreshStateTypeSubscription.isUnsubscribed()) {
+
+            calendarDataRefreshStateTypeSubscription =
+                    userModel.getLoginStateObservable()
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Observer<MyAccountDataLoginState>() {
+                                @Override
+                                public void onCompleted() {
+                                    // Do nothing
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    _mSwipeLayout.setRefreshing(false);
+                                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+
+                                @Override
+                                public void onNext(MyAccountDataLoginState myAccountDataLoginState) {
+                                    switch(myAccountDataLoginState.type) {
+                                        case RUNNING:
+                                            if(!_mSwipeLayout.isRefreshing()) {_mSwipeLayout.setRefreshing(true);}
+                                            break;
+
+                                        case ERROR:
+                                            Toast.makeText(getContext(), myAccountDataLoginState.exception.getMessage(),
+                                                    Toast.LENGTH_LONG).show();
+                                            _mSwipeLayout.setRefreshing(false);
+                                            break;
+
+                                        case SIGNED_IN:
+                                            if(myAccountDataLoginState.userData != null) {
+                                                Timber.d("Successfully Refresh MyAccount info");
+                                                _mPagerAdapter.refreshPagerFragmentsAndViews(myAccountDataLoginState
+                                                        .userData);
+                                                _playMyAccountLoadedRefreshAnimation(_mSwipeLayout);
+                                            }
+                                            _mSwipeLayout.setRefreshing(false);
+                                            break;
+
+                                        case SIGNED_OUT:
+                                        default:
+                                            _mSwipeLayout.setRefreshing(false);
+
+                                    }
+                                }
+                            });
+        }
     }
 
-    public static MyAccountLoaded newInstance(UserData userData, MyAccount parentMyAccountFragment) {
-        MyAccountLoaded returnFragment = new MyAccountLoaded();
-        returnFragment.userData = userData;
-        returnFragment.parentMyAccountFragment = parentMyAccountFragment;
-        return returnFragment;
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.my_account_loaded_action_icons_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch(id) {
+            case R.id.my_account_menu_item_logout:
+                Timber.i("Logout clicked");
+                userModel.getSignoutActivatePublishSubject().onNext(new MyAccountSignoutEvent());
+                return true;
+            default:
+                getActivity().onOptionsItemSelected(item);
+                return true;
+        }
     }
 
     private void _disableHorizontalSwipesFromTriggeringVerticalRefresh(ViewPager viewPager,
                                                                        final SwipeRefreshLayout swipeRefreshLayout) {
+        if(viewPager == null || swipeRefreshLayout == null) {return;} //quit early if incorrect state
+
+        viewPager.clearOnPageChangeListeners();
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -80,32 +206,21 @@ public class MyAccountLoaded extends Fragment {
         });
     }
 
-    private void _bindSwipeLayoutToMyAccountRefreshEvent(final SwipeRefreshLayout swipeRefreshLayout,
+    private void _playMyAccountLoadedRefreshAnimation(SwipeRefreshLayout swipeRefreshLayout) {
+        if(swipeRefreshLayout == null) {return;}
+
+        YoYo.with(Techniques.FadeIn)
+                .duration(300)
+                .playOn(swipeRefreshLayout);
+    }
+
+    private void _bindSwipeLayoutToMyAccountSigninEvent(final SwipeRefreshLayout swipeRefreshLayout,
                                                          final MyAccountPagerAdapter myAccountPagerAdapter) {
+        swipeRefreshLayout.setOnRefreshListener(null);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                parentMyAccountFragment.getSignInObs()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<Pair<UserData, UserCredentials>>() {
-                            @Override
-                            public void onCompleted() {
-                                swipeRefreshLayout.setRefreshing(false);
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                swipeRefreshLayout.setRefreshing(false);
-                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onNext(Pair<UserData, UserCredentials> userDataUserCredentialsPair) {
-                                Timber.v("Successfully refreshed!");
-                                myAccountPagerAdapter.refreshPagerFragmentsAndViews();
-                            }
-                        });
+                userModel.getSigninActivatePublishSubject().onNext(null);
             }
         });
     }
