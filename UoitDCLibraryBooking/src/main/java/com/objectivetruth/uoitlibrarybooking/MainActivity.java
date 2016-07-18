@@ -27,7 +27,6 @@ public class MainActivity extends ActivityBase {
     public static final int MAX_BOOKINGS_ALLOWED = 20; //This can safely be changed
     public static boolean isDialogShowing = false;
 	AppCompatActivity mActivity = this;
-	public static DbHelper mdbHelper;
 	public static CookieManager cookieManager;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
