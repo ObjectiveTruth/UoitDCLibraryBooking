@@ -18,7 +18,6 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.ActivityRoomInteraction;
-import com.objectivetruth.uoitlibrarybooking.ActivitySettings;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
@@ -240,8 +239,8 @@ public class Calendar extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(getContext(), ActivitySettings.class);
-            startActivity(intent);
+            //Intent intent = new Intent(getContext(), ActivitySettings.class);
+            //startActivity(intent);
 
         }
         else if(id == R.id.help_calendar){
