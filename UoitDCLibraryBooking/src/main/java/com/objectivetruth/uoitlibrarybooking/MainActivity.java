@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import com.google.android.gms.analytics.Tracker;
@@ -28,6 +29,7 @@ public class MainActivity extends ActivityBase {
     public static boolean isDialogShowing = false;
 	AppCompatActivity mActivity = this;
 	public static CookieManager cookieManager;
+    NavigationView drawer;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
@@ -40,7 +42,7 @@ public class MainActivity extends ActivityBase {
 
         ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
 
-        configureAndSetupLayoutAndDrawer(
+        drawer = configureAndSetupLayoutAndDrawer(
                 R.layout.activity_main,
                 R.id.drawer_layout,
                 R.id.toolbar);
@@ -54,9 +56,10 @@ public class MainActivity extends ActivityBase {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {
-            WhatsNewDialog.show(this);
-        }
+
+        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {WhatsNewDialog.show(this);}
+
+        _showMenuItem(R.id.drawer_menu_item_calendar);
     }
 
 
@@ -170,6 +173,11 @@ public class MainActivity extends ActivityBase {
         	}
         }
 		super.onRestart();
+	}
+
+	private void _showMenuItem(int menuItemResourceID) {
+		MenuItem initialMenuItem = drawer.getMenu().findItem(menuItemResourceID);
+		selectDrawerItem(initialMenuItem);
 	}
 
 	@Override

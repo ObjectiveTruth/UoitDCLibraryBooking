@@ -122,10 +122,11 @@ public abstract class ActivityBase extends AppCompatActivity {
                 .add(R.id.mainactivity_content_frame, guidelinesAndPoliciesFrag, GUIDELINES_POLICIES_FRAGMENT_TAG)
                 .add(R.id.mainactivity_content_frame, aboutFrag, ABOUT_FRAGMENT_TAG)
                 .add(R.id.mainactivity_content_frame, myAccountFrag, MY_ACCOUNT_FRAGMENT_TAG)
+                .add(R.id.mainactivity_content_frame, calendarFrag, CALENDAR_FRAGMENT_TAG)
                 .hide(guidelinesAndPoliciesFrag)
                 .hide(aboutFrag)
                 .hide(myAccountFrag)
-                .add(R.id.mainactivity_content_frame, calendarFrag, CALENDAR_FRAGMENT_TAG)
+                .hide(calendarFrag)
                 .commit();
     }
 
