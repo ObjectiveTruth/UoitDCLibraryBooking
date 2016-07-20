@@ -1,6 +1,9 @@
 package com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel;
 
-public class TimeCell {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class TimeCell implements Parcelable {
     public TimeCellType timeCellType;
     public String hrefSource;
     public String groupNameForWhenFullyBookedRoom;
@@ -29,4 +32,39 @@ public class TimeCell {
         return (object != null);
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.timeCellType == null ? -1 : this.timeCellType.ordinal());
+        dest.writeString(this.hrefSource);
+        dest.writeString(this.groupNameForWhenFullyBookedRoom);
+        dest.writeString(this.timeStringOrRoomName);
+    }
+
+    public TimeCell() {
+    }
+
+    protected TimeCell(Parcel in) {
+        int tmpTimeCellType = in.readInt();
+        this.timeCellType = tmpTimeCellType == -1 ? null : TimeCellType.values()[tmpTimeCellType];
+        this.hrefSource = in.readString();
+        this.groupNameForWhenFullyBookedRoom = in.readString();
+        this.timeStringOrRoomName = in.readString();
+    }
+
+    public static final Parcelable.Creator<TimeCell> CREATOR = new Parcelable.Creator<TimeCell>() {
+        @Override
+        public TimeCell createFromParcel(Parcel source) {
+            return new TimeCell(source);
+        }
+
+        @Override
+        public TimeCell[] newArray(int size) {
+            return new TimeCell[size];
+        }
+    };
 }

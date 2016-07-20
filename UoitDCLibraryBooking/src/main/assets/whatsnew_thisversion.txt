@@ -1,5 +1,3 @@
-July 17, 2016
+July 20, 2016
 ===
-‣ MyAccount animation on refresh/switch between fragments
-‣ Greately improved memory Management
-‣ Fixed logout icon not appearing/disappearing when expected
+‣ Fixed major bug when loading app after its been in the background for a while

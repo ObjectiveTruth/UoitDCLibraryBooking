@@ -135,7 +135,7 @@ public class LoginFragment extends Fragment {
                                     final EditText usernameField, final EditText passwordField,
                                     final RadioGroup institutionRadio,
                                     Observable<MyAccountDataLoginState> myAccountDataLoginStateObservable) {
-        if(myAccountDataLoginState.exception != null && errorTextView != null) {
+        if(myAccountDataLoginState != null && myAccountDataLoginState.exception != null && errorTextView != null) {
             String errorMessage = myAccountDataLoginState.exception.getMessage();
             errorTextView.setText(errorMessage);
         }

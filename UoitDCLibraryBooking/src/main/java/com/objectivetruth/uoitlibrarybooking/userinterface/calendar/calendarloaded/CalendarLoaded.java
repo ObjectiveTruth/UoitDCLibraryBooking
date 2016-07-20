@@ -17,6 +17,7 @@ import timber.log.Timber;
 public class CalendarLoaded extends Fragment {
     private CalendarData calendarData;
     private CalendarPagerAdapter _mPagerAdapter;
+    private static final String CALENDAR_DATA_BUNDLE_KEY = "CALENDAR_DATA_BUNDLE_KEY";
 
     @Nullable
     @Override
@@ -27,6 +28,10 @@ public class CalendarLoaded extends Fragment {
 
         ViewPager _mViewPager = (ViewPager) calendarLoadedView.findViewById(R.id.calendar_view_pager);
         TabLayout _mTabLayout = (TabLayout) calendarLoadedView.findViewById(R.id.calendar_tab_layout);
+
+        if(savedInstanceState != null) {
+            _restorePreviousState(savedInstanceState);
+        }
 
         // Will supply the ViewPager with what should be displayed
         _mPagerAdapter = new CalendarPagerAdapter(getChildFragmentManager(), calendarData);
@@ -67,5 +72,15 @@ public class CalendarLoaded extends Fragment {
             _mPagerAdapter.saveInformationAndDONTUpdatePagerFragmentUI(calendarData);
         }
         this.calendarData = calendarData;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(CALENDAR_DATA_BUNDLE_KEY, calendarData);
+    }
+
+    private void _restorePreviousState(Bundle inState) {
+        calendarData = inState.getParcelable(CALENDAR_DATA_BUNDLE_KEY);
     }
 }

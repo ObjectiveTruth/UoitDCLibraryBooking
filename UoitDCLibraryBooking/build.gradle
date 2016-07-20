@@ -231,7 +231,7 @@ dependencies {
     }
 
     // Standard Google Analytics library
-    compile 'com.google.android.gms:play-services-analytics:9.2.0'
+    compile 'com.google.android.gms:play-services-analytics:9.2.1'
     // Standard Google Backwards compatibility(compat) library
     compile 'com.android.support:appcompat-v7:24.0.0'
     // Standard Google Material Design Library
