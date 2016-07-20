@@ -15,15 +15,20 @@ import timber.log.Timber;
 public class Grid extends Fragment {
     private CalendarDay calendarDay;
     private GridAdapter gridAdapter;
+    private static final String CALENDAR_DAY_BUNDLE_KEY = "CALENDAR_DAY_BUNDLE_KEY";
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        View gridView = inflater.inflate(R.layout.calendar_page_grid, container, false);
+
+        if(savedInstanceState != null) {
+            _restorePreviousState(savedInstanceState);
+        }
         Timber.i("Starting creation of the grid and all required information");
         Timber.v(calendarDay.toString());
-        View gridView = inflater.inflate(R.layout.calendar_page_grid, container, false);
 
         TableFixHeaders _mTableFixheaders = (TableFixHeaders) gridView.findViewById(R.id.calendar_page_grid);
         gridAdapter = new GridAdapter(getActivity(), calendarDay);
@@ -46,5 +51,15 @@ public class Grid extends Fragment {
     public void saveNewCalendarDayWontUpdateUI(CalendarDay calendarDay) {
         this.calendarDay = calendarDay;
         gridAdapter.saveNewCalendarDayWontUpdateUI(calendarDay);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(CALENDAR_DAY_BUNDLE_KEY, calendarDay);
+    }
+
+    private void _restorePreviousState(Bundle inState) {
+        calendarDay = inState.getParcelable(CALENDAR_DAY_BUNDLE_KEY);
     }
 }

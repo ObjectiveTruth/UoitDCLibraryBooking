@@ -8,13 +8,13 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
+import timber.log.Timber;
 
 import javax.inject.Inject;
 import java.net.CookieManager;
@@ -29,7 +29,7 @@ public class MainActivity extends ActivityBase {
     public static boolean isDialogShowing = false;
 	AppCompatActivity mActivity = this;
 	public static CookieManager cookieManager;
-    NavigationView drawer;
+    private boolean isFirstLoadThisSession = false;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
@@ -39,13 +39,14 @@ public class MainActivity extends ActivityBase {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
+        if(savedInstanceState == null) {isFirstLoadThisSession = true; Timber.i("First time opening app this session");}
 
         ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
 
-        drawer = configureAndSetupLayoutAndDrawer(
-                R.layout.activity_main,
-                R.id.drawer_layout,
-                R.id.toolbar);
+        setContentView(R.layout.activity_main);
+        initializeAllMainFragmentsAndPreloadToView();
+        setupToolbar(R.id.toolbar);
+        setupDrawer(R.id.drawer_layout);
     }
 
     @Override
@@ -57,13 +58,17 @@ public class MainActivity extends ActivityBase {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
+        if(isFirstLoadThisSession) {
+            _goToScreenByMenuID(R.id.drawer_menu_item_calendar);
+        }else{
+            _goToScreenByMenuID(getLastMenuItemIDRequested());
+        }
+
         if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {WhatsNewDialog.show(this);}
 
-        _showMenuItem(R.id.drawer_menu_item_calendar);
     }
 
-
-	@Override
+    @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
         return getActionBarDrawerToggle().onOptionsItemSelected(item);
 	}
@@ -175,8 +180,8 @@ public class MainActivity extends ActivityBase {
 		super.onRestart();
 	}
 
-	private void _showMenuItem(int menuItemResourceID) {
-		MenuItem initialMenuItem = drawer.getMenu().findItem(menuItemResourceID);
+	private void _goToScreenByMenuID(int menuItemResourceID) {
+		MenuItem initialMenuItem = getDrawerView().getMenu().findItem(menuItemResourceID);
 		selectDrawerItem(initialMenuItem);
 	}
 

@@ -26,6 +26,7 @@ import timber.log.Timber;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.FragmentTags.*;
 
@@ -33,7 +34,12 @@ public abstract class ActivityBase extends AppCompatActivity {
     protected abstract String                           getActivityTitle();
     private ActionBarDrawerToggle _mDrawerToggle;
     private DrawerLayout _mDrawerLayout;
-    private HashMap<String, Fragment> stringFragmentHashMap = new HashMap<>();
+    private HashMap<String, Fragment> stringFragmentHashMap = new HashMap<String, Fragment>();
+    private int _lastMenuItemIDRequested;
+    private NavigationView navigationView;
+    private String LAST_MENU_ITEM_ID_REQUESTED_BUNDLE_KEY = "LAST_MENU_ITEM_ID_REQUESTED";
+    private String MAIN_FRAGMENT_TAGS_BUNDLE_KEY = "MAIN_FRAGMENT_TAGS_BUNDLE_KEY";
+    private boolean isFirstLoadThisSession = false;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -50,8 +56,15 @@ public abstract class ActivityBase extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle bundleExtras) {
-        super.onCreate(bundleExtras);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(savedInstanceState == null) {
+            isFirstLoadThisSession = true;
+        }else{
+            _restorePreviousInstanceInformation(savedInstanceState);
+        }
+
         if (BuildConfig.DEBUG) {
             // Programmatically unlock the screen for testing
             Window window = getWindow();
@@ -59,16 +72,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
-    protected NavigationView configureAndSetupLayoutAndDrawer(int layoutIdToLoad,
-                                                int drawerLayoutIdToLoad,
-                                                int toolbarLayoutIdToLoad) {
-        setContentView(layoutIdToLoad);
-        _configureAndSetupToolbar(toolbarLayoutIdToLoad);
-        _initializeAllMainFragmentsAndPreloadToView();
-        return _configureAndSetupDrawer(drawerLayoutIdToLoad);
-    }
-
-    private void _configureAndSetupToolbar(int toolbarLayoutIdToLoad) {
+    protected void setupToolbar(int toolbarLayoutIdToLoad) {
         Toolbar toolbar = (Toolbar) findViewById(toolbarLayoutIdToLoad);
         // Tells the system to use the toolbar as the actionbar at the top (its not really an action bar, its better!)
         setSupportActionBar(toolbar);
@@ -80,8 +84,18 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
-    private NavigationView _configureAndSetupDrawer(int drawerLayoutIdToLoad) {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+    private void _restorePreviousInstanceInformation(Bundle savedInstanceState) {
+        _lastMenuItemIDRequested = savedInstanceState.getInt(LAST_MENU_ITEM_ID_REQUESTED_BUNDLE_KEY);
+
+        String[] previousFragmentTags = savedInstanceState.getStringArray(MAIN_FRAGMENT_TAGS_BUNDLE_KEY);
+        stringFragmentHashMap = new HashMap<String, Fragment>(); // Android destroyed the previous HashMap. Must rebuild
+        for(String fragTag: previousFragmentTags) {
+            stringFragmentHashMap.put(fragTag, null);
+        }
+    }
+
+    protected NavigationView setupDrawer(int drawerLayoutIdToLoad) {
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
         _mDrawerLayout = (DrawerLayout) findViewById(drawerLayoutIdToLoad);
 
         // In Android support 23.2.1, there is a bug where you can't inflate the menu in XML, must be done manually
@@ -106,30 +120,62 @@ public abstract class ActivityBase extends AppCompatActivity {
         return navigationView;
     }
 
-    private void _initializeAllMainFragmentsAndPreloadToView() {
-        Calendar calendarFrag = Calendar.newInstance();
-        GuidelinesAndPolicies guidelinesAndPoliciesFrag = GuidelinesAndPolicies.newInstance();
-        About aboutFrag = About.newInstance();
-        MyAccount myAccountFrag = MyAccount.newInstance();
+    protected void initializeAllMainFragmentsAndPreloadToView() {
+        if(isFirstLoadThisSession) {
+            Calendar calendarFrag = Calendar.newInstance();
+            GuidelinesAndPolicies guidelinesAndPoliciesFrag = GuidelinesAndPolicies.newInstance();
+            About aboutFrag = About.newInstance();
+            MyAccount myAccountFrag = MyAccount.newInstance();
 
-        stringFragmentHashMap.put(CALENDAR_FRAGMENT_TAG, calendarFrag);
-        stringFragmentHashMap.put(GUIDELINES_POLICIES_FRAGMENT_TAG, guidelinesAndPoliciesFrag);
-        stringFragmentHashMap.put(ABOUT_FRAGMENT_TAG, aboutFrag);
-        stringFragmentHashMap.put(MY_ACCOUNT_FRAGMENT_TAG, myAccountFrag);
+            stringFragmentHashMap.put(CALENDAR_FRAGMENT_TAG, calendarFrag);
+            stringFragmentHashMap.put(GUIDELINES_POLICIES_FRAGMENT_TAG, guidelinesAndPoliciesFrag);
+            stringFragmentHashMap.put(ABOUT_FRAGMENT_TAG, aboutFrag);
+            stringFragmentHashMap.put(MY_ACCOUNT_FRAGMENT_TAG, myAccountFrag);
 
-        // The only one NOT being hidden is the Calendar
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.mainactivity_content_frame, guidelinesAndPoliciesFrag, GUIDELINES_POLICIES_FRAGMENT_TAG)
-                .add(R.id.mainactivity_content_frame, aboutFrag, ABOUT_FRAGMENT_TAG)
-                .add(R.id.mainactivity_content_frame, myAccountFrag, MY_ACCOUNT_FRAGMENT_TAG)
-                .add(R.id.mainactivity_content_frame, calendarFrag, CALENDAR_FRAGMENT_TAG)
-                .hide(guidelinesAndPoliciesFrag)
-                .hide(aboutFrag)
-                .hide(myAccountFrag)
-                .hide(calendarFrag)
-                .commit();
+            // The only one NOT being hidden is the Calendar
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.mainactivity_content_frame, guidelinesAndPoliciesFrag, GUIDELINES_POLICIES_FRAGMENT_TAG)
+                    .add(R.id.mainactivity_content_frame, aboutFrag, ABOUT_FRAGMENT_TAG)
+                    .add(R.id.mainactivity_content_frame, myAccountFrag, MY_ACCOUNT_FRAGMENT_TAG)
+                    .hide(guidelinesAndPoliciesFrag)
+                    .hide(aboutFrag)
+                    .hide(myAccountFrag)
+                    .add(R.id.mainactivity_content_frame, calendarFrag, CALENDAR_FRAGMENT_TAG)
+                    .commit();
+        }else{
+            Set<String> fragmentTagSet = stringFragmentHashMap.keySet();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            for(String fragTag: fragmentTagSet) {
+                stringFragmentHashMap.put(fragTag, fragmentManager.findFragmentByTag(fragTag));
+            }
+        }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        String[] mainFragmentTags = _stringSetToStringArray(stringFragmentHashMap.keySet());
+
+        outState.putInt (LAST_MENU_ITEM_ID_REQUESTED_BUNDLE_KEY, _lastMenuItemIDRequested);
+        outState.putStringArray(MAIN_FRAGMENT_TAGS_BUNDLE_KEY, mainFragmentTags);
+    }
+
+    private String[] _stringSetToStringArray(Set<String> strings) {
+        String[] returnArr = new String[strings.size()];
+        int i = 0;
+        for(String s: strings) {
+            returnArr[i] = s;
+            i++;
+        }
+        return returnArr;
+    }
+
+    /**
+     * Boolean tells you if the fragment was found {@code isFound}
+     * @param fragmentTag
+     * @param fragmentClass
+     * @return
+     */
     private Triple<Fragment, String, Boolean> _findFragmentByTagOrReturnNewInstance(String fragmentTag,
                                                                                     Class fragmentClass) {
         Fragment returnFragment = getSupportFragmentManager().findFragmentByTag(fragmentTag);
@@ -150,6 +196,22 @@ public abstract class ActivityBase extends AppCompatActivity {
     }
 
     /**
+     * Returns the Navigation view which represents the menu. This can be used to search for menu items or do
+     * work on the menu items
+     * @return
+     */
+    protected NavigationView getDrawerView() {
+        if(navigationView == null) {
+            navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        }
+        return navigationView;
+    }
+
+    protected int getLastMenuItemIDRequested() {
+        return _lastMenuItemIDRequested;
+    }
+
+    /**
      * Create a new fragment and specify the fragment to show based on nav item clicked
      * @param menuItem
      * @return
@@ -157,7 +219,8 @@ public abstract class ActivityBase extends AppCompatActivity {
     protected boolean selectDrawerItem(MenuItem menuItem) {
         Triple<Fragment, String, Boolean> fragmentTagIsFoundTriple = null;
 
-        switch(menuItem.getItemId()) {
+        _lastMenuItemIDRequested = menuItem.getItemId();
+        switch(_lastMenuItemIDRequested) {
             case R.id.drawer_menu_item_calendar:
                 Timber.i("Calendar selected from Drawer");
                 fragmentTagIsFoundTriple = _findFragmentByTagOrReturnNewInstance(CALENDAR_FRAGMENT_TAG, Calendar.class);
