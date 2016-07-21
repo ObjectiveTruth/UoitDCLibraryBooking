@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import com.google.android.gms.analytics.Tracker;
@@ -19,10 +20,11 @@ import timber.log.Timber;
 import javax.inject.Inject;
 import java.net.CookieManager;
 
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_DISMISSED_WHATSNEW_DIALOG_THIS_VERSION;
+
 
 public class MainActivity extends ActivityBase {
     final static private String ACTIVITY_TITLE = "Calendar";
-	final static private String HAS_DISMISSED_WHATS_NEW_DIALOG_BUNDLE_KEY = "HAS_DISMISSED_WHATS_NEW_DIALOG";
 
     public static final String MY_ACCOUNT_DIALOGFRAGMENT_TAG = "myAccountDiaFrag";
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
@@ -31,7 +33,6 @@ public class MainActivity extends ActivityBase {
 	AppCompatActivity mActivity = this;
 	public static CookieManager cookieManager;
     private boolean isFirstLoadThisSession = false;
-	private boolean _hasDismissedWhatsNewDialog = false;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
@@ -41,11 +42,7 @@ public class MainActivity extends ActivityBase {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
-        if(savedInstanceState == null) {
-        	isFirstLoadThisSession = true; Timber.i("First time opening app this session");
-        }else {
-        	_restorePreviousState(savedInstanceState);
-		}
+        if(savedInstanceState == null) {isFirstLoadThisSession = true; Timber.i("First time opening app this session");}
 
         ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
 
@@ -70,30 +67,25 @@ public class MainActivity extends ActivityBase {
             _goToScreenByMenuID(getLastMenuItemIDRequested());
         }
 
-        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall() && !_hasDismissedWhatsNewDialog) {
+        if(_hasNOTDismissedWhatsNewDialogThisVersion()) {
         	WhatsNewDialog
 					.show(this)
 					.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
                         @Override
                         public void onDismiss(DialogInterface dialogInterface) {
-                        	_hasDismissedWhatsNewDialog = true;
+                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+                                    .putBoolean(HAS_DISMISSED_WHATSNEW_DIALOG_THIS_VERSION, true)
+                                    .apply();
                         }
 		});}
 
     }
 
-    private void _restorePreviousState(Bundle inState) {
-        if(inState != null) {
-            _hasDismissedWhatsNewDialog = inState.getBoolean(HAS_DISMISSED_WHATS_NEW_DIALOG_BUNDLE_KEY);
-        }
+    private boolean _hasNOTDismissedWhatsNewDialogThisVersion() {
+        return !PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getBoolean(HAS_DISMISSED_WHATSNEW_DIALOG_THIS_VERSION, false);
 	}
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(HAS_DISMISSED_WHATS_NEW_DIALOG_BUNDLE_KEY, _hasDismissedWhatsNewDialog);
-    }
 
     @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
