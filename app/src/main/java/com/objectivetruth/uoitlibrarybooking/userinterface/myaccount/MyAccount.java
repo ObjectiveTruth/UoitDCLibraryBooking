@@ -3,9 +3,11 @@ package com.objectivetruth.uoitlibrarybooking.userinterface.myaccount;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
@@ -23,6 +25,7 @@ import javax.inject.Inject;
 
 public class MyAccount extends Fragment {
     private Subscription myAccountDataLoginStateObservableSubscription;
+    private static final String MY_ACCOUNT_TITLE = "My Account";
     public @Inject UserModel userModel;
 
     @Override
@@ -40,7 +43,7 @@ public class MyAccount extends Fragment {
 
     @Override
     public void onStart() {
-        Timber.d("MyAccount onStart");
+        Timber.d(getClass().getSimpleName() + " onStart");
         _setupViewBindings(userModel.getLoginStateObservable());
         super.onStart();
     }
@@ -48,17 +51,19 @@ public class MyAccount extends Fragment {
     @Override
     public void onHiddenChanged(boolean isNowHidden) {
         if(isNowHidden) {
-            Timber.d("MyAccount isNowHidden");
+            Timber.d(getClass().getSimpleName() + " isNowHidden");
             _teardownViewBindings();
         }else {
-            Timber.d("MyAccount isNowVisible");
+            Timber.d(getClass().getSimpleName() + " isNowVisible");
+            _setTitle(MY_ACCOUNT_TITLE);
             _setupViewBindings(userModel.getLoginStateObservable());
         }
         super.onHiddenChanged(isNowHidden);
     }
+
     @Override
     public void onStop() {
-        Timber.d("MyAccount Stopped");
+        Timber.d(getClass().getSimpleName() + " Stopped");
         _teardownViewBindings();
         super.onStop();
     }
@@ -116,7 +121,6 @@ public class MyAccount extends Fragment {
     private void _showFullscreenLoading() {
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame, Loading.newInstance())
-                .addToBackStack(null)
                 .commit();
     }
 
@@ -124,6 +128,13 @@ public class MyAccount extends Fragment {
         Fragment currentFragmentInContentFrame = getChildFragmentManager()
                 .findFragmentById(R.id.my_account_content_frame);
         return currentFragmentInContentFrame instanceof MyAccountLoaded && currentFragmentInContentFrame.isVisible();
+    }
+
+    private void _setTitle(String title) {
+        ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle(title);
+        }
     }
 
     private boolean _isMyAccountLoadedNOTShowing() {
@@ -144,7 +155,6 @@ public class MyAccount extends Fragment {
         //getActivity().invalidateOptionsMenu();
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame, myAccountLoadedFragment, MY_ACCOUNT_LOADED_FRAGMENT_TAG)
-                .addToBackStack(null)
                 .commit();
     }
 
@@ -163,7 +173,6 @@ public class MyAccount extends Fragment {
 
         getChildFragmentManager().beginTransaction()
                 .replace(R.id.my_account_content_frame, myAccountLoginFragment, MY_ACCOUNT_LOGIN_FRAGMENT_TAG)
-                .addToBackStack(null)
                 .commit();
     }
 

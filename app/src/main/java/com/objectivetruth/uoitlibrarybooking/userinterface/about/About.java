@@ -5,18 +5,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
+import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
+import timber.log.Timber;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class About extends Fragment{
+    private static final String ABOUT_TITLE = "About";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -69,6 +74,23 @@ public class About extends Fragment{
         return aboutPage.create();
     }
 
+    @Override
+    public void onHiddenChanged(boolean isNowHidden) {
+        if(isNowHidden) {
+            Timber.d(getClass().getSimpleName() + " isNowHidden");
+        }else {
+            Timber.d(getClass().getSimpleName() + " isNowVisible");
+            _setTitle(ABOUT_TITLE);
+        }
+        super.onHiddenChanged(isNowHidden);
+    }
+
+    private void _setTitle(String title) {
+        ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle(title);
+        }
+    }
 
     private Element _makeElement(String description) {
         Element element = new Element();

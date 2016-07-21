@@ -36,6 +36,7 @@ public abstract class ActivityBase extends AppCompatActivity {
     private DrawerLayout _mDrawerLayout;
     private HashMap<String, Fragment> stringFragmentHashMap = new HashMap<String, Fragment>();
     private int _lastMenuItemIDRequested;
+    private boolean _isFirstTimeSelectDrawerItem = true;
     private NavigationView navigationView;
     private String LAST_MENU_ITEM_ID_REQUESTED_BUNDLE_KEY = "LAST_MENU_ITEM_ID_REQUESTED";
     private String MAIN_FRAGMENT_TAGS_BUNDLE_KEY = "MAIN_FRAGMENT_TAGS_BUNDLE_KEY";
@@ -244,7 +245,7 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
         if(fragmentTagIsFoundTriple == null) {return false;}
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         // If the fragment was already created(isFound), just show it. If not,
         // Insert the fragment by replacing any existing fragment.
         // Don't forget to tag it so it can be retrieved later without loading it again
@@ -252,24 +253,37 @@ public abstract class ActivityBase extends AppCompatActivity {
         if(_isFragmentFoundAndVisible(fragmentTagIsFoundTriple)) {
             Timber.d("Drawer Item: " + menuItem.getTitle() + " already being shown. Not changing screen");
         }else if(!_isFragmentFoundAndVisible(fragmentTagIsFoundTriple)) {
-            _hideAllVisibleFragments(stringFragmentHashMap);
-            fragmentManager.beginTransaction()
+            fragmentTransaction =
+                    _addHideAllVisibleFragmentsToFragmentTransaction(stringFragmentHashMap, fragmentTransaction)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .show(fragmentTagIsFoundTriple.getLeft())
+                    .show(fragmentTagIsFoundTriple.getLeft());
+            // On the first time opening the drawer there is a special case where the backstack will be empty, so adding
+            // will cause the user to see a blank screen with nothing if they press back
+            if(_isFirstTimeSelectDrawerItem) {
+                _isFirstTimeSelectDrawerItem = false;
+            }else{
+                fragmentTransaction.addToBackStack(null);
+            }
+
+            fragmentTransaction
                     .commit();
         }else {
-            _hideAllVisibleFragments(stringFragmentHashMap);
-            fragmentManager.beginTransaction()
+            // To make sure the backstack works correctly, we split this into 2 separate transactions
+            // This one JUST adds it to the correct frame, and the 2nd one hides/unhides
+            getSupportFragmentManager().beginTransaction()
                     .add(R.id.mainactivity_content_frame,
                             fragmentTagIsFoundTriple.getLeft(),
                             fragmentTagIsFoundTriple.getMiddle())
+                    .commit();
+
+            _addHideAllVisibleFragmentsToFragmentTransaction(stringFragmentHashMap, fragmentTransaction)
+                    .addToBackStack(null)
                     .commit();
         }
 
         // Highlight the selected item
         menuItem.setChecked(true);
         // Set action bar title
-        if(getSupportActionBar() != null) {getSupportActionBar().setTitle(menuItem.getTitle());};
         _mDrawerLayout.closeDrawers();
         return true;
     }
@@ -278,16 +292,16 @@ public abstract class ActivityBase extends AppCompatActivity {
         return fragmentTagIsFoundTriple.getRight() && fragmentTagIsFoundTriple.getLeft().isVisible();
     }
 
-    private void _hideAllVisibleFragments(HashMap<String, Fragment> stringFragmentHashMap) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-
+    private FragmentTransaction _addHideAllVisibleFragmentsToFragmentTransaction(HashMap<String, Fragment>
+                                                                                         stringFragmentHashMap,
+                                          FragmentTransaction fragmentTransaction) {
         Collection<Fragment> fragmentCollection = stringFragmentHashMap.values();
         for(Fragment fragment: fragmentCollection) {
             if(fragment != null && fragment.isVisible()) {
                 fragmentTransaction = fragmentTransaction.hide(fragment);
             }
         }
-        fragmentTransaction.commit();
+        return fragmentTransaction;
     }
 
     protected ActionBarDrawerToggle getActionBarDrawerToggle() {

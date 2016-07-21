@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.*;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 import com.objectivetruth.uoitlibrarybooking.ActivityRoomInteraction;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
+import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_HELP;
 
 public class Calendar extends Fragment {
+    private static final String CALENDAR_TITLE = "Calendar";
     @Inject CalendarModel calendarModel;
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
@@ -84,10 +87,11 @@ public class Calendar extends Fragment {
     @Override
     public void onHiddenChanged(boolean isNowHidden) {
         if(isNowHidden) {
-            Timber.d("Calendar isNowHidden");
+            Timber.d(getClass().getSimpleName() + " isNowHidden");
             _teardownViewBindings(_mSwipeLayout);
         }else {
-            Timber.d("Calendar isNowVisible");
+            Timber.d(getClass().getSimpleName() + "isNowVisible");
+            _setTitle(CALENDAR_TITLE);
             _setupViewBindings(_mSwipeLayout, calendarModel.getCalendarDataRefreshObservable());
         }
         super.onHiddenChanged(isNowHidden);
@@ -95,7 +99,7 @@ public class Calendar extends Fragment {
 
     @Override
     public void onStop() {
-        Timber.d("Calendar Stopped");
+        Timber.d(getClass().getSimpleName() + " Stopped");
         _teardownViewBindings(_mSwipeLayout);
         super.onStop();
     }
@@ -104,6 +108,13 @@ public class Calendar extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(HAS_SHOWN_INITIAL_SCREEN_BUNDLE_KEY, _hasShownInitialScreen);
+    }
+
+    private void _setTitle(String title) {
+        ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle(title);
+        }
     }
 
     /**
