@@ -1,3 +1,7 @@
+July 20, 2016
+===
+‣ Fixed major bug when loading app after its been in the background for a while
+
 July 17, 2016
 ===
 ‣ MyAccount animation on refresh/switch between fragments
