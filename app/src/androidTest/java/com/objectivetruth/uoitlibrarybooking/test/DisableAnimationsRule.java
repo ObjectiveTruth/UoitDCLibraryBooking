@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking;
+package com.objectivetruth.uoitlibrarybooking.test;
 
 import android.os.IBinder;
 import org.junit.rules.TestRule;

@@ -28,9 +28,9 @@ cache:
 
 before_install:
   # Decrypt the release keystore
-  - echo ${CI_RELEASE_KEYSTORE_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "UoitDCLibraryBooking/release_key.keystore.gpg" > UoitDCLibraryBooking/release_key.keystore
+  - echo ${CI_RELEASE_KEYSTORE_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "app/release_key.keystore.gpg" > app/release_key.keystore
   # Decrypt the google play api key
-  - echo ${CI_GOOGLE_PLAY_API_KEY_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "UoitDCLibraryBooking/google_play_android_developer_api_keys.json.gpg" > UoitDCLibraryBooking/google_play_android_developer_api_keys.json
+  - echo ${CI_GOOGLE_PLAY_API_KEY_GPG_PASSPHRASE} | gpg --batch --passphrase-fd 0 --decrypt "app/google_play_android_developer_api_keys.json.gpg" > app/google_play_android_developer_api_keys.json
 
 script:
   - ./scripts/set_release_track_env_variable_based_on_ci_branch.sh
@@ -55,17 +55,17 @@ after_success:
   - git commit -m "Set build VERSION number" version.txt
   - export GIT_TAG=v1.$(expr 20020 + ${TRAVIS_BUILD_NUMBER})-${ANDROID_APK_RELEASE_TRACK}
   - echo ${GIT_TAG}
-  - git tag -a --file="UoitDCLibraryBooking/src/main/assets/whatsnew_thisversion.txt" $GIT_TAG
+  - git tag -a --file="app/src/main/assets/whatsnew_thisversion.txt" $GIT_TAG
   - git push --quiet https://$GH_TOKEN@github.com/ObjectiveTruth/UoitDCLibraryBooking.git $GIT_TAG > /dev/null 2>&1
   # Rename release apk file
-  - mv UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking-release.apk
-    UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking_${GIT_TAG}.apk
+  - mv app/build/outputs/apk/app-release.apk
+    app/build/outputs/apk/app_${GIT_TAG}.apk
 
 deploy:
   provider: releases
   api_key:
     secure: goZT2pPYFPu2+vYafTqPwXeTd6TDOd2TzRv4c5zdh8Z6hS2G45Fr0ACAOApLNeB0eCur9qthbWQPNF1rQRGg0ghlRHJCkruFi0wg0CwzSFBkdXAEYjptbcpP7hYcVWq4bRb9v53ISA0+cbhOIAWvexhHuJq/d1s68aA1llLLWWJhdVXo8i1VWMBSbAHMBmzyIKmoiX1QYKBgMNP8tpG1cxpG6MdEwHKVd+KFsSYYECv25Ak5pJCe2zcORej+PeuXs3FT6+jp/zc86qrx/LiiAdKJS7o7ZBoFYKtP6w2qq56CUDW3EdzdwBMwTFZalP3zQHR04cwatBgDscAzsEqapRiOXv6KL9yh6vB65T7uwyVMrX7BvXdG1vcCDzSAaFjBkSGcXcTOoDscvSuz7+q68XgFU9m2zZQZMjydArY6mxXV5rgdgDtyOvvBwu1kqswH4qJgiOyUbIpt9Tuvki2LcZYaEN67LriYx7QYf1Bqt6bg9ACuuzY5MRxX772abBMlrdJZwmg8aGMrb/Rr19VSsymxwX08fe5YvMCjSoDmZ//kFdPkEmw7milFlO0WkCLHW34z3W5XgcpkIlSK1oFBmtO0sHxeys8cXpUKtR8Nnf70Vgh4Qr5EUd6bAnq/zdDwtLkf5R6KjZN0VZjRgWKbwv3KE1sFT40YRQkYvlGctR8=
-  file: "UoitDCLibraryBooking/build/outputs/apk/UoitDCLibraryBooking_v*.apk"
+  file: "app/build/outputs/apk/app_v*.apk"
   file_glob: true
   skip_cleanup: true
   on:

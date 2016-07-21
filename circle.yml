@@ -33,7 +33,7 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter "android-24"
   post:
     # Copy the standard debug keystore to the CI, ensuring all app have the same certificate
-    - cp UoitDCLibraryBooking/debug.keystore ~/.android/
+    - cp app/debug.keystore ~/.android/
   cache_directories:
     - /usr/local/android-sdk-linux/tools
     - /usr/local/android-sdk-linux/build-tools/24.0.0
@@ -84,16 +84,16 @@ test:
         timeout: 900
 
     # Copy spoon html output
-    - cp -rv UoitDCLibraryBooking/build/outputs/debug $CIRCLE_ARTIFACTS/spoon-results
+    - cp -rv app/build/outputs/debug $CIRCLE_ARTIFACTS/spoon-results
 
     # Copy dex count information
-    - cp -rv UoitDCLibraryBooking/build/outputs/dexcount $CIRCLE_ARTIFACTS
+    - cp -rv app/build/outputs/dexcount $CIRCLE_ARTIFACTS
 
     # Copy the Jacoco test coverage report
-    - cp -rv UoitDCLibraryBooking/build/reports/jacoco/jacocoTestDebugUnitTestReport $CIRCLE_ARTIFACTS
+    - cp -rv app/build/reports/jacoco/jacocoTestDebugUnitTestReport $CIRCLE_ARTIFACTS
 
     # Copy the test results to the test results directory
-    - cp -rv UoitDCLibraryBooking/build/outputs/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
+    - cp -rv app/build/outputs/debug/junit-reports $CIRCLE_TEST_REPORTS/junit
   post:
     # Post test coverage results to codecov.io
     - bash <(curl -s https://codecov.io/bash)
