@@ -22,6 +22,7 @@ import java.net.CookieManager;
 
 public class MainActivity extends ActivityBase {
     final static private String ACTIVITY_TITLE = "Calendar";
+	final static private String HAS_DISMISSED_WHATS_NEW_DIALOG_BUNDLE_KEY = "HAS_DISMISSED_WHATS_NEW_DIALOG";
 
     public static final String MY_ACCOUNT_DIALOGFRAGMENT_TAG = "myAccountDiaFrag";
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
@@ -30,6 +31,7 @@ public class MainActivity extends ActivityBase {
 	AppCompatActivity mActivity = this;
 	public static CookieManager cookieManager;
     private boolean isFirstLoadThisSession = false;
+	private boolean _hasDismissedWhatsNewDialog = false;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
@@ -39,7 +41,11 @@ public class MainActivity extends ActivityBase {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
-        if(savedInstanceState == null) {isFirstLoadThisSession = true; Timber.i("First time opening app this session");}
+        if(savedInstanceState == null) {
+        	isFirstLoadThisSession = true; Timber.i("First time opening app this session");
+        }else {
+        	_restorePreviousState(savedInstanceState);
+		}
 
         ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
 
@@ -64,8 +70,29 @@ public class MainActivity extends ActivityBase {
             _goToScreenByMenuID(getLastMenuItemIDRequested());
         }
 
-        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {WhatsNewDialog.show(this);}
+        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall() && !_hasDismissedWhatsNewDialog) {
+        	WhatsNewDialog
+					.show(this)
+					.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                        	_hasDismissedWhatsNewDialog = true;
+                        }
+		});}
+
+    }
+
+    private void _restorePreviousState(Bundle inState) {
+        if(inState != null) {
+            _hasDismissedWhatsNewDialog = inState.getBoolean(HAS_DISMISSED_WHATS_NEW_DIALOG_BUNDLE_KEY);
+        }
+	}
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(HAS_DISMISSED_WHATS_NEW_DIALOG_BUNDLE_KEY, _hasDismissedWhatsNewDialog);
     }
 
     @Override

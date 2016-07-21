@@ -48,14 +48,17 @@ public class Calendar extends Fragment {
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
+    private static final String HAS_SHOWN_INITIAL_SCREEN_BUNDLE_KEY = "HAS_SHOWN_INTIAL_SCREEN";
     private Subscription calendarDataRefreshStateObservableSubscription;
     private SwipeRefreshLayout _mSwipeLayout;
+    private boolean _hasShownInitialScreen = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
         setHasOptionsMenu(true);
+        _loadPreviousStateIfAvailable(savedInstanceState);
     }
 
     @Override
@@ -63,6 +66,12 @@ public class Calendar extends Fragment {
         View view = inflater.inflate(R.layout.calendar, container, false);
         _mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.calendar_swipe_refresh_layout);
         return view;
+    }
+
+    private void _loadPreviousStateIfAvailable(Bundle inState) {
+        if(inState != null) {
+            _hasShownInitialScreen = inState.getBoolean(HAS_SHOWN_INITIAL_SCREEN_BUNDLE_KEY, false);
+        }
     }
 
     @Override
@@ -89,6 +98,12 @@ public class Calendar extends Fragment {
         Timber.d("Calendar Stopped");
         _teardownViewBindings(_mSwipeLayout);
         super.onStop();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(HAS_SHOWN_INITIAL_SCREEN_BUNDLE_KEY, _hasShownInitialScreen);
     }
 
     /**
@@ -181,12 +196,17 @@ public class Calendar extends Fragment {
 
     private void _doViewUpdatedBasedOnCalendarData(CalendarData calendarData) {
         Timber.d("Changing Calendar screen based on calendardata received");
-        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall()) {
+        if(UOITLibraryBookingApp.isFirstTimeLaunchSinceUpgradeOrInstall() &&
+                !_hasShownInitialScreen) {
+            Timber.d("Showing initial calendar welcome screen");
+            _hasShownInitialScreen = true;
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, FirstTimeLoaded.newInstance()).commit();
+
         }else if(calendarData == null || calendarData.days == null) {
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
+
         }else {
             _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(calendarData);
         }

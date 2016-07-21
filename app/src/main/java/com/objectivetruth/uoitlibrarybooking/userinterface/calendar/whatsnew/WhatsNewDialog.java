@@ -12,7 +12,7 @@ public class WhatsNewDialog {
     private static final String WHATS_NEW_MINOR_CONTENTS_FILE_NAME = "whatsnew_minor.txt";
     private static final String WHATS_NEW_THIS_VERSION_CONTENTS_FILE_NAME = "whatsnew_thisversion.txt";
 
-    public static void show(Context context){
+    public static AlertDialog show(Context context){
         String whatsNewString;
         try{
             whatsNewString = ResourceLoadingUtilities.loadAssetTextAsString(context, WHATS_NEW_CONTENTS_FILE_NAME) +
@@ -24,7 +24,7 @@ public class WhatsNewDialog {
             whatsNewString = "<Error: Couldn't load whatsnew.txt asset>";
         }
 
-        new AlertDialog.Builder(context)
+        return new AlertDialog.Builder(context)
                 .setTitle(WHATS_NEW_DIALOG_TITLE)
                 .setMessage(whatsNewString)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
