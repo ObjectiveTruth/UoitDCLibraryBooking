@@ -218,7 +218,7 @@ public class UserModelTest {
 
     private String _getRawInitialMyReservationsWebpage() throws IOException {
         String delim = File.separator;
-        String noDaysAvailableFileLocation = ".." + delim + "UoitDCLibraryBooking" + delim + "src" + delim +
+        String noDaysAvailableFileLocation = ".." + delim + "app" + delim + "src" + delim +
                 "testResources" + delim + "server_responses" + delim + "my_reservations" + delim +
                 "initial_my_reservations.aspx";
         return FileUtils.readFileToString(new File(noDaysAvailableFileLocation), "UTF-8");
@@ -226,7 +226,7 @@ public class UserModelTest {
 
     private String _getRawSuccessSignInNoReservations() throws IOException {
         String delim = File.separator;
-        String noDaysAvailableFileLocation = ".." + delim + "UoitDCLibraryBooking" + delim + "src" + delim +
+        String noDaysAvailableFileLocation = ".." + delim + "app" + delim + "src" + delim +
                 "testResources" + delim + "server_responses" + delim + "my_reservations" + delim + "sign_in" + delim +
                 "success_sign_in_no_reservations.aspx";
         return FileUtils.readFileToString(new File(noDaysAvailableFileLocation), "UTF-8");
@@ -234,7 +234,7 @@ public class UserModelTest {
 
     private String _getRawWrongUsernamePassword() throws IOException {
         String delim = File.separator;
-        String noDaysAvailableFileLocation = ".." + delim + "UoitDCLibraryBooking" + delim + "src" + delim +
+        String noDaysAvailableFileLocation = ".." + delim + "app" + delim + "src" + delim +
                 "testResources" + delim + "server_responses" + delim + "my_reservations" + delim + "sign_in" + delim +
                 "wrong_username_password.aspx";
         return FileUtils.readFileToString(new File(noDaysAvailableFileLocation), "UTF-8");

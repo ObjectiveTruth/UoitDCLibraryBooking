@@ -143,7 +143,7 @@ public class CalendarModelTest {
 
     private String _getRawInitialWebpageWithNoDaysAvailableFromTestResources() {
         String delim = File.separator;
-        String noDaysAvailableFileLocation = ".." + delim + "UoitDCLibraryBooking" + delim + "src" + delim +
+        String noDaysAvailableFileLocation = ".." + delim + "app" + delim + "src" + delim +
                 "testResources" + delim + "server_responses" + delim + "no_days_available.aspx";
         try {
             return FileUtils.readFileToString(new File(noDaysAvailableFileLocation), "UTF-8");
