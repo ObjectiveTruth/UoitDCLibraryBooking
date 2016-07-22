@@ -178,7 +178,6 @@ public class Calendar extends Fragment {
                                     if(!swipeRefreshLayout.isRefreshing()) {
                                         swipeRefreshLayout.setRefreshing(true);
                                     }
-                                    _doViewUpdatedBasedOnCalendarData(calendarDataRefreshState.calendarData);
                                     break;
                                 case ERROR:
                                     swipeRefreshLayout.setRefreshing(false);

@@ -1,5 +1,6 @@
 package com.objectivetruth.uoitlibrarybooking.app;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -45,6 +46,7 @@ public class UOITLibraryBookingApp extends Application {
         return mComponent;
     }
 
+    @SuppressLint("CommitPrefEdits") // We want this to be blocking because its relied upon in rest of app
     private void _checkIfFirstTimeAppLaunchedSinceVersionUpgradeOrInstall() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int oldAppVersion = sharedPreferences.getInt(APPVERSION, -1);
@@ -52,13 +54,19 @@ public class UOITLibraryBookingApp extends Application {
             Crashlytics.setBool("Upgradeing" , false);
             IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = true;
             Timber.i("App Version NOT found, saving current app version as " + BuildConfig.VERSION_CODE);
-            sharedPreferences.edit().putInt(APPVERSION, BuildConfig.VERSION_CODE).apply();
+            sharedPreferences.edit()
+                    .putBoolean(HAS_DISMISSED_WHATSNEW_DIALOG_THIS_VERSION, false)
+                    .putInt(APPVERSION, BuildConfig.VERSION_CODE)
+                    .commit();
         }
         else if(oldAppVersion != BuildConfig.VERSION_CODE){
             Crashlytics.setBool("Upgradeing" , true);
             IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = true;
             Timber.i("App Version has CHANGED: " + BuildConfig.VERSION_CODE + " (previously: " +  oldAppVersion + ")");
-            sharedPreferences.edit().putInt(APPVERSION, BuildConfig.VERSION_CODE).apply();
+            sharedPreferences.edit()
+                    .putBoolean(HAS_DISMISSED_WHATSNEW_DIALOG_THIS_VERSION, false)
+                    .putInt(APPVERSION, BuildConfig.VERSION_CODE)
+                    .commit();
         }
         else{
             IS_FIRST_TIME_LAUNCH_SINCE_UPGRADE_OR_INSTALL = false;

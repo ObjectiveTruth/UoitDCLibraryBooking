@@ -8,6 +8,7 @@ public class SHARED_PREFERENCES_KEYS {
     public static final String HAS_LEARNED_MYACCOUNT = "shared_pref_haslearned_myaccount";
     public static final String UUID = "shared_pref_uuid" ;
     public static final String HAS_LEARNED_REFRESH = "has_learned_refresh";
+    public static final String HAS_DISMISSED_WHATSNEW_DIALOG_THIS_VERSION = "HAS_DISMISSED_WHATSNEW_DIALOG_THIS_VERSION";
 
     public static final String USER_USERNAME = "username";
     public static final String USER_PASSWORD = "password";
