@@ -26,18 +26,13 @@ import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREF
 public class MainActivity extends ActivityBase {
     final static private String ACTIVITY_TITLE = "Calendar";
 
-    public static final String MY_ACCOUNT_DIALOGFRAGMENT_TAG = "myAccountDiaFrag";
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
-    public static final int MAX_BOOKINGS_ALLOWED = 20; //This can safely be changed
-    public static boolean isDialogShowing = false;
 	AppCompatActivity mActivity = this;
 	public static CookieManager cookieManager;
     private boolean isFirstLoadThisSession = false;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject Tracker googleAnalyticsTracker;
-    //TODO put this in savedinstancestate
-    public static String errorMessageFromLogin = "";
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,9 +159,6 @@ public class MainActivity extends ActivityBase {
 		
 		
 		startActivity(intent);
-		
-
-		
 	}*/
 
 	@Override
