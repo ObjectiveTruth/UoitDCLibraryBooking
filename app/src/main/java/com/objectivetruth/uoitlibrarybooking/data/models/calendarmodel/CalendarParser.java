@@ -192,16 +192,22 @@ public class CalendarParser {
             // Finds partially booked time slots
             else if(currentTableDataElement.contains("Incomplete reservation")){
                 int hrefStart = currentTableDataElement.indexOf("href=");
-                timeCellToBeAdded.hrefSource =
-                        currentTableDataElement.substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
+                String anchorHREF = currentTableDataElement.substring(hrefStart).split("\"")[1].replace("&amp;", "&");
+                timeCellToBeAdded.param_room =          _extractRoomParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_get_link =      _extractGETLinkParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_starttime =     _extractStartTimeParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_next =          _extractNextParamFromAnchorHREF(anchorHREF);
                 timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_COMPETING;
             }
 
             // Finds Completely OPEN time slots
             else if(currentTableDataElement.contains("book.aspx")){
                 int hrefStart = currentTableDataElement.indexOf("href=");
-                timeCellToBeAdded.hrefSource =
-                        currentTableDataElement.substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
+                String anchorHREF = currentTableDataElement.substring(hrefStart).split("\"")[1].replace("&amp;", "&");
+                timeCellToBeAdded.param_room =          _extractRoomParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_get_link =      _extractGETLinkParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_starttime =     _extractStartTimeParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_next =          _extractNextParamFromAnchorHREF(anchorHREF);
                 timeCellToBeAdded.timeCellType = TimeCellType.BOOKING_OPEN;
             }
 
@@ -218,8 +224,12 @@ public class CalendarParser {
             // Finds fully booked rooms. Can still join or leave if you're in that booking but can't start a new one
             else if(currentTableDataElement.contains("viewleaveorjoin.aspx")){
                 int hrefStart = currentTableDataElement.indexOf("href=");
-                timeCellToBeAdded.hrefSource =
-                        currentTableDataElement.substring(hrefStart).split("\"")[1].replace(" ", "%20").replace("&amp;", "&");
+                String anchorHREF = currentTableDataElement.substring(hrefStart).split("\"")[1].replace("&amp;", "&");
+                timeCellToBeAdded.param_room =          _extractRoomParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_get_link =      _extractGETLinkParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_starttime =     _extractStartTimeParamFromAnchorHREF(anchorHREF);
+                timeCellToBeAdded.param_next =          _extractNextParamFromAnchorHREF(anchorHREF);
+
                 beginningWord = currentTableDataElement.indexOf("color:Black;\">");
                 endWord = currentTableDataElement.lastIndexOf("</a>");
                 timeCellToBeAdded.groupNameForWhenFullyBookedRoom =
@@ -287,5 +297,69 @@ public class CalendarParser {
     static private String _getTimeStringOrRoomNameFromString(String subject) {
         String webPageSearchString = "font-size:8pt;\">";
         return findStringFromStringBetweenSearchTerms(subject, webPageSearchString, "</td>");
+    }
+
+    /**
+     * Extracts the get link parameter. Assumes this format
+     * temp.aspx?starttime=4:00 PM&room=LIB309&next=book
+     * @param anchorHREF
+     * @return
+     */
+    static private String _extractGETLinkParamFromAnchorHREF(String anchorHREF) {
+        return anchorHREF.split("\\?")[0];
+    }
+
+    /**
+     * Extracts the starttime query parameter. Assumes this format
+     * temp.aspx?starttime=4:00 PM&room=LIB309&next=book
+     * @param anchorHREF
+     * @return
+     */
+    static private String _extractStartTimeParamFromAnchorHREF(String anchorHREF) {
+        String STARTTIME_QUERY_PARAM_NAME = "starttime";
+        String[] queryParams = anchorHREF.split("\\?")[1].split("&");
+        for(String s: queryParams) {
+            String[] arrayWithBothSidesOfTheEqualSign = s.split("=");
+            if(arrayWithBothSidesOfTheEqualSign[0].contentEquals(STARTTIME_QUERY_PARAM_NAME)) {
+                return arrayWithBothSidesOfTheEqualSign[1];
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Extracts the room query parameter. Assumes this format
+     * temp.aspx?starttime=4:00 PM&room=LIB309&next=book
+     * @param anchorHREF
+     * @return
+     */
+    static private String _extractRoomParamFromAnchorHREF(String anchorHREF) {
+        String ROOM_QUERY_PARAM_NAME = "room";
+        String[] queryParams = anchorHREF.split("\\?")[1].split("&");
+        for(String s: queryParams) {
+            String[] arrayWithBothSidesOfTheEqualSign = s.split("=");
+            if(arrayWithBothSidesOfTheEqualSign[0].contentEquals(ROOM_QUERY_PARAM_NAME)) {
+                return arrayWithBothSidesOfTheEqualSign[1];
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Extracts the next query parameter. Assumes this format
+     * temp.aspx?starttime=4:00 PM&room=LIB309&next=book
+     * @param anchorHREF
+     * @return
+     */
+    static private String _extractNextParamFromAnchorHREF(String anchorHREF) {
+        String NEXT_QUERY_PARAM_NAME = "next";
+        String[] queryParams = anchorHREF.split("\\?")[1].split("&");
+        for(String s: queryParams) {
+            String[] arrayWithBothSidesOfTheEqualSign = s.split("=");
+            if(arrayWithBothSidesOfTheEqualSign[0].contentEquals(NEXT_QUERY_PARAM_NAME)) {
+                return arrayWithBothSidesOfTheEqualSign[1];
+            }
+        }
+        return "";
     }
 }
