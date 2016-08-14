@@ -11,6 +11,7 @@ import rx.functions.Func0;
 import rx.functions.FuncN;
 import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -19,12 +20,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class CalendarWebService {
-    RequestQueue requestQueue;
+    @Inject RequestQueue requestQueue;
     final private static String UOIT_LIBRARY_MAIN_CALENDAR_URL =
             "https://rooms.library.dc-uoit.ca/dc_studyrooms/calendar.aspx";
 
-    public CalendarWebService(UOITLibraryBookingApp mApplication, RequestQueue requestQueue) {
-        this.requestQueue = requestQueue;
+    public CalendarWebService(UOITLibraryBookingApp mApplication) {
+        mApplication.getComponent().inject(this);
     }
 
     public Observable<String> getRawInitialWebPageObs() {

@@ -4,8 +4,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.app.networking.OkHttp3Stack;
+import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionWebService;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebService;
 import dagger.Module;
@@ -35,8 +37,20 @@ public class DataModule {
 
     @Provides
     @Singleton
-    CalendarWebService providesCalendarWebService(RequestQueue requestQueue) {
-        return new CalendarWebService(mApplication, requestQueue);
+    BookingInteractionModel providesBookingInteractionModel(BookingInteractionWebService bookingInteractionWebService) {
+        return new BookingInteractionModel(mApplication, bookingInteractionWebService);
+    }
+
+    @Provides
+    @Singleton
+    BookingInteractionWebService providesBookingInteractionWebService() {
+        return new BookingInteractionWebService(mApplication);
+    }
+
+    @Provides
+    @Singleton
+    CalendarWebService providesCalendarWebService() {
+        return new CalendarWebService(mApplication);
     }
 
     @Provides

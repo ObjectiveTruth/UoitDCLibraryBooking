@@ -1,6 +1,5 @@
 package com.objectivetruth.uoitlibrarybooking.data.models.usermodel;
 
-import android.app.Application;
 import android.support.v4.util.Pair;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -24,8 +23,8 @@ public class UserWebService {
     final private static String UOIT_LIBRARY_SIGNIN_URL =
             "https://rooms.library.dc-uoit.ca/uoit_studyrooms/myreservations.aspx";
 
-    public UserWebService(Application mApplication) {
-        ((UOITLibraryBookingApp) mApplication).getComponent().inject(this);
+    public UserWebService(UOITLibraryBookingApp mApplication) {
+        mApplication.getComponent().inject(this);
     }
 
     public Observable<String> getRawInitialSignInWebPageObs() {

@@ -3,6 +3,8 @@ package com.objectivetruth.uoitlibrarybooking.app;
 import com.objectivetruth.uoitlibrarybooking.ActivityRoomInteraction;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.data.DataModule;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionWebService;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebService;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.Grid;
@@ -23,6 +25,8 @@ public interface AppComponent {
     void inject(MyAccount myAccount);
     void inject(LoginFragment loginFragment);
     void inject(UserWebService userWebService);
+    void inject(BookingInteractionWebService bookingInteractionWebService);
+    void inject(CalendarWebService calendarWebService);
     void inject(MyAccountLoaded myAccountLoaded);
     void inject(Grid grid);
 }

@@ -40,7 +40,7 @@ public class AppModule {
     @Singleton
     Tracker providesGoogleAnalyticsTracker(SharedPreferences defaultSharedPreferences) {
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(mApplication);
-        if(BuildConfig.DEBUG || isSerialInIgnoreList(Build.SERIAL)){
+        if(BuildConfig.DEBUG || _isSerialInIgnoreList(Build.SERIAL)){
             // Will just log the information without actually sending it
             analytics.setDryRun(true);
         }
@@ -55,7 +55,7 @@ public class AppModule {
         return googleAnalyticsTracker;
     }
 
-    private boolean isSerialInIgnoreList(String thisDeviceSerial) {
+    private boolean _isSerialInIgnoreList(String thisDeviceSerial) {
         for (String s: SERIALS_TO_IGNORE_FOR_ANALYTICS) {
             if(s.contentEquals(thisDeviceSerial)) {
                 Timber.i("Serial: " + thisDeviceSerial + " is in the analytics ignore list, disabling Google Analytics");
