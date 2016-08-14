@@ -1,6 +1,7 @@
 package com.objectivetruth.uoitlibrarybooking.app;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
@@ -8,9 +9,11 @@ import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
 import dagger.Module;
 import dagger.Provides;
+import timber.log.Timber;
 
 import javax.inject.Singleton;
 
+import static com.objectivetruth.uoitlibrarybooking.common.constants.Analytics.SERIALS_TO_IGNORE_FOR_ANALYTICS;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.UUID;
 
 @Module
@@ -37,7 +40,7 @@ public class AppModule {
     @Singleton
     Tracker providesGoogleAnalyticsTracker(SharedPreferences defaultSharedPreferences) {
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(mApplication);
-        if(BuildConfig.DEBUG){
+        if(BuildConfig.DEBUG || isSerialInIgnoreList(Build.SERIAL)){
             // Will just log the information without actually sending it
             analytics.setDryRun(true);
         }
@@ -50,5 +53,15 @@ public class AppModule {
         }
         googleAnalyticsTracker.set("&cid", usersUUID);
         return googleAnalyticsTracker;
+    }
+
+    private boolean isSerialInIgnoreList(String thisDeviceSerial) {
+        for (String s: SERIALS_TO_IGNORE_FOR_ANALYTICS) {
+            if(s.contentEquals(thisDeviceSerial)) {
+                Timber.i("Serial: " + thisDeviceSerial + " is in the analytics ignore list, disabling Google Analytics");
+                return true;
+            }
+        }
+        return false;
     }
 }
