@@ -27,6 +27,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDataRefreshState;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.RefreshActivateEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.ScrollAtTopOfGridEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBooking;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
@@ -38,6 +39,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -55,6 +57,7 @@ public class Calendar extends Fragment {
     private Subscription calendarDataRefreshStateObservableSubscription;
     private SwipeRefreshLayout _mSwipeLayout;
     private boolean _hasShownInitialScreen = false;
+    private Subscription calendarModelScrollAtTopGridObservableSubscription;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,6 +129,10 @@ public class Calendar extends Fragment {
             calendarDataRefreshStateObservableSubscription.unsubscribe();
         }
 
+        if(calendarModelScrollAtTopGridObservableSubscription != null) {
+            calendarModelScrollAtTopGridObservableSubscription.unsubscribe();
+        }
+
         if(swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(null);
             swipeRefreshLayout.setRefreshing(false);
@@ -150,6 +157,16 @@ public class Calendar extends Fragment {
                 }
             });
         }
+
+        calendarModelScrollAtTopGridObservableSubscription =
+                calendarModel.getScrollAtTopGridObservable().subscribe(new Action1<ScrollAtTopOfGridEvent>() {
+            @Override
+            public void call(ScrollAtTopOfGridEvent scrollAtTopOfGridEvent) {
+                if(_mSwipeLayout != null) {
+                    _mSwipeLayout.setEnabled(scrollAtTopOfGridEvent.isScrollAtTop());
+                }
+            }
+        });
 
         // To ensure this is idempotent, need to ONLY subscribe if there is no current subscription, or the subscription
         // has been unsubscribed from

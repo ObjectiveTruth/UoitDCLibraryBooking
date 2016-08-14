@@ -7,15 +7,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.common.GridAdapter;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.TableFixHeaders;
 import timber.log.Timber;
 
+import javax.inject.Inject;
+
 public class Grid extends Fragment {
+    @Inject CalendarModel calendarModel;
     private CalendarDay calendarDay;
     private GridAdapter gridAdapter;
     private static final String CALENDAR_DAY_BUNDLE_KEY = "CALENDAR_DAY_BUNDLE_KEY";
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
@@ -33,6 +44,7 @@ public class Grid extends Fragment {
         TableFixHeaders _mTableFixheaders = (TableFixHeaders) gridView.findViewById(R.id.calendar_page_grid);
         gridAdapter = new GridAdapter(getActivity(), calendarDay);
         _mTableFixheaders.setAdapter(gridAdapter);
+        _mTableFixheaders.setScrollAtTopGridBehaviourSubject(calendarModel.getScrollAtTopOfGridBehaviourSubject());
 
         return gridView;
     }

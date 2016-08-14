@@ -30,6 +30,7 @@ public class CalendarModel {
     private BehaviorSubject<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubject;
     private Observable<CalendarDataRefreshState> calendarDataRefreshStateBehaviorSubjectAsObservable;
     private PublishSubject<RefreshActivateEvent> refreshActivateEventPublishSubject;
+    private BehaviorSubject<ScrollAtTopOfGridEvent> scrollAtTopOfGridEventBehaviorSubject;
     private CalendarWebService calendarWebService;
 
     public CalendarModel(UOITLibraryBookingApp mApplication, CalendarWebService calendarWebService) {
@@ -70,6 +71,20 @@ public class CalendarModel {
         }else {
             return refreshActivateEventPublishSubject;
         }
+    }
+
+    public BehaviorSubject<ScrollAtTopOfGridEvent> getScrollAtTopOfGridBehaviourSubject() {
+        if(scrollAtTopOfGridEventBehaviorSubject == null || scrollAtTopOfGridEventBehaviorSubject.hasCompleted()) {
+            ScrollAtTopOfGridEvent initialState = new ScrollAtTopOfGridEvent(true);
+            scrollAtTopOfGridEventBehaviorSubject = BehaviorSubject.create(initialState);
+            return scrollAtTopOfGridEventBehaviorSubject;
+        }else {
+            return scrollAtTopOfGridEventBehaviorSubject;
+        }
+    }
+
+    public Observable<ScrollAtTopOfGridEvent> getScrollAtTopGridObservable() {
+        return getScrollAtTopOfGridBehaviourSubject().asObservable();
     }
 
     private void _bindRefreshActivateEventPublishSubjectToGettingCalendarData(PublishSubject<RefreshActivateEvent>

@@ -11,6 +11,8 @@ import android.view.*;
 import android.widget.ImageView;
 import android.widget.Scroller;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.ScrollAtTopOfGridEvent;
+import rx.subjects.BehaviorSubject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,8 @@ public class TableFixHeaders extends ViewGroup {
 	private VelocityTracker velocityTracker;
 
 	private int touchSlop;
+
+    private BehaviorSubject<ScrollAtTopOfGridEvent> scrollAtTopOfGridEventBehaviorSubject ;
 
 	/**
 	 * Simple constructor to use when creating a view from code.
@@ -287,8 +291,12 @@ public class TableFixHeaders extends ViewGroup {
 		}
 
 		if (scrollY == 0) {
+            if(scrollAtTopOfGridEventBehaviorSubject != null) {
+                scrollAtTopOfGridEventBehaviorSubject.onNext(new ScrollAtTopOfGridEvent(true));}
 			// no op
 		} else if (scrollY > 0) {
+            if(scrollAtTopOfGridEventBehaviorSubject != null) {
+                scrollAtTopOfGridEventBehaviorSubject.onNext(new ScrollAtTopOfGridEvent(false));}
 			while (heights[firstRow + 1] < scrollY) {
 				if (!columnViewList.isEmpty()) {
 					removeTop();
@@ -300,6 +308,8 @@ public class TableFixHeaders extends ViewGroup {
 				addBottom();
 			}
 		} else {
+            if(scrollAtTopOfGridEventBehaviorSubject != null) {
+                scrollAtTopOfGridEventBehaviorSubject.onNext(new ScrollAtTopOfGridEvent(false));}
 			while (!columnViewList.isEmpty() && getFilledHeight() - heights[firstRow + columnViewList.size()] >= height) {
 				removeBottom();
 			}
@@ -467,6 +477,11 @@ public class TableFixHeaders extends ViewGroup {
 		}
 		invalidate();
 	}
+
+    public void setScrollAtTopGridBehaviourSubject(BehaviorSubject<ScrollAtTopOfGridEvent>
+                                                           scrollAtTopGridBehaviourSubject) {
+        this.scrollAtTopOfGridEventBehaviorSubject = scrollAtTopGridBehaviourSubject;
+    }
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
