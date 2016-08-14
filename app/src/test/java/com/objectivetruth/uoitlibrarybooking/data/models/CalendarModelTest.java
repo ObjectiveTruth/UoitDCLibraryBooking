@@ -6,6 +6,7 @@ import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDataRefreshState;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.RefreshActivateEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.ScrollAtTopOfGridEvent;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -139,6 +140,45 @@ public class CalendarModelTest {
         assertThat(currentState.type, is(SUCCESS));
         assertNull(currentState.exception);
         assertNull(currentState.calendarData);
+    }
+
+    @Test
+    public void whenNoGridScrollingOccursReturnsDefaultState() throws Exception {
+        // Shared Prefs returns null if its the first time the app loads and has no default data
+        Mockito.when(sharedPreferencesMock.getString(eq(CALENDAR_DATA_JSON), anyString()))
+                .thenReturn(null);
+        TestSubscriber<ScrollAtTopOfGridEvent> testSubscriber = new TestSubscriber<>();
+        CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
+
+        Observable<ScrollAtTopOfGridEvent> scrollAtTopGridObservable =
+                calendarModel.getScrollAtTopGridObservable();
+        scrollAtTopGridObservable.subscribe(testSubscriber);
+        List<ScrollAtTopOfGridEvent> scrollAtTopOfGridEvents = scrollAtTopGridObservable
+                .buffer(300, TimeUnit.MILLISECONDS)
+                .toBlocking().next().iterator().next();
+        ScrollAtTopOfGridEvent firstItem = scrollAtTopOfGridEvents.get(INDEX_OF_FIRST_EVENT);
+
+        testSubscriber.assertNoTerminalEvent(); // Sequence has not ended
+        assertThat(scrollAtTopOfGridEvents.size(), is(1)); // Sequence should contain right # items
+        assertThat(firstItem.isScrollAtTop(), is(true));
+    }
+
+    @Test
+    public void whenEventChangesScrollPositionReturnsTheNewState() throws
+            InterruptedException, ExecutionException, TimeoutException {
+        // Shared Prefs returns null if its the first time the app loads and has no default data
+        Mockito.when(sharedPreferencesMock.getString(eq(CALENDAR_DATA_JSON), anyString()))
+                .thenReturn(null);
+        CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
+        // Activate a scrollTopChange
+        calendarModel.getScrollAtTopOfGridBehaviourSubject().onNext(new ScrollAtTopOfGridEvent(false));
+        Thread.sleep(100);
+
+        ScrollAtTopOfGridEvent scrollAtTopOfGridEvent =
+                calendarModel.getScrollAtTopGridObservable().first()
+                        .toBlocking().toFuture().get(300, TimeUnit.MILLISECONDS);
+
+        assertThat(scrollAtTopOfGridEvent.isScrollAtTop(), is(false));
     }
 
     private String _getRawInitialWebpageWithNoDaysAvailableFromTestResources() {

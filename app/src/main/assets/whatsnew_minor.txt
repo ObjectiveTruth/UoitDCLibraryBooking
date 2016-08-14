@@ -1,3 +1,7 @@
+July 21, 2016
+===
+‣ Added proper backstack navigation (back pressing)
+
 July 20, 2016
 ===
 ‣ Fixed major bug when loading app after its been in the background for a while
