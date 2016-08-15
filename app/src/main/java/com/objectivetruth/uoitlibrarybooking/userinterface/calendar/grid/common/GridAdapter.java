@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.common.ScreenRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
@@ -202,7 +201,7 @@ public class GridAdapter extends FixedTableAdapter {
         @Override
         public void onClick(View view) {
             Timber.i("Clicked: " + timeCell.param_get_link);
-            mainActivity.getMainActivityRouterPublishSubject().onNext(new ScreenRequest());
+            mainActivity.getMainActivityRouterPublishSubject().onNext(timeCell);
         }
     }
 }

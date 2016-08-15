@@ -1,29 +1,3 @@
-
-<!--	<ViewFlipper
-	        android:id="@+id/viewFlipper"
-	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:autoStart="false"
-	        android:flipInterval="25000"
-	        android:background="@android:color/black"
-	        android:inAnimation="@anim/custom_fade_in"
-	        android:outAnimation="@anim/custom_fade_out">
-
-        <ImageView
-	            android:id="@+id/placeholder_view"
-	            android:layout_width="match_parent"
-	            android:layout_height="match_parent"
-	            
-	            android:src="@null"/>
-
-        <ImageView
-	            android:scaleType="centerCrop"
-	            android:id="@+id/students_background"
-	            android:layout_width="match_parent"
-	            android:layout_height="match_parent"
-	            android:src="@null" />    
-	      
-	    </ViewFlipper>-->
 <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -101,17 +75,14 @@
             android:text="@string/error_room_no_exist_comment"
             />
 
-        <com.cengalabs.flatui.views.FlatEditText
-            style="@style/flat_edittext"
+        <EditText
             android:id="@+id/book_group_name_actual"
             android:layout_width="200dp"
             android:layout_marginTop="20dp"
             android:layout_below="@+id/textView1"
             android:layout_centerHorizontal="true"
             android:layout_height="wrap_content"
-            android:textColorHint="@color/dark_light"
             android:digits="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:inputType="textNoSuggestions"
             android:maxLength="10"
             android:hint="Group Name"
             />
@@ -124,8 +95,7 @@
             android:layout_toRightOf="@+id/book_group_name_actual"
             />-->
 
-        <com.cengalabs.flatui.views.FlatEditText
-            style="@style/flat_edittext"
+        <EditText
             android:id="@+id/book_group_code_actual"
             android:layout_width="200dp"
             android:layout_marginTop="20dp"
@@ -138,6 +108,7 @@
             android:maxLength="4"
             android:hint="Code"
             />
+
         <ImageButton
             style="@style/edittext_info"
             android:id="@+id/info_group_code"
@@ -157,7 +128,7 @@
 
             />
 
-        <com.cengalabs.flatui.views.FlatButton
+        <Button
             style="@style/flat_ui_button"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
@@ -177,31 +148,5 @@
             android:layout_toRightOf="@+id/book_room_number_actual"
             android:layout_marginLeft="50dp"
             />
-    <!--
-            <com.cengalabs.flatui.views.FlatRadioButton
-                style="@style/flat_radio"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-
-                android:text="1 hour"
-                />
-            <com.cengalabs.flatui.views.FlatRadioButton
-                style="@style/flat_radio"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-
-                android:text="1.5 hours"
-                />
-            <com.cengalabs.flatui.views.FlatRadioButton
-                style="@style/flat_radio"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-
-                android:text="2 hours"
-                />-->
-
-
-
-
     </RelativeLayout>
 </ScrollView>

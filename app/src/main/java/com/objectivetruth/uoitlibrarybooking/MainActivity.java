@@ -9,10 +9,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.common.ScreenRequest;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.BookingInteraction;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
@@ -31,7 +32,7 @@ public class MainActivity extends ActivityBase {
 	AppCompatActivity mActivity = this;
 	public static CookieManager cookieManager;
     private boolean isFirstLoadThisSession = false;
-    private PublishSubject<ScreenRequest> screenRequestPublishSubject;
+    private PublishSubject<TimeCell> bookingInteractionRequestPublishSubject;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
 
@@ -215,22 +216,24 @@ public class MainActivity extends ActivityBase {
      * Can be used to request a Screen change from the MainActivity
      * @return
      */
-    public PublishSubject<ScreenRequest> getMainActivityRouterPublishSubject() {
-        if(screenRequestPublishSubject == null || screenRequestPublishSubject.hasCompleted()) {
-            screenRequestPublishSubject = PublishSubject.create();
-            _bindScreenRequestPublishSubjectToRouter(screenRequestPublishSubject);
-            return screenRequestPublishSubject;
+    public PublishSubject<TimeCell> getMainActivityRouterPublishSubject() {
+        if(bookingInteractionRequestPublishSubject == null || bookingInteractionRequestPublishSubject.hasCompleted()) {
+            bookingInteractionRequestPublishSubject = PublishSubject.create();
+            _bindScreenRequestPublishSubjectToRouter(bookingInteractionRequestPublishSubject);
+            return bookingInteractionRequestPublishSubject;
         }else {
-            return screenRequestPublishSubject;
+            return bookingInteractionRequestPublishSubject;
         }
 	}
 
-	private void _bindScreenRequestPublishSubjectToRouter(PublishSubject<ScreenRequest> screenRequestPublishSubject) {
-	    screenRequestPublishSubject.subscribe(new Action1<ScreenRequest>() {
+	private void _bindScreenRequestPublishSubjectToRouter(PublishSubject<TimeCell> screenRequestPublishSubject) {
+	    screenRequestPublishSubject.subscribe(new Action1<TimeCell>() {
             @Override
-            public void call(ScreenRequest screenRequest) {
+            public void call(TimeCell timeCell) {
                 addHidingOfAllCurrentFragmentsToTransaction(getSupportFragmentManager().beginTransaction())
-                        .add(R.id.mainactivity_content_frame, BookingInteraction.newInstance())
+                        .add(R.id.mainactivity_content_frame, BookingInteraction.newInstance(timeCell))
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .addToBackStack(null)
                         .commit();
             }
         });

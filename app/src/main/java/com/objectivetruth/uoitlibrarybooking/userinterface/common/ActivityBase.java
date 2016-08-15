@@ -18,7 +18,6 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.statelessutilities.Triple;
-import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.BookingInteraction;
 import com.objectivetruth.uoitlibrarybooking.userinterface.about.About;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesAndPolicies;
@@ -126,7 +125,6 @@ public abstract class ActivityBase extends AppCompatActivity {
             GuidelinesAndPolicies guidelinesAndPoliciesFrag = GuidelinesAndPolicies.newInstance();
             About aboutFrag = About.newInstance();
             MyAccount myAccountFrag = MyAccount.newInstance();
-            BookingInteraction bookingInteractions = BookingInteraction.newInstance();
 
             stringFragmentHashMap.put(CALENDAR_FRAGMENT_TAG, calendarFrag);
             stringFragmentHashMap.put(GUIDELINES_POLICIES_FRAGMENT_TAG, guidelinesAndPoliciesFrag);
@@ -349,6 +347,25 @@ public abstract class ActivityBase extends AppCompatActivity {
     private void _closeNavDrawer() {
         if (_mDrawerLayout != null) {
             _mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    public void setDrawerState(boolean isEnabled) {
+        if ( isEnabled ) {
+            _mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
+            if(getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+            getActionBarDrawerToggle().syncState();
+        }
+        else {
+            _mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+            if(getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            }
+            getActionBarDrawerToggle().syncState();
         }
     }
 }

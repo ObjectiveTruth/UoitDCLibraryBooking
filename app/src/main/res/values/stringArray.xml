@@ -24,11 +24,10 @@
     </string-array>
     
     <string-array name="duration">
-        <item>How long?</item>
-        <item>30 min.</item>
-        <item>1 hr.</item>
-        <item>1:30 hr.</item>
-        <item>2:00 hr.</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>1 hour and 30 minutes</item>
+        <item>2 hours</item>
     </string-array>
     
     <string-array name="times">
