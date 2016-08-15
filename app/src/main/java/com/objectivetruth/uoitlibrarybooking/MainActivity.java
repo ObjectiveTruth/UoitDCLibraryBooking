@@ -11,10 +11,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.common.ScreenRequest;
+import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.BookingInteraction;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
+import rx.functions.Action1;
+import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -24,15 +27,13 @@ import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREF
 
 
 public class MainActivity extends ActivityBase {
-    final static private String ACTIVITY_TITLE = "Calendar";
-
     public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
 	AppCompatActivity mActivity = this;
 	public static CookieManager cookieManager;
     private boolean isFirstLoadThisSession = false;
+    private PublishSubject<ScreenRequest> screenRequestPublishSubject;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
-    @Inject Tracker googleAnalyticsTracker;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +42,10 @@ public class MainActivity extends ActivityBase {
 
         ((UOITLibraryBookingApp) getApplication()).getComponent().inject(this);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.app_root);
         initializeAllMainFragmentsAndPreloadToView();
         setupToolbar(R.id.toolbar);
         setupDrawer(R.id.drawer_layout);
-    }
-
-    @Override
-    protected String getActivityTitle() {
-        return ACTIVITY_TITLE;
     }
 
     @Override
@@ -213,5 +209,30 @@ public class MainActivity extends ActivityBase {
 	    {
 	        return false;
 	    }
+    }
+
+    /**
+     * Can be used to request a Screen change from the MainActivity
+     * @return
+     */
+    public PublishSubject<ScreenRequest> getMainActivityRouterPublishSubject() {
+        if(screenRequestPublishSubject == null || screenRequestPublishSubject.hasCompleted()) {
+            screenRequestPublishSubject = PublishSubject.create();
+            _bindScreenRequestPublishSubjectToRouter(screenRequestPublishSubject);
+            return screenRequestPublishSubject;
+        }else {
+            return screenRequestPublishSubject;
+        }
+	}
+
+	private void _bindScreenRequestPublishSubjectToRouter(PublishSubject<ScreenRequest> screenRequestPublishSubject) {
+	    screenRequestPublishSubject.subscribe(new Action1<ScreenRequest>() {
+            @Override
+            public void call(ScreenRequest screenRequest) {
+                addHidingOfAllCurrentFragmentsToTransaction(getSupportFragmentManager().beginTransaction())
+                        .add(R.id.mainactivity_content_frame, BookingInteraction.newInstance())
+                        .commit();
+            }
+        });
     }
 }

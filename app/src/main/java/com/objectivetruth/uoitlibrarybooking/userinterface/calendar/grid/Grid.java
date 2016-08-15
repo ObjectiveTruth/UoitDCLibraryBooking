@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
@@ -42,7 +43,7 @@ public class Grid extends Fragment {
         Timber.v(calendarDay.toString());
 
         TableFixHeaders _mTableFixheaders = (TableFixHeaders) gridView.findViewById(R.id.calendar_page_grid);
-        gridAdapter = new GridAdapter(getActivity(), calendarDay);
+        gridAdapter = new GridAdapter((MainActivity) getActivity(), calendarDay);
         _mTableFixheaders.setAdapter(gridAdapter);
         _mTableFixheaders.setScrollAtTopGridBehaviourSubject(calendarModel.getScrollAtTopOfGridBehaviourSubject());
 

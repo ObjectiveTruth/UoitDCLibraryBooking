@@ -1,14 +1,16 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.common;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.common.ScreenRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
+import timber.log.Timber;
 
 import java.util.Random;
 
@@ -18,11 +20,13 @@ public class GridAdapter extends FixedTableAdapter {
     private int _width_of_cell_in_pixels;
     private int _height_of_cell_in_pixels;
     private CalendarDay calendarDay;
+    private MainActivity mainActivity;
 
-    public GridAdapter(Context context, CalendarDay calendarDay) {
-        super(context);
-        _width_of_cell_in_pixels = context.getResources().getDimensionPixelSize(R.dimen.table_width);
-        _height_of_cell_in_pixels = context.getResources().getDimensionPixelSize(R.dimen.table_height);
+    public GridAdapter(MainActivity mainActivity, CalendarDay calendarDay) {
+        super(mainActivity);
+        this.mainActivity = mainActivity;
+        _width_of_cell_in_pixels = mainActivity.getResources().getDimensionPixelSize(R.dimen.table_width);
+        _height_of_cell_in_pixels = mainActivity.getResources().getDimensionPixelSize(R.dimen.table_height);
         this.calendarDay = calendarDay;
     }
 
@@ -96,6 +100,9 @@ public class GridAdapter extends FixedTableAdapter {
         // Start Business Logic
         TimeCell currentTimeCellForThisViewCall =
                 calendarDay.timeCells.get(_convertRowAndColumnToTimeCellIndex(row, column));
+
+        holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                mainActivity));
 
         switch(currentTimeCellForThisViewCall.timeCellType) {
             case TABLE_COLUMN_HEADER:
@@ -181,5 +188,21 @@ public class GridAdapter extends FixedTableAdapter {
 
     private boolean _isTopLeftCell(int row, int column) {
         return (row < 0 && column < 0);
+    }
+
+    private static class TimeCellOnClickListener implements View.OnClickListener {
+        private TimeCell timeCell;
+        MainActivity mainActivity;
+
+        TimeCellOnClickListener(TimeCell timeCell, MainActivity mainActivity) {
+            this.timeCell = timeCell;
+            this.mainActivity = mainActivity;
+        }
+
+        @Override
+        public void onClick(View view) {
+            Timber.i("Clicked: " + timeCell.param_get_link);
+            mainActivity.getMainActivityRouterPublishSubject().onNext(new ScreenRequest());
+        }
     }
 }

@@ -135,7 +135,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		
 		else if(bundleExtras.getString("type").equalsIgnoreCase("createbooking")){
             Timber.i("CreateBooking SubRoutine Executing...");
-			setContentView(R.layout.interaction_book);
+			setContentView(R.layout.bookinginteraction_book);
 
 
             TextView roomNumberTextView = (TextView) findViewById(R.id.interaction_book_room_number);

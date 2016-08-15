@@ -18,6 +18,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.statelessutilities.Triple;
+import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.BookingInteraction;
 import com.objectivetruth.uoitlibrarybooking.userinterface.about.About;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesAndPolicies;
@@ -31,7 +32,6 @@ import java.util.Set;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.FragmentTags.*;
 
 public abstract class ActivityBase extends AppCompatActivity {
-    protected abstract String                           getActivityTitle();
     private ActionBarDrawerToggle _mDrawerToggle;
     private DrawerLayout _mDrawerLayout;
     private HashMap<String, Fragment> stringFragmentHashMap = new HashMap<String, Fragment>();
@@ -81,7 +81,6 @@ public abstract class ActivityBase extends AppCompatActivity {
         if(getSupportActionBar() != null) {
             // enable ActionBar app icon to behave as any action menu item to toggle nav drawer
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(getActivityTitle());
         }
     }
 
@@ -127,6 +126,7 @@ public abstract class ActivityBase extends AppCompatActivity {
             GuidelinesAndPolicies guidelinesAndPoliciesFrag = GuidelinesAndPolicies.newInstance();
             About aboutFrag = About.newInstance();
             MyAccount myAccountFrag = MyAccount.newInstance();
+            BookingInteraction bookingInteractions = BookingInteraction.newInstance();
 
             stringFragmentHashMap.put(CALENDAR_FRAGMENT_TAG, calendarFrag);
             stringFragmentHashMap.put(GUIDELINES_POLICIES_FRAGMENT_TAG, guidelinesAndPoliciesFrag);
@@ -312,6 +312,10 @@ public abstract class ActivityBase extends AppCompatActivity {
                     "This Activity did not initialize the ActionBarDrawerToggle, did you forget to call " +
                             "configureAndSetupLayoutAndDrawer()?");
         }
+    }
+
+    protected FragmentTransaction addHidingOfAllCurrentFragmentsToTransaction(FragmentTransaction fragmentTransaction) {
+        return _addHideAllVisibleFragmentsToFragmentTransaction(stringFragmentHashMap, fragmentTransaction);
     }
 
     @Override
