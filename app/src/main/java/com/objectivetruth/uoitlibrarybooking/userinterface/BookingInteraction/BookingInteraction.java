@@ -14,6 +14,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 
 public class BookingInteraction extends Fragment {
     private static final String BOOKING_INTERACTION_TITLE = "Booking";
+    private static final String TIME_CELL_BUNDLE_KEY = "TIME_CELL_BUNDLE_KEY";
     private TimeCell timeCell;
 
     @Nullable
@@ -46,6 +47,12 @@ public class BookingInteraction extends Fragment {
 
 
         Spinner durationSpinner = (Spinner) view.findViewById(R.id.book_spinner_duration);
+        _setupDurationSpinner(durationSpinner);
+
+        return view;
+    }
+
+    private void _setupDurationSpinner(Spinner durationSpinner) {
         ArrayAdapter<CharSequence> durationAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.duration, android.R.layout.simple_spinner_item);
         durationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -63,9 +70,6 @@ public class BookingInteraction extends Fragment {
             public void onNothingSelected(AdapterView<?> adapter) { }
         });
         durationSpinner.setSelection(1);
-
-
-        return view;
     }
 
     @Override
@@ -90,6 +94,19 @@ public class BookingInteraction extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        if(savedInstanceState != null) {
+            _loadPreviousStateIfAvailable(savedInstanceState);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(TIME_CELL_BUNDLE_KEY, timeCell);
+    }
+
+    private void _loadPreviousStateIfAvailable(Bundle inState) {
+        timeCell = inState.getParcelable(TIME_CELL_BUNDLE_KEY);
     }
 
     private void _setTitle(String title) {
