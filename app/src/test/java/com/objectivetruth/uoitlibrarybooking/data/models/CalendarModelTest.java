@@ -155,7 +155,7 @@ public class CalendarModelTest {
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-        Thread.sleep(100);
+        Thread.sleep(300);
 
         CalendarDataRefreshState currentState =
                 calendarModel.getCalendarDataRefreshObservable().first()
