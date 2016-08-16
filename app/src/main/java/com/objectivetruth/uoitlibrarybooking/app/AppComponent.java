@@ -6,8 +6,10 @@ import com.objectivetruth.uoitlibrarybooking.data.DataModule;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionWebService;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebService;
+import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.BookingInteraction;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.Grid;
+import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.common.GridAdapter;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.LoginFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.myaccountloaded.MyAccountLoaded;
@@ -26,7 +28,9 @@ public interface AppComponent {
     void inject(LoginFragment loginFragment);
     void inject(UserWebService userWebService);
     void inject(BookingInteractionWebService bookingInteractionWebService);
+    void inject(BookingInteraction bookingInteraction);
     void inject(CalendarWebService calendarWebService);
     void inject(MyAccountLoaded myAccountLoaded);
+    void inject(GridAdapter gridAdapter);
     void inject(Grid grid);
 }

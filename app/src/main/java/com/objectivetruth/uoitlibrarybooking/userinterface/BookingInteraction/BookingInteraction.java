@@ -10,12 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Action1;
+
+import javax.inject.Inject;
 
 public class BookingInteraction extends Fragment {
     private static final String BOOKING_INTERACTION_TITLE = "Booking";
-    private static final String TIME_CELL_BUNDLE_KEY = "TIME_CELL_BUNDLE_KEY";
-    private TimeCell timeCell;
+    private Subscription bookingInteractionEventSubscription;
+    @Inject BookingInteractionModel bookingInteractionModel;
 
     @Nullable
     @Override
@@ -32,20 +39,32 @@ public class BookingInteraction extends Fragment {
     public void onStart() {
         super.onStart();
         ((MainActivity) getActivity()).setDrawerState(false);
-        _setupViewBindings(timeCell);
+        _setupViewBindings(bookingInteractionModel.getBookingInteractionEventObservable());
     }
 
     @Override
     public void onStop() {
         ((MainActivity) getActivity()).setDrawerState(true);
+        _tearDownViewBindings(bookingInteractionEventSubscription);
         super.onStop();
     }
 
-    private void _setupViewBindings(TimeCell timeCell) {
-        getChildFragmentManager()
-                .beginTransaction()
-                .add(R.id.bookinginteraction_content_frame, Book.newInstance(timeCell))
-                .commit();
+    private void _setupViewBindings(Observable<BookingInteractionEvent> bookingInteractionEventObservable) {
+        bookingInteractionEventSubscription = bookingInteractionEventObservable
+                .subscribe(new Action1<BookingInteractionEvent>() {
+            @Override
+            public void call(BookingInteractionEvent bookingInteractionEvent) {
+                getChildFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.bookinginteraction_content_frame,
+                                Book.newInstance(bookingInteractionEvent.timeCell))
+                        .commit();
+            }
+        });
+    }
+
+    private void _tearDownViewBindings(Subscription subscription) {
+        if(subscription != null) {subscription.unsubscribe();}
     }
 
     @Override
@@ -60,29 +79,15 @@ public class BookingInteraction extends Fragment {
         ((MainActivity) getActivity()).setIsNonDrawerScreenShowing(false);
     }
 
-    public static BookingInteraction newInstance(TimeCell timeCell) {
-        BookingInteraction fragment = new BookingInteraction();
-        fragment.timeCell = timeCell;
-        return fragment;
+    public static BookingInteraction newInstance() {
+        return new BookingInteraction();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
         setHasOptionsMenu(true);
-        if(savedInstanceState != null) {
-            _loadPreviousStateIfAvailable(savedInstanceState);
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(TIME_CELL_BUNDLE_KEY, timeCell);
-    }
-
-    private void _loadPreviousStateIfAvailable(Bundle inState) {
-        timeCell = inState.getParcelable(TIME_CELL_BUNDLE_KEY);
     }
 
     private void _setTitle(String title) {

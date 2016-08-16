@@ -13,12 +13,14 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
+import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionScreenLoadEvent;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.BookingInteraction;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
+import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action1;
-import rx.subjects.PublishSubject;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -32,9 +34,10 @@ public class MainActivity extends ActivityBase {
 	AppCompatActivity mActivity = this;
 	public static CookieManager cookieManager;
     private boolean isFirstLoadThisSession = false;
-    private PublishSubject<TimeCell> bookingInteractionRequestPublishSubject;
+    private Subscription bookingInteractionScreenLoadEventSubscription;
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
+    @Inject BookingInteractionModel bookingInteractionModel;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,7 @@ public class MainActivity extends ActivityBase {
 
         if(isFirstLoadThisSession) {
             _goToScreenByMenuID(R.id.drawer_menu_item_calendar);
-        }else if(areOnlyDrawerRelatedScreensShowing()){
+        }else if(areOnlyDrawerRelatedScreensShowing()){ // A hack for the time being, use git blame to find out more
             _goToScreenByMenuID(getLastMenuItemIDRequested());
         }
 
@@ -212,26 +215,29 @@ public class MainActivity extends ActivityBase {
 	    }
     }
 
-    /**
-     * Can be used to request a Screen change from the MainActivity
-     * @return
-     */
-    public PublishSubject<TimeCell> getMainActivityRouterPublishSubject() {
-        if(bookingInteractionRequestPublishSubject == null || bookingInteractionRequestPublishSubject.hasCompleted()) {
-            bookingInteractionRequestPublishSubject = PublishSubject.create();
-            _bindScreenRequestPublishSubjectToRouter(bookingInteractionRequestPublishSubject);
-            return bookingInteractionRequestPublishSubject;
-        }else {
-            return bookingInteractionRequestPublishSubject;
-        }
-	}
+    @Override
+    protected void onStart() {
+        super.onStart();
+        _bindBookingInteractionEventToLoadingBookingInteractionScreen(
+                bookingInteractionModel.getBookingInteractionScreenLoadEventObservable());
+    }
 
-	private void _bindScreenRequestPublishSubjectToRouter(PublishSubject<TimeCell> screenRequestPublishSubject) {
-	    screenRequestPublishSubject.subscribe(new Action1<TimeCell>() {
+    @Override
+    protected void onStop() {
+        if(bookingInteractionScreenLoadEventSubscription != null) {
+            bookingInteractionScreenLoadEventSubscription.unsubscribe();
+        }
+        super.onStop();
+    }
+
+    private void _bindBookingInteractionEventToLoadingBookingInteractionScreen(
+			Observable<BookingInteractionScreenLoadEvent> bookingInteractionEventObservable) {
+	    bookingInteractionScreenLoadEventSubscription = bookingInteractionEventObservable
+                .subscribe(new Action1<BookingInteractionScreenLoadEvent>() {
             @Override
-            public void call(TimeCell timeCell) {
+            public void call(BookingInteractionScreenLoadEvent bookingInteractionScreenLoadEvent) {
                 addHidingOfAllCurrentFragmentsToTransaction(getSupportFragmentManager().beginTransaction())
-                        .add(R.id.mainactivity_content_frame, BookingInteraction.newInstance(timeCell))
+                        .add(R.id.mainactivity_content_frame, BookingInteraction.newInstance())
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .addToBackStack(null)
                         .commit();

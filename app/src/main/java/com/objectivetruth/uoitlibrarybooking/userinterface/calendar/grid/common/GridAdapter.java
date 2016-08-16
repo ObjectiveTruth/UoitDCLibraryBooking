@@ -1,16 +1,21 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.common;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionScreenLoadEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
 import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.util.Random;
 
 import static com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCellType.BOOKING_CONFIRMED;
@@ -19,13 +24,13 @@ public class GridAdapter extends FixedTableAdapter {
     private int _width_of_cell_in_pixels;
     private int _height_of_cell_in_pixels;
     private CalendarDay calendarDay;
-    private MainActivity mainActivity;
+    @Inject BookingInteractionModel bookingInteractionModel;
 
-    public GridAdapter(MainActivity mainActivity, CalendarDay calendarDay) {
-        super(mainActivity);
-        this.mainActivity = mainActivity;
-        _width_of_cell_in_pixels = mainActivity.getResources().getDimensionPixelSize(R.dimen.table_width);
-        _height_of_cell_in_pixels = mainActivity.getResources().getDimensionPixelSize(R.dimen.table_height);
+    public GridAdapter(Context context, CalendarDay calendarDay) {
+        super(context);
+        ((UOITLibraryBookingApp) context.getApplicationContext()).getComponent().inject(this);
+        _width_of_cell_in_pixels = context.getResources().getDimensionPixelSize(R.dimen.table_width);
+        _height_of_cell_in_pixels = context.getResources().getDimensionPixelSize(R.dimen.table_height);
         this.calendarDay = calendarDay;
     }
 
@@ -101,7 +106,7 @@ public class GridAdapter extends FixedTableAdapter {
                 calendarDay.timeCells.get(_convertRowAndColumnToTimeCellIndex(row, column));
 
         holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
-                mainActivity));
+                bookingInteractionModel));
 
         switch(currentTimeCellForThisViewCall.timeCellType) {
             case TABLE_COLUMN_HEADER:
@@ -191,17 +196,18 @@ public class GridAdapter extends FixedTableAdapter {
 
     private static class TimeCellOnClickListener implements View.OnClickListener {
         private TimeCell timeCell;
-        MainActivity mainActivity;
+        BookingInteractionModel bookingInteractionModel;
 
-        TimeCellOnClickListener(TimeCell timeCell, MainActivity mainActivity) {
+        TimeCellOnClickListener(TimeCell timeCell, BookingInteractionModel bookingInteractionModel) {
             this.timeCell = timeCell;
-            this.mainActivity = mainActivity;
+            this.bookingInteractionModel = bookingInteractionModel;
         }
 
         @Override
         public void onClick(View view) {
-            Timber.i("Clicked: " + timeCell.param_get_link);
-            mainActivity.getMainActivityRouterPublishSubject().onNext(timeCell);
+            Timber.i("Clicked: " + timeCell.toString());
+            bookingInteractionModel.getBookingInteractionScreenLoadEventPublishSubject().onNext(
+                    new BookingInteractionScreenLoadEvent(timeCell, BookingInteractionEventType.IN_PROGRESS));
         }
     }
 }
