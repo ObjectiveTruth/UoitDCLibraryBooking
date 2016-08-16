@@ -55,7 +55,7 @@ public class MainActivity extends ActivityBase {
 
         if(isFirstLoadThisSession) {
             _goToScreenByMenuID(R.id.drawer_menu_item_calendar);
-        }else{
+        }else if(areOnlyDrawerRelatedScreensShowing()){
             _goToScreenByMenuID(getLastMenuItemIDRequested());
         }
 

@@ -1,5 +1,6 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -82,6 +83,18 @@ public class BookingInteraction extends Fragment {
     public void onStop() {
         ((MainActivity) getActivity()).setDrawerState(true);
         super.onStop();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ((MainActivity) getActivity()).setIsNonDrawerScreenShowing(true);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        ((MainActivity) getActivity()).setIsNonDrawerScreenShowing(false);
     }
 
     public static BookingInteraction newInstance(TimeCell timeCell) {
