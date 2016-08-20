@@ -86,9 +86,11 @@ public class BookingInteraction extends Fragment {
                                                                         Fragment currentFragmentInContentFrame) {
         if(currentFragmentInContentFrame == null) {return true;}
 
-        switch(bookingInteractionEvent.timeCell.param_next) {
-            case "book.aspx":
+        switch(bookingInteractionEvent.type) {
+            case BOOK:
                 return !(currentFragmentInContentFrame instanceof Book);
+            case SUCCESS:
+                return !(currentFragmentInContentFrame instanceof Success);
             default:
                 Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();
                 Timber.w("Tried to load a bookinginteractionevent, but it didn't contain any expected " +

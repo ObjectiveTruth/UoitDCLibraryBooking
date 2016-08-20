@@ -145,7 +145,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 			groupNameEditText = (EditText) findViewById(R.id.book_group_name_actual);
             ImageButton commentImageButton = (ImageButton) findViewById(R.id.comment_button);
 			groupCodeEditText = (EditText) findViewById(R.id.book_group_code_actual);
-			titleButton = (Button) findViewById(R.id.book_room_number_actual);
+			titleButton = (Button) findViewById(R.id.bookingInteraction_book_create_button);
             ImageButton groupCodeInfoImageButton = (ImageButton) findViewById(R.id.info_group_code);
 			//titleButton.setTextColor(getResources().getColor(R.color.disabled_button_text));
             ImageView roomPicture = (ImageView) findViewById(R.id.room_landing_room_picture);
@@ -687,7 +687,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		Button addToCalendarButton;
 		Button okButton;
 		firstHiddenFunny = false;
-		setContentView(R.layout.interaction_book_success);
+		setContentView(R.layout.bookinginteraction_success);
 		final ImageView qrCodeActual = (ImageView) findViewById(R.id.qractual);
 		final TextView successMessage = (TextView) findViewById(R.id.book_success_actual);
 

@@ -8,8 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
+
+import javax.inject.Inject;
 
 public class Book extends Fragment{
     private TimeCell timeCell;
@@ -18,6 +23,7 @@ public class Book extends Fragment{
     private static final String TIME_CELL_BUNDLE_KEY = "TIME_CELL_BUNDLE_KEY";
     private static final String MONTH_WORD_BUNDLE_KEY = "MONTH_WORD_BUNDLE_KEY";
     private static final String DAY_OF_MONTH_NUMBER_BUNDLE_KEY = "DAY_OF_MONTH_NUMBER_BUNDLE_KEY";
+    @Inject BookingInteractionModel bookingInteractionModel;
 
     @Nullable
     @Override
@@ -40,7 +46,8 @@ public class Book extends Fragment{
 
         EditText groupCodeEditText = (EditText) view.findViewById(R.id.book_group_code_actual);
 
-        Button titleButton = (Button) view.findViewById(R.id.book_room_number_actual);
+        Button createButton = (Button) view.findViewById(R.id.bookingInteraction_book_create_button);
+        _setupCreateButton(createButton);
 
         ImageButton groupCodeInfoImageButton = (ImageButton) view.findViewById(R.id.info_group_code);
 
@@ -60,9 +67,24 @@ public class Book extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
         if(savedInstanceState != null) {
             _loadPreviousStateIfAvailable(savedInstanceState);
+        }
+    }
+
+    private void _setupCreateButton(Button createButton) {
+        if(createButton != null) {
+            createButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    bookingInteractionModel.getBookingInteractionEventReplaySubject()
+                            .onNext(new BookinginteractionEventWithDateInfo(
+                                    timeCell, BookingInteractionEventType.SUCCESS,
+                                    dayOfMonthNumber, monthWord
+                            ));
+                }
+            });
         }
     }
 

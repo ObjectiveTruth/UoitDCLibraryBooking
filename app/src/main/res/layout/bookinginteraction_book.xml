@@ -132,7 +132,7 @@
             style="@style/flat_ui_button"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:id="@+id/book_room_number_actual"
+            android:id="@+id/bookingInteraction_book_create_button"
             android:layout_below="@+id/book_spinner_duration"
             android:layout_alignLeft="@+id/room_landing_room_picture"
             android:layout_marginLeft="50dp"
@@ -144,8 +144,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/comment_button_selector"
-            android:layout_alignTop="@+id/book_room_number_actual"
-            android:layout_toRightOf="@+id/book_room_number_actual"
+            android:layout_alignTop="@+id/bookingInteraction_book_create_button"
+            android:layout_toRightOf="@+id/bookingInteraction_book_create_button"
             android:layout_marginLeft="50dp"
             />
     </RelativeLayout>

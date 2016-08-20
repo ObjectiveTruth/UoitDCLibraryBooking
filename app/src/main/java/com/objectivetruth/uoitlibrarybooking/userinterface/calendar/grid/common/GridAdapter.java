@@ -210,8 +210,18 @@ public class GridAdapter extends FixedTableAdapter {
         public void onClick(View view) {
             Timber.i("Clicked: " + timeCell.toString());
             bookingInteractionModel.getBookingInteractionScreenLoadEventPublishSubject().onNext(
-                    new BookingInteractionScreenLoadEvent(timeCell, BookingInteractionEventType.IN_PROGRESS,
+                    new BookingInteractionScreenLoadEvent(timeCell,
+                            _getBookingInteractionEventTypeBasedOnTimeCell(timeCell),
                     calendarDay.extDayOfMonthNumber, calendarDay.extMonthWord));
+        }
+    }
+
+    private static BookingInteractionEventType _getBookingInteractionEventTypeBasedOnTimeCell(TimeCell timeCell) {
+        switch(timeCell.param_next) {
+            case "book.aspx":
+                return BookingInteractionEventType.BOOK;
+            default:
+                return BookingInteractionEventType.UNKNOWN;
         }
     }
 }

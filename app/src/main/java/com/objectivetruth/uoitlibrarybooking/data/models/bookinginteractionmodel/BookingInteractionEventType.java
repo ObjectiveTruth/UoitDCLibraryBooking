@@ -5,12 +5,22 @@ package com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmode
  */
 public enum BookingInteractionEventType {
     /**
-     * When a booking interaction flow is in progress (they're choosing their room name/code, etc)
+     * When Booking is requested
      */
-    IN_PROGRESS,
+    BOOK,
+
+    /**
+     * When the user clicks on a booking that is being competed for
+     */
+    JOIN_OR_LEAVE,
 
     /**
      * When an interaction flow succeeds
      */
-    SUCCESS
+    SUCCESS,
+
+    /**
+     * Incase a cell contains unknown information, should error gracefully if this happens
+     */
+    UNKNOWN
 }

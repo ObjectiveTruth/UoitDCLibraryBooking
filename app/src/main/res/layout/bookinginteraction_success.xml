@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+	android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical" >
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/viewleaveorjoin_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Nice!"
+            android:gravity="center"
+            android:textColor="@color/blue_font"
+            android:textSize="@dimen/dialog_title_text" />
+
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/book_success_actual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minLines="4"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:text="@string/error_room_no_exist_comment"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#0099CC" />
+
+        <ImageView
+            android:id="@+id/qractual"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/dialog"
+            android:src="@drawable/ic_freddie_success" />
+
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <com.cengalabs.flatui.views.FlatButton
+                style="@style/flat_ui_button"
+                android:id="@+id/okbutton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="@android:string/ok" />
+
+            <com.cengalabs.flatui.views.FlatButton
+                style="@style/flat_ui_button"
+                android:id="@+id/addtocalendarbutton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:text="Add to Calendar" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
