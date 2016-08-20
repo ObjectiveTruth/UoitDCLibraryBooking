@@ -8,11 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 
 public class Book extends Fragment{
     private TimeCell timeCell;
+    private String monthWord = "";
+    private String dayOfMonthNumber = "";
     private static final String TIME_CELL_BUNDLE_KEY = "TIME_CELL_BUNDLE_KEY";
+    private static final String MONTH_WORD_BUNDLE_KEY = "MONTH_WORD_BUNDLE_KEY";
+    private static final String DAY_OF_MONTH_NUMBER_BUNDLE_KEY = "DAY_OF_MONTH_NUMBER_BUNDLE_KEY";
 
     @Nullable
     @Override
@@ -25,7 +30,7 @@ public class Book extends Fragment{
         if(roomNumberTextView != null) {roomNumberTextView.setText(timeCell.param_room.toUpperCase());}
 
         TextView dateField = (TextView) view.findViewById(R.id.book_date_actual);
-        if(dateField != null) {dateField.setText(timeCell.param_starttime);}
+        if(dateField != null) {dateField.setText(_getFormattedDateString());}
 
         TextView errorTextView = (TextView) view.findViewById(R.id.book_error_message_actual);
 
@@ -44,9 +49,11 @@ public class Book extends Fragment{
         return view;
     }
 
-    static public Book newInstance(TimeCell timeCell) {
+    static public Book newInstance(BookinginteractionEventWithDateInfo bookinginteractionEventWithDateInfo) {
         Book fragment = new Book();
-        fragment.timeCell = timeCell;
+        fragment.timeCell = bookinginteractionEventWithDateInfo.timeCell;
+        fragment.monthWord = bookinginteractionEventWithDateInfo.monthWord;
+        fragment.dayOfMonthNumber = bookinginteractionEventWithDateInfo.dayOfMonthNumber;
         return fragment;
     }
 
@@ -59,8 +66,14 @@ public class Book extends Fragment{
         }
     }
 
+    private String _getFormattedDateString() {
+        return dayOfMonthNumber + ", " + monthWord + " @ " + timeCell.param_starttime;
+    }
+
     private void _loadPreviousStateIfAvailable(Bundle inState) {
         timeCell = inState.getParcelable(TIME_CELL_BUNDLE_KEY);
+        monthWord = inState.getString(MONTH_WORD_BUNDLE_KEY);
+        dayOfMonthNumber = inState.getString(DAY_OF_MONTH_NUMBER_BUNDLE_KEY);
     }
 
     private void _setupDurationSpinner(Spinner durationSpinner) {
@@ -87,5 +100,7 @@ public class Book extends Fragment{
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(TIME_CELL_BUNDLE_KEY, timeCell);
+        outState.putString(DAY_OF_MONTH_NUMBER_BUNDLE_KEY, dayOfMonthNumber);
+        outState.putString(MONTH_WORD_BUNDLE_KEY, monthWord);
     }
 }

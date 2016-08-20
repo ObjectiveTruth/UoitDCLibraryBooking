@@ -4,6 +4,7 @@ import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionScreenLoadEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionWebService;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.subjects.PublishSubject;
@@ -14,8 +15,8 @@ import javax.inject.Inject;
 public class BookingInteractionModel {
     @Inject BookingInteractionWebService bookingInteractionWebService;
 
-    private ReplaySubject<BookingInteractionEvent> bookingInteractionEventReplaySubject;
-    private Observable<BookingInteractionEvent> bookingInteractionEventObservable;
+    private ReplaySubject<BookinginteractionEventWithDateInfo> bookingInteractionEventReplaySubject;
+    private Observable<BookinginteractionEventWithDateInfo> bookingInteractionEventObservable;
 
     private PublishSubject<BookingInteractionScreenLoadEvent> bookingInteractionScreenLoadEventPublishSubject;
     private Observable<BookingInteractionScreenLoadEvent> bookingInteractionScreenLoadEventObservable;
@@ -30,7 +31,7 @@ public class BookingInteractionModel {
      * @see BookingInteractionEvent
      * @return
      */
-    public ReplaySubject<BookingInteractionEvent> getBookingInteractionEventReplaySubject() {
+    public ReplaySubject<BookinginteractionEventWithDateInfo> getBookingInteractionEventReplaySubject() {
         if(bookingInteractionEventReplaySubject == null || bookingInteractionEventReplaySubject.hasCompleted()) {
             bookingInteractionEventReplaySubject = ReplaySubject.createWithSize(1);
             bookingInteractionEventObservable = bookingInteractionEventReplaySubject.asObservable();
@@ -72,7 +73,10 @@ public class BookingInteractionModel {
                     @Override
                     public void call(BookingInteractionScreenLoadEvent b) {
                         getBookingInteractionEventReplaySubject()
-                                .onNext(new BookingInteractionEvent(b.timeCellInQuestion, b.type));
+                                .onNext(new BookinginteractionEventWithDateInfo(b.timeCell,
+                                        b.type,
+                                        b.dayOfMonthNumber,
+                                        b.monthWord));
                     }
                 });
     }
@@ -91,7 +95,7 @@ public class BookingInteractionModel {
      * @see BookingInteractionEvent
      * @return
      */
-    public Observable<BookingInteractionEvent> getBookingInteractionEventObservable() {
+    public Observable<BookinginteractionEventWithDateInfo> getBookingInteractionEventObservable() {
         getBookingInteractionEventReplaySubject(); //Sets up all the references before we return to ensure its created
         return bookingInteractionEventObservable;
     }

@@ -2,12 +2,9 @@ package com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmode
 
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 
-public class BookingInteractionScreenLoadEvent {
-    public TimeCell timeCellInQuestion;
-    public BookingInteractionEventType type;
+public class BookingInteractionScreenLoadEvent extends BookinginteractionEventWithDateInfo{
 
-    public BookingInteractionScreenLoadEvent(TimeCell timeCellInQuestion, BookingInteractionEventType type) {
-        this.timeCellInQuestion = timeCellInQuestion;
-        this.type = type;
+    public BookingInteractionScreenLoadEvent(TimeCell timeCell, BookingInteractionEventType type, String dayOfMonthNumber, String monthWord) {
+        super(timeCell, type, dayOfMonthNumber, monthWord);
     }
 }

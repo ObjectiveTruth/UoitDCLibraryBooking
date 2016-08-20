@@ -8,14 +8,16 @@ import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
+import timber.log.Timber;
 
 import javax.inject.Inject;
 
@@ -49,18 +51,52 @@ public class BookingInteraction extends Fragment {
         super.onStop();
     }
 
-    private void _setupViewBindings(Observable<BookingInteractionEvent> bookingInteractionEventObservable) {
+    private void _setupViewBindings(Observable<BookinginteractionEventWithDateInfo> bookingInteractionEventObservable) {
         bookingInteractionEventSubscription = bookingInteractionEventObservable
-                .subscribe(new Action1<BookingInteractionEvent>() {
+                .subscribe(new Action1<BookinginteractionEventWithDateInfo>() {
             @Override
-            public void call(BookingInteractionEvent bookingInteractionEvent) {
-                getChildFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.bookinginteraction_content_frame,
-                                Book.newInstance(bookingInteractionEvent.timeCell))
-                        .commit();
+            public void call(BookinginteractionEventWithDateInfo bookingInteractionEvent) {
+                _replaceContentFrameWithFragmentBasedOnEvent(bookingInteractionEvent);
             }
         });
+    }
+
+    private void _replaceContentFrameWithFragmentBasedOnEvent(
+            BookinginteractionEventWithDateInfo bookingInteractionEvent) {
+        Fragment currentFragmentInContentFrame = getChildFragmentManager()
+                .findFragmentById(R.id.bookinginteraction_content_frame);
+
+        if(_doesCurrentContentFrameNeedToBeChanged(bookingInteractionEvent, currentFragmentInContentFrame)) {
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.bookinginteraction_content_frame,
+                            Book.newInstance(bookingInteractionEvent))
+                    .commit();
+        }
+    }
+
+    /**
+     * Checks whether the content frame shoudld be updated. For example, if its empty, or doesn't contain the correct
+     * fragment for the currently requested BookingEvent
+     * @param bookingInteractionEvent
+     * @param currentFragmentInContentFrame
+     * @return
+     */
+    private boolean _doesCurrentContentFrameNeedToBeChanged(BookinginteractionEventWithDateInfo bookingInteractionEvent,
+                                                                        Fragment currentFragmentInContentFrame) {
+        if(currentFragmentInContentFrame == null) {return true;}
+
+        switch(bookingInteractionEvent.timeCell.param_next) {
+            case "book.aspx":
+                return !(currentFragmentInContentFrame instanceof Book);
+            default:
+                Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();
+                Timber.w("Tried to load a bookinginteractionevent, but it didn't contain any expected " +
+                        "values in the param_next field: " + bookingInteractionEvent.timeCell.toString());
+                // Remove the BookingInteraction Fragment. Undoes the booking interaction fragment loading
+                getActivity().getSupportFragmentManager().popBackStack();
+                return false;
+        }
     }
 
     private void _tearDownViewBindings(Subscription subscription) {

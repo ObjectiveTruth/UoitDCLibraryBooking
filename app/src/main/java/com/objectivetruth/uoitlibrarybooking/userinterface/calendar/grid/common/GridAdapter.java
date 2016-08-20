@@ -106,7 +106,7 @@ public class GridAdapter extends FixedTableAdapter {
                 calendarDay.timeCells.get(_convertRowAndColumnToTimeCellIndex(row, column));
 
         holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
-                bookingInteractionModel));
+                bookingInteractionModel, calendarDay));
 
         switch(currentTimeCellForThisViewCall.timeCellType) {
             case TABLE_COLUMN_HEADER:
@@ -196,18 +196,22 @@ public class GridAdapter extends FixedTableAdapter {
 
     private static class TimeCellOnClickListener implements View.OnClickListener {
         private TimeCell timeCell;
+        private CalendarDay calendarDay;
         BookingInteractionModel bookingInteractionModel;
 
-        TimeCellOnClickListener(TimeCell timeCell, BookingInteractionModel bookingInteractionModel) {
+        TimeCellOnClickListener(TimeCell timeCell, BookingInteractionModel bookingInteractionModel,
+                                CalendarDay calendarDay) {
             this.timeCell = timeCell;
             this.bookingInteractionModel = bookingInteractionModel;
+            this.calendarDay = calendarDay;
         }
 
         @Override
         public void onClick(View view) {
             Timber.i("Clicked: " + timeCell.toString());
             bookingInteractionModel.getBookingInteractionScreenLoadEventPublishSubject().onNext(
-                    new BookingInteractionScreenLoadEvent(timeCell, BookingInteractionEventType.IN_PROGRESS));
+                    new BookingInteractionScreenLoadEvent(timeCell, BookingInteractionEventType.IN_PROGRESS,
+                    calendarDay.extDayOfMonthNumber, calendarDay.extMonthWord));
         }
     }
 }
