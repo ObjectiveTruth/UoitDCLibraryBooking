@@ -1,8 +1,10 @@
 package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
+import timber.log.Timber;
 
 import javax.inject.Inject;
 
@@ -20,6 +23,7 @@ public class Book extends Fragment{
     private TimeCell timeCell;
     private String monthWord = "";
     private String dayOfMonthNumber = "";
+    private String comment = "";
     private static final String TIME_CELL_BUNDLE_KEY = "TIME_CELL_BUNDLE_KEY";
     private static final String MONTH_WORD_BUNDLE_KEY = "MONTH_WORD_BUNDLE_KEY";
     private static final String DAY_OF_MONTH_NUMBER_BUNDLE_KEY = "DAY_OF_MONTH_NUMBER_BUNDLE_KEY";
@@ -42,7 +46,8 @@ public class Book extends Fragment{
 
         EditText groupNameEditText = (EditText) view.findViewById(R.id.book_group_name_actual);
 
-        ImageButton commentImageButton = (ImageButton) view.findViewById(R.id.comment_button);
+        ImageButton commentButton = (ImageButton) view.findViewById(R.id.comment_button);
+        _setupCommentButton(commentButton);
 
         EditText groupCodeEditText = (EditText) view.findViewById(R.id.book_group_code_actual);
 
@@ -71,6 +76,39 @@ public class Book extends Fragment{
         if(savedInstanceState != null) {
             _loadPreviousStateIfAvailable(savedInstanceState);
         }
+    }
+
+    private void _setupCommentButton(ImageButton button) {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _showCommentDialog();
+            }
+        });
+    }
+
+    private void _showCommentDialog() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+        final EditText edittext = new EditText(getActivity());
+        alert.setMessage("Visible in the library system to all users");
+        alert.setTitle("Comments");
+
+        alert.setView(edittext);
+
+        alert.setPositiveButton("Set Comment", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                comment = edittext.getText().toString();
+                Timber.i("Comment changed by user to: " + comment);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                Timber.i("Comment edit canceled by user. Comment will be " + comment);
+            }
+        });
+        alert.setCancelable(false);
+        alert.create().show();
     }
 
     private void _setupCreateButton(Button createButton) {
