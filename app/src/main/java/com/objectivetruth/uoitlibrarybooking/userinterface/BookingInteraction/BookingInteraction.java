@@ -67,14 +67,14 @@ public class BookingInteraction extends Fragment {
                 .findFragmentById(R.id.bookinginteraction_content_frame);
 
         if(_doesCurrentContentFrameNeedToBeChanged(bookingInteractionEvent, currentFragmentInContentFrame)) {
-            Timber.i("Received event request to change fragment, changing: " + bookingInteractionEvent.type);
+            Timber.d("Received event request to change fragment, changing: " + bookingInteractionEvent.type);
             getChildFragmentManager()
                     .beginTransaction()
                     .replace(R.id.bookinginteraction_content_frame,
                             _getFragmentForEvent(bookingInteractionEvent))
                     .commit();
         }else{
-            Timber.i("Received event request to change fragment, but fragment is already in the correct state: " +
+            Timber.d("Received event request to change fragment, but fragment is already in the correct state: " +
                     bookingInteractionEvent.type);
         }
     }
@@ -82,12 +82,16 @@ public class BookingInteraction extends Fragment {
     private Fragment _getFragmentForEvent(BookinginteractionEventWithDateInfo bookinginteractionEventWithDateInfo) {
        switch(bookinginteractionEventWithDateInfo.type) {
            case BOOK:
+               Timber.i("Showing: Book");
                return Book.newInstance(bookinginteractionEventWithDateInfo);
            case SUCCESS:
+               Timber.i("Showing: Success");
                return Success.newInstance();
            case JOIN_OR_LEAVE:
+               Timber.i("Showing: JoinOrLeave");
                return JoinOrLeave.newInstance(bookinginteractionEventWithDateInfo);
            default:
+               Timber.w("No valid Fragment requested, showing Success");
                return Success.newInstance();
        }
     }

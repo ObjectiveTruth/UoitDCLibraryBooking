@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
@@ -27,6 +29,10 @@ public class Book extends Fragment{
     private static final String TIME_CELL_BUNDLE_KEY = "TIME_CELL_BUNDLE_KEY";
     private static final String MONTH_WORD_BUNDLE_KEY = "MONTH_WORD_BUNDLE_KEY";
     private static final String DAY_OF_MONTH_NUMBER_BUNDLE_KEY = "DAY_OF_MONTH_NUMBER_BUNDLE_KEY";
+
+    private EditText groupNameET;
+    private EditText groupCodeET;
+    private String durationSpinnerValue = "1.0"; // a default value to avoid NPE. Stands for 1 hour
     @Inject BookingInteractionModel bookingInteractionModel;
 
     @Nullable
@@ -44,12 +50,12 @@ public class Book extends Fragment{
 
         TextView errorTextView = (TextView) view.findViewById(R.id.book_error_message_actual);
 
-        EditText groupNameEditText = (EditText) view.findViewById(R.id.book_group_name_actual);
+        groupNameET = (EditText) view.findViewById(R.id.book_group_name_actual);
 
         ImageButton commentButton = (ImageButton) view.findViewById(R.id.comment_button);
         _setupCommentButton(commentButton);
 
-        EditText groupCodeEditText = (EditText) view.findViewById(R.id.book_group_code_actual);
+        groupCodeET = (EditText) view.findViewById(R.id.book_group_code_actual);
 
         Button createButton = (Button) view.findViewById(R.id.bookingInteraction_book_create_button);
         _setupCreateButton(createButton);
@@ -107,7 +113,13 @@ public class Book extends Fragment{
                 Timber.i("Comment edit canceled by user. Comment will be " + comment);
             }
         });
-        alert.setCancelable(false);
+
+        alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                Timber.i("Comment edit canceled by user. Comment will be " + comment);
+            }
+        });
         alert.create().show();
     }
 
@@ -116,11 +128,15 @@ public class Book extends Fragment{
             createButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    bookingInteractionModel.getBookingInteractionEventReplaySubject()
-                            .onNext(new BookinginteractionEventWithDateInfo(
-                                    timeCell, BookingInteractionEventType.SUCCESS,
-                                    dayOfMonthNumber, monthWord
-                            ));
+                    if(_isFormFilledCorrectly()) {
+                        bookingInteractionModel.getBookingInteractionEventReplaySubject()
+                                .onNext(new BookinginteractionEventWithDateInfo(
+                                        timeCell, BookingInteractionEventType.SUCCESS,
+                                        dayOfMonthNumber, monthWord
+                                ));
+                    }else {
+                        _showValidationErrorsAndAnimations();
+                    }
                 }
             });
         }
@@ -147,13 +163,14 @@ public class Book extends Fragment{
             public void onItemSelected(AdapterView<?> adapter, View view,
                                        int position, long id) {
                 String[] timeToDecimal = new String[]{"0.5", "1.0", "1.5", "2"};
-                String durationSpinnerValue = timeToDecimal[position];
+                durationSpinnerValue = timeToDecimal[position];
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapter) { }
         });
         durationSpinner.setSelection(1);
+        durationSpinnerValue = "1.0";
     }
 
     @Override
@@ -162,5 +179,30 @@ public class Book extends Fragment{
         outState.putParcelable(TIME_CELL_BUNDLE_KEY, timeCell);
         outState.putString(DAY_OF_MONTH_NUMBER_BUNDLE_KEY, dayOfMonthNumber);
         outState.putString(MONTH_WORD_BUNDLE_KEY, monthWord);
+    }
+
+    private boolean _isFormFilledCorrectly() {
+        Timber.i("Some fields were not filled in correctly");
+        return _isGroupCodeFilledCorrectly() && _isGroupNameFilledCorrectly();
+    }
+
+    private boolean _isGroupCodeFilledCorrectly() {
+        return !groupCodeET.getText().toString().trim().isEmpty();
+    }
+
+    private boolean _isGroupNameFilledCorrectly() {
+        return !groupNameET.getText().toString().trim().isEmpty();
+    }
+
+    private void _showValidationErrorsAndAnimations() {
+        if(!_isGroupNameFilledCorrectly()) {
+            Timber.d("GroupName not filled correctly, playing animation");
+            YoYo.with(Techniques.Shake).duration(1000).playOn(groupNameET);
+        }
+
+        if(!_isGroupCodeFilledCorrectly()) {
+            Timber.d("GroupCode not filled correctly, playing animation");
+            YoYo.with(Techniques.Shake).delay(100).duration(900).playOn(groupCodeET);
+        }
     }
 }
