@@ -689,11 +689,11 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		firstHiddenFunny = false;
 		setContentView(R.layout.bookinginteraction_success);
 		final ImageView qrCodeActual = (ImageView) findViewById(R.id.qractual);
-		final TextView successMessage = (TextView) findViewById(R.id.book_success_actual);
+		final TextView successMessage = (TextView) findViewById(R.id.bookingInteraction_success_body);
 
 
 
-        addToCalendarButton = (Button) findViewById(R.id.addtocalendarbutton);
+        addToCalendarButton = (Button) findViewById(R.id.bookingInteraction_success_add_to_calendar_button);
         //A Cancel success Event
         if(!isCalendarable){
         	addToCalendarButton.setVisibility(View.GONE);
@@ -833,7 +833,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
                 }
             });
         }
-		okButton = (Button) findViewById(R.id.okbutton);
+		okButton = (Button) findViewById(R.id.bookingInteraction_success_ok_button);
 		
 		
 		okButton.setOnClickListener(new OnClickListener(){

@@ -70,9 +70,20 @@ public class BookingInteraction extends Fragment {
             getChildFragmentManager()
                     .beginTransaction()
                     .replace(R.id.bookinginteraction_content_frame,
-                            Book.newInstance(bookingInteractionEvent))
+                            _getFragmentForEvent(bookingInteractionEvent))
                     .commit();
         }
+    }
+
+    private Fragment _getFragmentForEvent(BookinginteractionEventWithDateInfo bookinginteractionEventWithDateInfo) {
+       switch(bookinginteractionEventWithDateInfo.type) {
+           case BOOK:
+               return Book.newInstance(bookinginteractionEventWithDateInfo);
+           case SUCCESS:
+               return Success.newInstance();
+           default:
+               return Success.newInstance();
+       }
     }
 
     /**
@@ -95,10 +106,16 @@ public class BookingInteraction extends Fragment {
                 Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();
                 Timber.w("Tried to load a bookinginteractionevent, but it didn't contain any expected " +
                         "values in the param_next field: " + bookingInteractionEvent.timeCell.toString());
-                // Remove the BookingInteraction Fragment. Undoes the booking interaction fragment loading
-                getActivity().getSupportFragmentManager().popBackStack();
+                _popFragmentBackstack();
                 return false;
         }
+    }
+
+    /**
+     * Remove this Fragment. Effectively undoes the booking interaction fragment loading event
+     */
+    private void _popFragmentBackstack() {
+        getActivity().getSupportFragmentManager().popBackStack();
     }
 
     private void _tearDownViewBindings(Subscription subscription) {

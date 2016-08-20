@@ -15,7 +15,7 @@
         android:orientation="vertical" >
 
         <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
-            android:id="@+id/viewleaveorjoin_date"
+            android:id="@+id/bookingInteraction_success_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -26,7 +26,7 @@
 
 
         <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
-            android:id="@+id/book_success_actual"
+            android:id="@+id/bookingInteraction_success_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minLines="4"
@@ -57,7 +57,7 @@
 
             <com.cengalabs.flatui.views.FlatButton
                 style="@style/flat_ui_button"
-                android:id="@+id/okbutton"
+                android:id="@+id/bookingInteraction_success_ok_button"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
 
             <com.cengalabs.flatui.views.FlatButton
                 style="@style/flat_ui_button"
-                android:id="@+id/addtocalendarbutton"
+                android:id="@+id/bookingInteraction_success_add_to_calendar_button"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
