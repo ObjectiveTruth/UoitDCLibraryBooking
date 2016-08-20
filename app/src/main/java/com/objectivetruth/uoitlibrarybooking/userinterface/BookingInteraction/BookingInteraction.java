@@ -14,6 +14,7 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
+import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.Utils;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
@@ -68,6 +69,7 @@ public class BookingInteraction extends Fragment {
 
         if(_doesCurrentContentFrameNeedToBeChanged(bookingInteractionEvent, currentFragmentInContentFrame)) {
             Timber.d("Received event request to change fragment, changing: " + bookingInteractionEvent.type);
+            _setTitle(_getFormattedTitle(bookingInteractionEvent));
             getChildFragmentManager()
                     .beginTransaction()
                     .replace(R.id.bookinginteraction_content_frame,
@@ -77,6 +79,13 @@ public class BookingInteraction extends Fragment {
             Timber.d("Received event request to change fragment, but fragment is already in the correct state: " +
                     bookingInteractionEvent.type);
         }
+    }
+
+    private String _getFormattedTitle(BookinginteractionEventWithDateInfo bookingInteractionEvent) {
+        String dayOfWeekWord = Utils.getDayOfWeekBasedOnDayNumberMonthNumber( bookingInteractionEvent.monthWord,
+                bookingInteractionEvent.dayOfMonthNumber);
+        return BOOKING_INTERACTION_TITLE + " - " + dayOfWeekWord + ": " +
+                bookingInteractionEvent.timeCell.param_starttime;
     }
 
     private Fragment _getFragmentForEvent(BookinginteractionEventWithDateInfo bookinginteractionEventWithDateInfo) {
