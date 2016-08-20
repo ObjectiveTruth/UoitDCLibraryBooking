@@ -282,7 +282,7 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		}
 		else if(bundleExtras.getString("type").equalsIgnoreCase("joinorleave")){
             Timber.i("JoinOrLeave SubRoutine Executing...");
-			setContentView(R.layout.interaction_joinorleave);
+			setContentView(R.layout.bookinginteraction_joinorleave);
 
 			TextView roomNumberTextView = (TextView) findViewById(R.id.joinorleave_room_number);
 			TextView dateTextView = (TextView) findViewById(R.id.joinorleave_date);

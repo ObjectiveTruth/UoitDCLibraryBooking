@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import com.objectivetruth.uoitlibrarybooking.R;
+import timber.log.Timber;
 
 public class Success extends Fragment{
 
@@ -50,6 +51,7 @@ public class Success extends Fragment{
      * Remove this Fragment. Effectively undoes the booking interaction fragment loading event
      */
     private void _popFragmentBackstack() {
+        Timber.d("Popping backstack");
         getActivity().getSupportFragmentManager().popBackStack();
     }
 }

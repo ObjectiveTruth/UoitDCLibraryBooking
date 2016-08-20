@@ -220,6 +220,8 @@ public class GridAdapter extends FixedTableAdapter {
         switch(timeCell.param_next) {
             case "book.aspx":
                 return BookingInteractionEventType.BOOK;
+            case "joinorleave.aspx":
+                return BookingInteractionEventType.JOIN_OR_LEAVE;
             default:
                 return BookingInteractionEventType.UNKNOWN;
         }

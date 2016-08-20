@@ -10,7 +10,7 @@ public enum BookingInteractionEventType {
     BOOK,
 
     /**
-     * When the user clicks on a booking that is being competed for
+     * When the user clicks on a booking that is being competed for, they can join it or leave
      */
     JOIN_OR_LEAVE,
 

@@ -67,11 +67,15 @@ public class BookingInteraction extends Fragment {
                 .findFragmentById(R.id.bookinginteraction_content_frame);
 
         if(_doesCurrentContentFrameNeedToBeChanged(bookingInteractionEvent, currentFragmentInContentFrame)) {
+            Timber.i("Received event request to change fragment, changing: " + bookingInteractionEvent.type);
             getChildFragmentManager()
                     .beginTransaction()
                     .replace(R.id.bookinginteraction_content_frame,
                             _getFragmentForEvent(bookingInteractionEvent))
                     .commit();
+        }else{
+            Timber.i("Received event request to change fragment, but fragment is already in the correct state: " +
+                    bookingInteractionEvent.type);
         }
     }
 
@@ -81,6 +85,8 @@ public class BookingInteraction extends Fragment {
                return Book.newInstance(bookinginteractionEventWithDateInfo);
            case SUCCESS:
                return Success.newInstance();
+           case JOIN_OR_LEAVE:
+               return JoinOrLeave.newInstance(bookinginteractionEventWithDateInfo);
            default:
                return Success.newInstance();
        }
@@ -102,6 +108,8 @@ public class BookingInteraction extends Fragment {
                 return !(currentFragmentInContentFrame instanceof Book);
             case SUCCESS:
                 return !(currentFragmentInContentFrame instanceof Success);
+            case JOIN_OR_LEAVE:
+                return !(currentFragmentInContentFrame instanceof JoinOrLeave);
             default:
                 Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();
                 Timber.w("Tried to load a bookinginteractionevent, but it didn't contain any expected " +
@@ -115,6 +123,7 @@ public class BookingInteraction extends Fragment {
      * Remove this Fragment. Effectively undoes the booking interaction fragment loading event
      */
     private void _popFragmentBackstack() {
+        Timber.d("Popping backstack");
         getActivity().getSupportFragmentManager().popBackStack();
     }
 
