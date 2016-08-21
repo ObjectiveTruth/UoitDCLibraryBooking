@@ -60,10 +60,21 @@ public class GuidelinesAndPolicies extends Fragment{
         int id = item.getItemId();
 
         if(id == R.id.debug_options_settings) {
-            getChildFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.guidelinesandpolicies_root_content_frame, new DebugPreferences(), null)
-                    .commit();
+            Fragment currentFragment = getChildFragmentManager()
+                    .findFragmentById(R.id.guidelinesandpolicies_root_content_frame);
+
+            if(currentFragment instanceof DebugPreferences) {
+                getChildFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.guidelinesandpolicies_root_content_frame,
+                                GuidelinesAndPoliciesLoaded.newInstance())
+                        .commit();
+            }else{
+                getChildFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.guidelinesandpolicies_root_content_frame, new DebugPreferences(), null)
+                        .commit();
+            }
             return true;
         }else if(id == R.id.debug_options_button){
             Timber.d("Does Nothing");
