@@ -8,6 +8,7 @@ import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.app.networking.MockHttpStack;
 import com.objectivetruth.uoitlibrarybooking.app.networking.OkHttp3Stack;
+import com.objectivetruth.uoitlibrarybooking.app.networking.customvolley.CustomVolleyToHandleRedirects;
 import com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
@@ -43,8 +44,9 @@ public class DataModule {
 
     @Provides
     @Singleton
-    BookingInteractionModel providesBookingInteractionModel(BookingInteractionWebService bookingInteractionWebService) {
-        return new BookingInteractionModel(mApplication, bookingInteractionWebService);
+    BookingInteractionModel providesBookingInteractionModel(BookingInteractionWebService bookingInteractionWebService,
+                                                            CalendarWebService calendarWebService) {
+        return new BookingInteractionModel(mApplication, bookingInteractionWebService, calendarWebService);
     }
 
     @Provides
@@ -72,7 +74,7 @@ public class DataModule {
             Timber.i("Using Mock Http Stack");
             return Volley.newRequestQueue(mApplication, new MockHttpStack(mApplication));
         }else {
-            return Volley.newRequestQueue(mApplication, new OkHttp3Stack());
+            return CustomVolleyToHandleRedirects.newRequestQueue(mApplication, new OkHttp3Stack());
         }
     }
 

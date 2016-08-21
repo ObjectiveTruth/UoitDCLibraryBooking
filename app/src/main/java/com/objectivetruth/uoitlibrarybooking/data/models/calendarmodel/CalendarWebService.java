@@ -13,6 +13,7 @@ import timber.log.Timber;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpCookie;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,6 +68,43 @@ public class CalendarWebService {
                 });
             }
         });
+    }
+
+    public Observable<HttpCookie> getCookieFromCalendarDay(final CalendarDay calendarDay) {
+        return Observable.defer(new Func0<Observable<HttpCookie>>() {
+            @Override
+            public Observable<HttpCookie> call() {
+                try {
+                    return Observable.just(_getCookieFromRequestByBlocking(calendarDay));
+                } catch (InterruptedException | ExecutionException e) {
+                    Timber.e(e, "Error while getting cookie" + calendarDay.toString());
+                    return Observable.error(e);
+                }
+            }
+        });
+    }
+
+    private HttpCookie _getCookieFromRequestByBlocking(final CalendarDay calendarDay)
+            throws InterruptedException, ExecutionException{
+        Timber.d("Starting the POST request to the clickable date " + calendarDay.extDayOfMonthNumber + "...");
+        RequestFuture<HttpCookie> future = RequestFuture.newFuture();
+        CookieRequest cookieRequest =
+                new CookieRequest(Request.Method.POST, MAIN_CALENDAR_URL, future, future) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String>  headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/x-www-form-urlencoded");
+                        return headers;
+                    }
+
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        return _getBodyInBytesForCalendarDayData(calendarDay);
+                    }
+                };
+        requestQueue.add(cookieRequest);
+        Timber.i("POST request finished when searching for cookie on day: " + calendarDay.extDayOfMonthNumber);
+        return future.get();
     }
 
     /**
