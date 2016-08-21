@@ -14,8 +14,10 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.BookRequestOptions;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import timber.log.Timber;
 
@@ -67,7 +69,7 @@ public class Book extends Fragment{
         return view;
     }
 
-    static public Book newInstance(BookinginteractionEventWithDateInfo bookinginteractionEventWithDateInfo) {
+    static public Book newInstance(BookingInteractionEvent bookinginteractionEventWithDateInfo) {
         Book fragment = new Book();
         fragment.timeCell = bookinginteractionEventWithDateInfo.timeCell;
         fragment.monthWord = bookinginteractionEventWithDateInfo.monthWord;
@@ -151,11 +153,19 @@ public class Book extends Fragment{
                 @Override
                 public void onClick(View view) {
                     if(_isFormFilledCorrectly()) {
-                        bookingInteractionModel.getBookingInteractionEventReplaySubject()
-                                .onNext(new BookinginteractionEventWithDateInfo(
-                                        timeCell, BookingInteractionEventType.SUCCESS,
-                                        dayOfMonthNumber, monthWord
-                                ));
+                        BookRequestOptions requestOptions = new BookRequestOptions(
+                                groupNameET.getText().toString().trim(),
+                                groupCodeET.getText().toString().trim(),
+                                durationSpinnerValue,
+                                comment
+                        );
+                        bookingInteractionModel.getBookingInteractionEventUserRequest()
+                                .onNext(new BookingInteractionEventUserRequest(
+                                        timeCell,
+                                        BookingInteractionEventUserRequestType.BOOK_REQUEST,
+                                        dayOfMonthNumber,
+                                        monthWord,
+                                        requestOptions));
                     }else {
                         _showValidationErrorsAndAnimations();
                     }

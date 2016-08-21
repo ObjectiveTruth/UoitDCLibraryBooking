@@ -2,7 +2,7 @@ package com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmode
 
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 
-public class BookingInteractionScreenLoadEvent extends BookinginteractionEventWithDateInfo{
+public class BookingInteractionScreenLoadEvent extends BookingInteractionEvent{
 
     public BookingInteractionScreenLoadEvent(TimeCell timeCell, BookingInteractionEventType type, String dayOfMonthNumber, String monthWord) {
         super(timeCell, type, dayOfMonthNumber, monthWord);

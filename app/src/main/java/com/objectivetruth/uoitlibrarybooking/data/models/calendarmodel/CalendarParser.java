@@ -16,6 +16,16 @@ public class CalendarParser {
         return Observable.just(_parseDataToFindNumberOfDaysInfo(rawWebPage));
     }
 
+    /**
+     * Returns a CalendarDay partially filled. Will contain the 3: ViewState, ViewStateGenerator, and EventValidation
+     * @param rawWebpage
+     * @return
+     */
+    static public Observable<CalendarDay> parseRawWebpageForViewStateGeneratorAndEventValidation(String rawWebpage) {
+        return Observable.just(
+                _parsePageAndReplaceViewStateAndEventValidationOfCalendarDay(rawWebpage, new CalendarDay()));
+    }
+
     static public Observable<CalendarData> parseDataToFindAdditionalNumberOfDaysInfoObs(CalendarData calendarData,
                                                                                         String[] rawWebPages) {
         return Observable.just(_parseDataToFindAdditionalNumberOfDaysInfo(calendarData, rawWebPages));
@@ -185,6 +195,10 @@ public class CalendarParser {
             currentTableDataElement = tdStore[iterationIndex];
             Timber.v("Parsing: " + currentTableDataElement);
             TimeCell timeCellToBeAdded = new TimeCell();
+
+            // Populate timecell with info from CalendarDay
+            timeCellToBeAdded.param_eventtarget = calendarDay.extEventTarget;
+            timeCellToBeAdded.param_eventargument = calendarDay.extEventArgument;
 
             // Is the very first cell thats being parsed means its the top left cell
             if(iterationIndex == 1) { timeCellToBeAdded.timeCellType = TimeCellType.TABLE_TOP_LEFT_CELL;}

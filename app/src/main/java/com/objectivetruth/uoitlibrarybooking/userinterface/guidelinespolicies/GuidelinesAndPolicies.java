@@ -8,7 +8,7 @@ import android.view.*;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.DebugPreferences.DebugPreferences;
+import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.debugpreferences.DebugPreferences;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.guidelinesandpoliciesloaded.GuidelinesAndPoliciesLoaded;
 import timber.log.Timber;
 

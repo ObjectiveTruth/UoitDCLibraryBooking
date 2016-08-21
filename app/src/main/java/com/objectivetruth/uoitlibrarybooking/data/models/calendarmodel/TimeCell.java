@@ -12,6 +12,8 @@ public class TimeCell implements Parcelable {
     public String param_get_link;
     public String param_starttime;
     public String param_room;
+    public String param_eventargument;
+    public String param_eventtarget;
 
     @Override
     public String toString() {
@@ -30,6 +32,12 @@ public class TimeCell implements Parcelable {
 
         returnString += "param_room: ";
         if(notNull(param_room)) {returnString += param_room + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "param_eventargument: ";
+        if(notNull(param_eventargument)) {returnString += param_eventargument + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "param_eventtarget: ";
+        if(notNull(param_eventtarget)) {returnString += param_eventtarget + ", ";} else {returnString += "NULL, ";}
 
         returnString += "groupNameForWhenFullyBookedRoom: ";
         if(notNull(groupNameForWhenFullyBookedRoom))
@@ -57,6 +65,8 @@ public class TimeCell implements Parcelable {
         dest.writeString(this.param_get_link);
         dest.writeString(this.param_starttime);
         dest.writeString(this.param_room);
+        dest.writeString(this.param_eventargument);
+        dest.writeString(this.param_eventtarget);
         dest.writeString(this.groupNameForWhenFullyBookedRoom);
         dest.writeString(this.timeStringOrRoomName);
     }
@@ -71,6 +81,8 @@ public class TimeCell implements Parcelable {
         this.param_get_link = in.readString();
         this.param_starttime = in.readString();
         this.param_room = in.readString();
+        this.param_eventargument = in.readString();
+        this.param_eventtarget = in.readString();
         this.groupNameForWhenFullyBookedRoom = in.readString();
         this.timeStringOrRoomName = in.readString();
     }

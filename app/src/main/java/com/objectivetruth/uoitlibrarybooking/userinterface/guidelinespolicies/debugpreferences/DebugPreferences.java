@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.DebugPreferences;
+package com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.debugpreferences;
 
 
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCE_NAMES;
 import timber.log.Timber;
@@ -28,11 +29,11 @@ public class DebugPreferences extends PreferenceFragmentCompat {
             public boolean onPreferenceClick(Preference preference) {
                 Timber.d("Dumping shared preferences information to LogCat. ");
                 Timber.d("Remember, you can also use: adb pull /data/data/com.objectivetruth.uoitlibrarybooking/shared_prefs/prefs.xml");
-                _dumpSharedPreference(
-                        _getDefaultSharedPreferencesName(getActivity()),
-                        SHARED_PREFERENCE_NAMES.USER_SHARED_PREFERENCES_NAME,
-                        SHARED_PREFERENCE_NAMES.CALENDAR_SHARED_PREFERENCES_NAME);
-
+                if(BuildConfig.DEBUG) {
+                    _dumpSharedPreference(
+                            _getDefaultSharedPreferencesName(getActivity()),
+                            SHARED_PREFERENCE_NAMES.CALENDAR_SHARED_PREFERENCES_NAME);
+                }
                 return true;
             }
         });

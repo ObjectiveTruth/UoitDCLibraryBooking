@@ -14,7 +14,7 @@ import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.Utils;
 import rx.Observable;
 import rx.Subscription;
@@ -64,18 +64,18 @@ public class BookingInteraction extends Fragment {
         }
     }
 
-    private void _setupViewBindings(Observable<BookinginteractionEventWithDateInfo> bookingInteractionEventObservable) {
+    private void _setupViewBindings(Observable<BookingInteractionEvent> bookingInteractionEventObservable) {
         bookingInteractionEventSubscription = bookingInteractionEventObservable
-                .subscribe(new Action1<BookinginteractionEventWithDateInfo>() {
+                .subscribe(new Action1<BookingInteractionEvent>() {
             @Override
-            public void call(BookinginteractionEventWithDateInfo bookingInteractionEvent) {
+            public void call(BookingInteractionEvent bookingInteractionEvent) {
                 _replaceContentFrameWithFragmentBasedOnEvent(bookingInteractionEvent);
             }
         });
     }
 
     private void _replaceContentFrameWithFragmentBasedOnEvent(
-            BookinginteractionEventWithDateInfo bookingInteractionEvent) {
+            BookingInteractionEvent bookingInteractionEvent) {
         Fragment currentFragmentInContentFrame = getChildFragmentManager()
                 .findFragmentById(R.id.bookinginteraction_content_frame);
 
@@ -93,24 +93,24 @@ public class BookingInteraction extends Fragment {
         }
     }
 
-    private String _getFormattedTitle(BookinginteractionEventWithDateInfo bookingInteractionEvent) {
+    private String _getFormattedTitle(BookingInteractionEvent bookingInteractionEvent) {
         String dayOfWeekWord = Utils.getDayOfWeekBasedOnDayNumberMonthNumber(bookingInteractionEvent.dayOfMonthNumber,
                 bookingInteractionEvent.monthWord);
         return dayOfWeekWord + ", " + bookingInteractionEvent.dayOfMonthNumber + " @ " +
                 bookingInteractionEvent.timeCell.param_starttime;
     }
 
-    private Fragment _getFragmentForEvent(BookinginteractionEventWithDateInfo bookinginteractionEventWithDateInfo) {
-       switch(bookinginteractionEventWithDateInfo.type) {
+    private Fragment _getFragmentForEvent(BookingInteractionEvent bookingInteractionEvent) {
+       switch(bookingInteractionEvent.type) {
            case BOOK:
                Timber.i("Showing: Book");
-               return Book.newInstance(bookinginteractionEventWithDateInfo);
+               return Book.newInstance(bookingInteractionEvent);
            case SUCCESS:
                Timber.i("Showing: Success");
                return Success.newInstance();
            case JOIN_OR_LEAVE:
                Timber.i("Showing: JoinOrLeave");
-               return JoinOrLeave.newInstance(bookinginteractionEventWithDateInfo);
+               return JoinOrLeave.newInstance(bookingInteractionEvent);
            default:
                Timber.w("No valid Fragment requested, showing Success");
                return Success.newInstance();
@@ -124,7 +124,7 @@ public class BookingInteraction extends Fragment {
      * @param currentFragmentInContentFrame
      * @return
      */
-    private boolean _doesCurrentContentFrameNeedToBeChanged(BookinginteractionEventWithDateInfo bookingInteractionEvent,
+    private boolean _doesCurrentContentFrameNeedToBeChanged(BookingInteractionEvent bookingInteractionEvent,
                                                                         Fragment currentFragmentInContentFrame) {
         if(currentFragmentInContentFrame == null) {return true;}
 

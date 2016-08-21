@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.MAIN_CALENDAR_URL;
+
 public class CalendarWebService {
     @Inject RequestQueue requestQueue;
-    final private static String UOIT_LIBRARY_MAIN_CALENDAR_URL =
-            "https://rooms.library.dc-uoit.ca/dc_studyrooms/calendar.aspx";
 
     public CalendarWebService(UOITLibraryBookingApp mApplication) {
         mApplication.getComponent().inject(this);
@@ -101,7 +101,7 @@ public class CalendarWebService {
         Timber.i("Starting the POST request to the clickable date " + calendarDay.extDayOfMonthNumber + "...");
         RequestFuture<String> future = RequestFuture.newFuture();
         StringRequest stringRequest =
-                new StringRequest(Request.Method.POST, UOIT_LIBRARY_MAIN_CALENDAR_URL, future, future) {
+                new StringRequest(Request.Method.POST, MAIN_CALENDAR_URL, future, future) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String>  headers = new HashMap<String, String>();
@@ -129,7 +129,7 @@ public class CalendarWebService {
         Timber.i("Starting the GET request to the initial uoitlibrary webpage...");
         RequestFuture<String> future = RequestFuture.newFuture();
         StringRequest stringRequest =
-                new StringRequest(Request.Method.GET, UOIT_LIBRARY_MAIN_CALENDAR_URL, future, future) {
+                new StringRequest(Request.Method.GET, MAIN_CALENDAR_URL, future, future) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String>  headers = new HashMap<String, String>();

@@ -1,25 +1,25 @@
 package com.objectivetruth.uoitlibrarybooking.data.models;
 
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionScreenLoadEvent;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionWebService;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.*;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
+import timber.log.Timber;
 
 import javax.inject.Inject;
 
 public class BookingInteractionModel {
     @Inject BookingInteractionWebService bookingInteractionWebService;
 
-    private ReplaySubject<BookinginteractionEventWithDateInfo> bookingInteractionEventReplaySubject;
-    private Observable<BookinginteractionEventWithDateInfo> bookingInteractionEventObservable;
+    private ReplaySubject<BookingInteractionEvent> bookingInteractionEventReplaySubject;
+    private Observable<BookingInteractionEvent> bookingInteractionEventObservable;
 
     private PublishSubject<BookingInteractionScreenLoadEvent> bookingInteractionScreenLoadEventPublishSubject;
     private Observable<BookingInteractionScreenLoadEvent> bookingInteractionScreenLoadEventObservable;
+
+    private PublishSubject<BookingInteractionEventUserRequest> bookingInteractionEventUserRequestPublishSubject;
 
     public BookingInteractionModel(UOITLibraryBookingApp mApplication,
                                    BookingInteractionWebService bookingInteractionWebService) {
@@ -27,17 +27,61 @@ public class BookingInteractionModel {
     }
 
     /**
-     * Can be used to request a Screen change by sending an event with your request
+     * Can be used to monitor any requests to show the Booking Interaction Fragment
+     * @return
+     */
+    public Observable<BookingInteractionScreenLoadEvent> getBookingInteractionScreenLoadEventObservable() {
+        getBookingInteractionScreenLoadEventPublishSubject();
+        return bookingInteractionScreenLoadEventObservable;
+    }
+
+    /**
+     * Like the get version of Booking Interaction Event but returns an observable instead of a subject
      * @see BookingInteractionEvent
      * @return
      */
-    public ReplaySubject<BookinginteractionEventWithDateInfo> getBookingInteractionEventReplaySubject() {
-        if(bookingInteractionEventReplaySubject == null || bookingInteractionEventReplaySubject.hasCompleted()) {
-            bookingInteractionEventReplaySubject = ReplaySubject.createWithSize(1);
-            bookingInteractionEventObservable = bookingInteractionEventReplaySubject.asObservable();
-            return bookingInteractionEventReplaySubject;
+    public Observable<BookingInteractionEvent> getBookingInteractionEventObservable() {
+        getBookingInteractionEventReplaySubject(); //Sets up all the references before we return to ensure its created
+        return bookingInteractionEventObservable;
+    }
+
+    /**
+     * Used to signal when a request is initiated by user. For example, actually DOING the request in the booking
+     * Interaction Flow
+     * @return
+     */
+    public PublishSubject<BookingInteractionEventUserRequest> getBookingInteractionEventUserRequest() {
+        if(bookingInteractionEventUserRequestPublishSubject == null ||
+                bookingInteractionEventUserRequestPublishSubject.hasCompleted()) {
+            bookingInteractionEventUserRequestPublishSubject = PublishSubject.create();
+            _bindUserRequestEventToWebCalls(bookingInteractionEventUserRequestPublishSubject);
+            return bookingInteractionEventUserRequestPublishSubject;
         }else {
-            return bookingInteractionEventReplaySubject;
+            return bookingInteractionEventUserRequestPublishSubject;
+        }
+
+    }
+
+    private void _bindUserRequestEventToWebCalls(
+            PublishSubject<BookingInteractionEventUserRequest> bookingInteractionEventUserRequestPublishSubject) {
+        bookingInteractionEventUserRequestPublishSubject
+                .subscribe(new Action1<BookingInteractionEventUserRequest>() {
+                    @Override
+                    public void call(BookingInteractionEventUserRequest s) {
+                        _executeBasedOnUserRequestType(s);
+                    }
+                });
+    }
+
+    private void _executeBasedOnUserRequestType(BookingInteractionEventUserRequest userRequest) {
+        switch(userRequest.type) {
+            case BOOK_REQUEST:
+                Timber.d("Booooooking");
+                getBookingInteractionEventReplaySubject()
+                        .onNext(new BookingInteractionEvent(userRequest.timeCell,
+                                BookingInteractionEventType.SUCCESS,
+                                userRequest.dayOfMonthNumber,
+                                userRequest.monthWord));
         }
     }
 
@@ -73,7 +117,7 @@ public class BookingInteractionModel {
                     @Override
                     public void call(BookingInteractionScreenLoadEvent b) {
                         getBookingInteractionEventReplaySubject()
-                                .onNext(new BookinginteractionEventWithDateInfo(b.timeCell,
+                                .onNext(new BookingInteractionEvent(b.timeCell,
                                         b.type,
                                         b.dayOfMonthNumber,
                                         b.monthWord));
@@ -82,21 +126,18 @@ public class BookingInteractionModel {
     }
 
     /**
-     * Can be used to monitor any requests to show the Booking Interaction Fragment
-     * @return
-     */
-    public Observable<BookingInteractionScreenLoadEvent> getBookingInteractionScreenLoadEventObservable() {
-        getBookingInteractionScreenLoadEventPublishSubject();
-        return bookingInteractionScreenLoadEventObservable;
-    }
-
-    /**
-     * Like the get version of Booking Interaction Event but returns an observable instead of a subject
+     * Can be used to monitor for how the bookingInteraction flow is progressing.
      * @see BookingInteractionEvent
      * @return
      */
-    public Observable<BookinginteractionEventWithDateInfo> getBookingInteractionEventObservable() {
-        getBookingInteractionEventReplaySubject(); //Sets up all the references before we return to ensure its created
-        return bookingInteractionEventObservable;
+    private ReplaySubject<BookingInteractionEvent> getBookingInteractionEventReplaySubject() {
+        if(bookingInteractionEventReplaySubject == null || bookingInteractionEventReplaySubject.hasCompleted()) {
+            bookingInteractionEventReplaySubject = ReplaySubject.createWithSize(1);
+            bookingInteractionEventObservable = bookingInteractionEventReplaySubject.asObservable();
+            return bookingInteractionEventReplaySubject;
+        }else {
+            return bookingInteractionEventReplaySubject;
+        }
     }
+
 }

@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.objectivetruth.uoitlibrarybooking.R;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookinginteractionEventWithDateInfo;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import timber.log.Timber;
 
@@ -25,7 +25,7 @@ public class JoinOrLeave extends Fragment{
         return view;
     }
 
-    public static JoinOrLeave newInstance(BookinginteractionEventWithDateInfo bookingInteractionEvent) {
+    public static JoinOrLeave newInstance(BookingInteractionEvent bookingInteractionEvent) {
         JoinOrLeave fragment =  new JoinOrLeave();
         fragment.timeCell = bookingInteractionEvent.timeCell;
         fragment.monthWord = bookingInteractionEvent.monthWord;
