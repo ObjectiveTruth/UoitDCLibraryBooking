@@ -1,0 +1,18 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="Preferences">
+    <PreferenceCategory
+            android:title="Web">
+        <CheckBoxPreference
+                android:key="DEBUG_SHOULD_MOCK_HTTP_CALLS"
+                android:title="Mock HTTP Calls"
+                android:summary="Requires app restart, or you'll get funky behaviour" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="Utilities">
+        <Preference android:title="Dump SharedPreference"
+                    android:key="DEBUG_DUMP_SHARED_PREFERENCES_BUTTON"
+                    android:summary="Visible via LogCat with ADB(Android Device Bridge)"/>
+    </PreferenceCategory>
+</PreferenceScreen>

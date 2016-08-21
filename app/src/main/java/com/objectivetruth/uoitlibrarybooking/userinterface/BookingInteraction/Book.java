@@ -32,6 +32,7 @@ public class Book extends Fragment{
 
     private EditText groupNameET;
     private EditText groupCodeET;
+    private ImageButton groupCodeInfoImageButton;
     private String durationSpinnerValue = "1.0"; // a default value to avoid NPE. Stands for 1 hour
     @Inject BookingInteractionModel bookingInteractionModel;
 
@@ -57,7 +58,7 @@ public class Book extends Fragment{
         Button createButton = (Button) view.findViewById(R.id.bookingInteraction_book_create_button);
         _setupCreateButton(createButton);
 
-        ImageButton groupCodeInfoImageButton = (ImageButton) view
+        groupCodeInfoImageButton = (ImageButton) view
                 .findViewById(R.id.bookingInteraction_book_group_code_info);
         _setupGroupCodeInfoButton(groupCodeInfoImageButton);
 
@@ -220,6 +221,7 @@ public class Book extends Fragment{
         if(!_isGroupCodeFilledCorrectly()) {
             Timber.d("GroupCode not filled correctly, playing animation");
             YoYo.with(Techniques.Shake).delay(100).duration(900).playOn(groupCodeET);
+            YoYo.with(Techniques.Shake).delay(100).duration(900).playOn(groupCodeInfoImageButton);
         }
     }
 }

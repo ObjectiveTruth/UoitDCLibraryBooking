@@ -86,7 +86,7 @@ public class Calendar_Generic_Page_Fragment extends Fragment {
 
         }
         else{
-            rootView = inflater.inflate(R.layout.guidelines_policies, container, false);
+            rootView = inflater.inflate(R.layout.guidelinesandpolicies_loaded, container, false);
         }*//*
 
 

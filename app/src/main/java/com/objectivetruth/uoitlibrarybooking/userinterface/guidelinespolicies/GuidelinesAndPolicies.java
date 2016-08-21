@@ -4,11 +4,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
+import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.DebugPreferences.DebugPreferences;
+import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.guidelinesandpoliciesloaded.GuidelinesAndPoliciesLoaded;
 import timber.log.Timber;
 
 public class GuidelinesAndPolicies extends Fragment{
@@ -18,7 +19,14 @@ public class GuidelinesAndPolicies extends Fragment{
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.guidelines_policies, container, false);
+        if(BuildConfig.DEBUG) { setHasOptionsMenu(true);}
+
+        View view = inflater.inflate(R.layout.guidelinesandpolicies_root, container, false);
+        getChildFragmentManager()
+                .beginTransaction()
+                .add(R.id.guidelinesandpolicies_root_content_frame, GuidelinesAndPoliciesLoaded.newInstance(), null)
+                .commit();
+        return view;
     }
 
     @Override
@@ -36,6 +44,32 @@ public class GuidelinesAndPolicies extends Fragment{
         ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
         if(actionBar != null) {
             actionBar.setTitle(title);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if(BuildConfig.DEBUG){
+            inflater.inflate(R.menu.debug_options, menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.debug_options_settings) {
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.guidelinesandpolicies_root_content_frame, new DebugPreferences(), null)
+                    .commit();
+            return true;
+        }else if(id == R.id.debug_options_button){
+            Timber.d("Does Nothing");
+            return true;
+        }else {
+            return super.onOptionsItemSelected(item);
         }
     }
 

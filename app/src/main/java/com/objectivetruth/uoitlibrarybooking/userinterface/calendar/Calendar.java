@@ -2,7 +2,6 @@ package com.objectivetruth.uoitlibrarybooking.userinterface.calendar;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,9 +16,6 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.google.gson.Gson;
-import com.objectivetruth.uoitlibrarybooking.ActivityRoomInteraction;
-import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
@@ -28,9 +24,6 @@ import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarD
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDataRefreshState;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.RefreshActivateEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.ScrollAtTopOfGridEvent;
-import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBooking;
-import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
-import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserData;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.calendarloaded.CalendarLoaded;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.firsttimeloaded.FirstTimeLoaded;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.helpdialog.HelpDialogFragment;
@@ -43,7 +36,6 @@ import rx.functions.Action1;
 import timber.log.Timber;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_LEARNED_HELP;
 
@@ -272,25 +264,14 @@ public class Calendar extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        // Inflate the menu; this adds items to the action bar if it is present.
-    	if(BuildConfig.DEBUG){
-        	inflater.inflate(R.menu.calendar_action_icons_menu_debug, menu);
-        }
-        else{
         	inflater.inflate(R.menu.calendar_action_icons_menu, menu);
-        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            //Intent intent = new Intent(getContext(), ActivitySettings.class);
-            //startActivity(intent);
-
-        }
-        else if(id == R.id.help_calendar){
+        if(id == R.id.help_calendar){
             googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Calendar Home")
                     .setAction("HelpDialog")
@@ -299,36 +280,7 @@ public class Calendar extends Fragment {
             );
             handleHelpClick();
             return true;
-        }
-        else if(id == R.id.debug_success){
-            Intent intent = new Intent(getContext(), ActivityRoomInteraction.class);
-            intent.putExtra("type", "test");
-            startActivity(intent);
-        }
-        else if(id == R.id.debug_booknew){
-            Intent intent = new Intent(getContext(), ActivityRoomInteraction.class);
-            intent.putExtra("type", "createbooking");
-            intent.putExtra("room", "Lib999");
-            intent.putExtra("date", "March 15, 1990, Monday");
-            startActivity(intent);
-        }
-        else if(id == R.id.calendar_action_menu_item_debug_gson){
-            UserCredentials userCredentials = new UserCredentials("username", "password", "institution");
-            UserData userData = new UserData();
-            userData.completeBookings = new ArrayList<MyAccountBooking>();
-            userData.incompleteBookings = new ArrayList<MyAccountBooking>();
-            userData.pastBookings = new ArrayList<MyAccountBooking>();
-
-            Timber.v("JSON-test-before");
-            Gson gson = new Gson();
-            String s = gson.toJson(userData);
-            Timber.v(s);
-            String userDataJson = "{}";
-            UserData userData1 = gson.fromJson(userDataJson, UserData.class);
-            Timber.v("JSON-test-after");
-            Timber.v(userData1.toString());
-        }
-        else {
+        } else {
             // If no match to the action button, let the activity handle it (for back/up buttons)
             getActivity().onOptionsItemSelected(item);
         }

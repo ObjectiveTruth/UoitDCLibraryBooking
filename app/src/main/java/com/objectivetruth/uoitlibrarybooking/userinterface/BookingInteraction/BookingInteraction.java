@@ -186,5 +186,4 @@ public class BookingInteraction extends Fragment {
             actionBar.setTitle(title);
         }
     }
-
 }
