@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -34,7 +35,7 @@ public class BookingInteraction extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.bookinginteraction_root, container, false);
-        _setTitle(BOOKING_INTERACTION_TITLE);
+        _setTitleAndBackButton(BOOKING_INTERACTION_TITLE, true);
         return view;
     }
 
@@ -50,6 +51,17 @@ public class BookingInteraction extends Fragment {
         ((MainActivity) getActivity()).setDrawerState(true);
         _tearDownViewBindings(bookingInteractionEventSubscription);
         super.onStop();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                _popFragmentBackstack();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void _setupViewBindings(Observable<BookinginteractionEventWithDateInfo> bookingInteractionEventObservable) {
@@ -69,7 +81,7 @@ public class BookingInteraction extends Fragment {
 
         if(_doesCurrentContentFrameNeedToBeChanged(bookingInteractionEvent, currentFragmentInContentFrame)) {
             Timber.d("Received event request to change fragment, changing: " + bookingInteractionEvent.type);
-            _setTitle(_getFormattedTitle(bookingInteractionEvent));
+            _setTitleAndBackButton(_getFormattedTitle(bookingInteractionEvent), true);
             getChildFragmentManager()
                     .beginTransaction()
                     .replace(R.id.bookinginteraction_content_frame,
@@ -82,9 +94,9 @@ public class BookingInteraction extends Fragment {
     }
 
     private String _getFormattedTitle(BookinginteractionEventWithDateInfo bookingInteractionEvent) {
-        String dayOfWeekWord = Utils.getDayOfWeekBasedOnDayNumberMonthNumber( bookingInteractionEvent.monthWord,
-                bookingInteractionEvent.dayOfMonthNumber);
-        return BOOKING_INTERACTION_TITLE + " - " + dayOfWeekWord + ": " +
+        String dayOfWeekWord = Utils.getDayOfWeekBasedOnDayNumberMonthNumber(bookingInteractionEvent.dayOfMonthNumber,
+                bookingInteractionEvent.monthWord);
+        return dayOfWeekWord + ", " + bookingInteractionEvent.dayOfMonthNumber + " @ " +
                 bookingInteractionEvent.timeCell.param_starttime;
     }
 
@@ -167,10 +179,12 @@ public class BookingInteraction extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    private void _setTitle(String title) {
+    private void _setTitleAndBackButton(String title, boolean shouldSetBackbutton) {
         ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
         if(actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(shouldSetBackbutton);
             actionBar.setTitle(title);
         }
     }
+
 }

@@ -105,40 +105,48 @@ public class GridAdapter extends FixedTableAdapter {
         TimeCell currentTimeCellForThisViewCall =
                 calendarDay.timeCells.get(_convertRowAndColumnToTimeCellIndex(row, column));
 
-        holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
-                bookingInteractionModel, calendarDay));
-
         switch(currentTimeCellForThisViewCall.timeCellType) {
             case TABLE_COLUMN_HEADER:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName); break;
+                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName);
+                holder.textViewOnly.setOnClickListener(null); break;
 
             case TABLE_ROW_HEADER:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName); break;
+                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName);
+                holder.textViewOnly.setOnClickListener(null); break;
 
             case TABLE_TOP_LEFT_CELL:
-                holder.textViewOnly.setText(""); break;
-
-            case BOOKING_OPEN:
-                holder.textViewOnly.setText("Open"); break;
+                holder.textViewOnly.setText("");
+                holder.textViewOnly.setOnClickListener(null); break;
 
             case BOOKING_LIBRARY_CLOSED:
-                holder.textViewOnly.setText("Closed"); break;
+                holder.textViewOnly.setText("Closed");
+                holder.textViewOnly.setOnClickListener(null); break;
+
+            case BOOKING_OPEN:
+                holder.textViewOnly.setText("Open");
+                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                        bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_COMPETING:
-                holder.textViewOnly.setText("Open"); break;
+                holder.textViewOnly.setText("Open");
+                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                        bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_CONFIRMED:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.groupNameForWhenFullyBookedRoom); break;
+                holder.textViewOnly.setText(currentTimeCellForThisViewCall.groupNameForWhenFullyBookedRoom);
+                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                        bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_LOCKED:
                 TimeCell parentTimeCell = _getTimeCellWithGroupNameAboutThisOne(row, column);
                 if(parentTimeCell == null) {
                     parentTimeCell = new TimeCell(); parentTimeCell.groupNameForWhenFullyBookedRoom = "";}
-                holder.textViewOnly.setText(parentTimeCell.groupNameForWhenFullyBookedRoom); break;
+                holder.textViewOnly.setText(parentTimeCell.groupNameForWhenFullyBookedRoom);
+                holder.textViewOnly.setOnClickListener(null); break;
 
             default:
                 holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeCellType.name());
-
+                holder.textViewOnly.setOnClickListener(null);
 
         }
         return convertView;

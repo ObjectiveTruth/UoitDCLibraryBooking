@@ -45,9 +45,6 @@ public class Book extends Fragment{
         TextView roomNumberTextView = (TextView) view.findViewById(R.id.interaction_book_room_number);
         if(roomNumberTextView != null) {roomNumberTextView.setText(timeCell.param_room.toUpperCase());}
 
-        TextView dateField = (TextView) view.findViewById(R.id.book_date_actual);
-        if(dateField != null) {dateField.setText(_getFormattedDateString());}
-
         TextView errorTextView = (TextView) view.findViewById(R.id.book_error_message_actual);
 
         groupNameET = (EditText) view.findViewById(R.id.book_group_name_actual);
@@ -140,10 +137,6 @@ public class Book extends Fragment{
                 }
             });
         }
-    }
-
-    private String _getFormattedDateString() {
-        return dayOfMonthNumber + ", " + monthWord + " @ " + timeCell.param_starttime;
     }
 
     private void _loadPreviousStateIfAvailable(Bundle inState) {
