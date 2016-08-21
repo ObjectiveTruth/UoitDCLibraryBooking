@@ -42,14 +42,14 @@ public class Book extends Fragment{
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.bookinginteraction_book, container, false);
 
-        TextView roomNumberTextView = (TextView) view.findViewById(R.id.interaction_book_room_number);
+        TextView roomNumberTextView = (TextView) view.findViewById(R.id.bookingInteraction_book_roomnumber);
         if(roomNumberTextView != null) {roomNumberTextView.setText(timeCell.param_room.toUpperCase());}
 
         TextView errorTextView = (TextView) view.findViewById(R.id.book_error_message_actual);
 
-        groupNameET = (EditText) view.findViewById(R.id.book_group_name_actual);
+        groupNameET = (EditText) view.findViewById(R.id.bookingInteraction_book_groupname);
 
-        ImageButton commentButton = (ImageButton) view.findViewById(R.id.comment_button);
+        ImageButton commentButton = (ImageButton) view.findViewById(R.id.bookingInteraction_book_comment_button);
         _setupCommentButton(commentButton);
 
         groupCodeET = (EditText) view.findViewById(R.id.book_group_code_actual);
@@ -57,7 +57,9 @@ public class Book extends Fragment{
         Button createButton = (Button) view.findViewById(R.id.bookingInteraction_book_create_button);
         _setupCreateButton(createButton);
 
-        ImageButton groupCodeInfoImageButton = (ImageButton) view.findViewById(R.id.info_group_code);
+        ImageButton groupCodeInfoImageButton = (ImageButton) view
+                .findViewById(R.id.bookingInteraction_book_group_code_info);
+        _setupGroupCodeInfoButton(groupCodeInfoImageButton);
 
         Spinner durationSpinner = (Spinner) view.findViewById(R.id.book_spinner_duration);
         _setupDurationSpinner(durationSpinner);
@@ -90,15 +92,37 @@ public class Book extends Fragment{
         });
     }
 
+    private void _setupGroupCodeInfoButton(ImageButton groupCodeInfoButton) {
+        groupCodeInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _showGroupCodeInfoDialog();
+            }
+        });
+    }
+
+    private void _showGroupCodeInfoDialog() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+        alert.setMessage(R.string.INFO_BOOKING_INTERACTION_BOOK_GROUPCODE_INFO_PARAGRAPH);
+        alert.setTitle(R.string.INFO_BOOKING_INTERACTION_BOOK_GROUPCODE_INFO_TITLE);
+
+        alert.setPositiveButton("Comment", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+        alert.create().show();
+    }
+
     private void _showCommentDialog() {
         AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
         final EditText edittext = new EditText(getActivity());
-        alert.setMessage("Visible in the library system to all users");
-        alert.setTitle("Comments");
+        alert.setMessage(R.string.INFO_BOOKING_INTERACTION_BOOK_COMMENT_INFO_PARAGRAPH);
+        alert.setTitle(R.string.INFO_BOOKING_INTERACTION_BOOK_COMMENT_INFO_TITLE);
 
         alert.setView(edittext);
 
-        alert.setPositiveButton("Set Comment", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton("Comment", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 comment = edittext.getText().toString();
                 Timber.i("Comment changed by user to: " + comment);

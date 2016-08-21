@@ -138,31 +138,20 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 			setContentView(R.layout.bookinginteraction_book);
 
 
-            TextView roomNumberTextView = (TextView) findViewById(R.id.interaction_book_room_number);
+            TextView roomNumberTextView = (TextView) findViewById(R.id.bookingInteraction_book_roomnumber);
 			errorTextView = (TextView) findViewById(R.id.book_error_message_actual);
 			TextView dateField = (TextView) findViewById(R.id.book_date_actual);
             durationSpinner = (Spinner) findViewById(R.id.book_spinner_duration);
-			groupNameEditText = (EditText) findViewById(R.id.book_group_name_actual);
-            ImageButton commentImageButton = (ImageButton) findViewById(R.id.comment_button);
+			groupNameEditText = (EditText) findViewById(R.id.bookingInteraction_book_groupname);
+            ImageButton commentImageButton = (ImageButton) findViewById(R.id.bookingInteraction_book_comment_button);
 			groupCodeEditText = (EditText) findViewById(R.id.book_group_code_actual);
 			titleButton = (Button) findViewById(R.id.bookingInteraction_book_create_button);
-            ImageButton groupCodeInfoImageButton = (ImageButton) findViewById(R.id.info_group_code);
+            ImageButton groupCodeInfoImageButton = (ImageButton) findViewById(R.id.bookingInteraction_book_group_code_info);
 			//titleButton.setTextColor(getResources().getColor(R.color.disabled_button_text));
             ImageView roomPicture = (ImageView) findViewById(R.id.room_landing_room_picture);
             roomPicture.setImageResource(getResources().getIdentifier(roomNumber.toLowerCase(), "drawable", getPackageName()));
 			durationSpinnerValue = null;
             roomNumberTextView.setText(roomNumber);
-
-            groupCodeInfoImageButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    FragmentManager fragMan = getSupportFragmentManager();
-                    DiaFragGeneric frag = new DiaFragGeneric();
-                    frag.setArguments("Group Code Information", getString(R.string.tooltip_groupcode));
-                    frag.show(fragMan, MainActivity.GROUP_CODE_DIALOGFRAGMENT_TAG);
-                }
-            });
-
 
             commentImageButton.setOnClickListener(new OnClickListener() {
                 @Override

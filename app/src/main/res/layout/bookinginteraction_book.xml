@@ -30,7 +30,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
-            android:id="@+id/interaction_book_room_number"
+            android:id="@+id/bookingInteraction_book_roomnumber"
             android:layout_width="wrap_content"
             android:layout_alignTop="@+id/textView1"
             android:layout_below="@+id/room_landing_room_picture"
@@ -54,11 +54,10 @@
             android:textColor="@color/booked_red"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:gravity="center_horizontal"
-            android:text="@string/error_room_no_exist_comment"
-            />
+            android:text="@string/error_room_no_exist_comment" />
 
         <EditText
-            android:id="@+id/book_group_name_actual"
+            android:id="@+id/bookingInteraction_book_groupname"
             android:layout_width="200dp"
             android:layout_marginTop="20dp"
             android:layout_below="@+id/textView1"
@@ -66,39 +65,29 @@
             android:layout_height="wrap_content"
             android:digits="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             android:maxLength="10"
-            android:hint="Group Name"
-            />
-<!--        <ImageButton
-            style="@style/edittext_info"
-            android:id="@+id/info_group_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/book_group_name_actual"
-            android:layout_toRightOf="@+id/book_group_name_actual"
-            />-->
+            android:hint="Group Name" />
 
         <EditText
             android:id="@+id/book_group_code_actual"
             android:layout_width="200dp"
             android:layout_marginTop="20dp"
             android:digits="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            android:layout_below="@+id/book_group_name_actual"
+            android:layout_below="@+id/bookingInteraction_book_groupname"
             android:layout_centerHorizontal="true"
             android:layout_height="wrap_content"
             android:textColorHint="@color/dark_light"
             android:inputType="textNoSuggestions"
             android:maxLength="4"
-            android:hint="Code"
-            />
+            android:hint="Code" />
 
         <ImageButton
             style="@style/edittext_info"
-            android:id="@+id/info_group_code"
+            android:id="@+id/bookingInteraction_book_group_code_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/book_group_code_actual"
-            android:layout_toRightOf="@+id/book_group_code_actual"
-            />
+            android:layout_toRightOf="@+id/book_group_code_actual" />
+
         <Spinner
             android:id="@+id/book_spinner_duration"
             android:layout_width="200dp"
@@ -106,9 +95,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginLeft="15dp"
             android:layout_below="@+id/book_group_code_actual"
-            android:layout_centerHorizontal="true"
-
-            />
+            android:layout_centerHorizontal="true"/>
 
         <Button
             style="@style/flat_ui_button"
@@ -122,13 +109,12 @@
             android:text="Create Group" />
 
         <ImageButton
-            android:id="@+id/comment_button"
+            android:id="@+id/bookingInteraction_book_comment_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/comment_button_selector"
             android:layout_alignTop="@+id/bookingInteraction_book_create_button"
             android:layout_toRightOf="@+id/bookingInteraction_book_create_button"
-            android:layout_marginLeft="50dp"
-            />
+            android:layout_marginLeft="50dp" />
     </RelativeLayout>
 </ScrollView>
