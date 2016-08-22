@@ -14,7 +14,6 @@ import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.text.Html;
 import android.view.*;
@@ -37,7 +36,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.*;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.USER_PASSWORD;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.USER_USERNAME;
 
 public class ActivityRoomInteraction extends FragmentActivity implements CommunicatorRoomInteractions {
 	final public String TAG = "ActivityRoomInteraction";
@@ -123,152 +123,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 			InteractionSuccess("THIS IS A TEST LOREM IPSUM AND ALL THAT", true);
 		}
 
-
-		//CREATE BOOKING
-		//CREATE BOOKING
-		//CREATE BOOKING
-		//CREATE BOOKING
-		//CREATE BOOKING
-		//CREATE BOOKING
-		//CREATE BOOKING
-		//CREATE BOOKING
-		
-		else if(bundleExtras.getString("type").equalsIgnoreCase("createbooking")){
-            Timber.i("CreateBooking SubRoutine Executing...");
-			setContentView(R.layout.bookinginteraction_book);
-
-
-            TextView roomNumberTextView = (TextView) findViewById(R.id.bookingInteraction_book_roomnumber);
-			errorTextView = (TextView) findViewById(R.id.book_error_message_actual);
-			TextView dateField = (TextView) findViewById(R.id.book_date_actual);
-            durationSpinner = (Spinner) findViewById(R.id.book_spinner_duration);
-			groupNameEditText = (EditText) findViewById(R.id.bookingInteraction_book_groupname);
-            ImageButton commentImageButton = (ImageButton) findViewById(R.id.bookingInteraction_book_comment_button);
-			groupCodeEditText = (EditText) findViewById(R.id.book_group_code_actual);
-			titleButton = (Button) findViewById(R.id.bookingInteraction_book_create_button);
-            ImageButton groupCodeInfoImageButton = (ImageButton) findViewById(R.id.bookingInteraction_book_group_code_info);
-			//titleButton.setTextColor(getResources().getColor(R.color.disabled_button_text));
-            ImageView roomPicture = (ImageView) findViewById(R.id.room_landing_room_picture);
-            roomPicture.setImageResource(getResources().getIdentifier(roomNumber.toLowerCase(), "drawable", getPackageName()));
-			durationSpinnerValue = null;
-            roomNumberTextView.setText(roomNumber);
-
-            commentImageButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Calendar Interaction")
-                            .setAction("Show Comments Input Dialog")
-                            .build());
-                    FragmentManager fragMan = getSupportFragmentManager();
-                    new commentDiaFrag().show(fragMan, null);
-                }
-            });
-            /*ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_main_tooltipRelativeLayout);
-            ToolTip toolTip = new ToolTip()
-                    .withText("A beautiful View")
-                    .withColor(R.color.blue_font)
-                    .withShadow();
-
-
-            toolTipRelativeLayout.showToolTipForView(toolTip, commentImageButton);*/
-            /*myToolTipView.setOnToolTipViewClickedListener(new ToolTipView.OnToolTipViewClickedListener() {
-                @Override
-                public void onToolTipViewClicked(ToolTipView toolTipView) {
-
-                }
-            });*/
-
-			//titleButton.setText("Create Group - " + roomNumber);
-            titleButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(isValidBook()) {
-                        String inputUsername = mDefaultSharedPreferences.getString(USER_USERNAME, null);
-                        String inputPassword = mDefaultSharedPreferences.getString(USER_PASSWORD, null);
-                        String institutionSpinnerValue = mDefaultSharedPreferences.getString(USER_INSTITUTION, null);
-                        //Checks if the sharedPrefs values are valid
-                        if(inputPassword != null && inputUsername != null && institutionSpinnerValue != null){
-                            String[] fieldData = new String[]{
-                                    viewState,
-                                    eventValidation,
-                                    groupNameEditText.getText().toString(),
-                                    commentsStringActual,
-                                    inputPassword,
-                                    inputUsername,
-                                    "Create group",
-                                    groupCodeEditText.getText().toString(),
-                                    durationSpinnerValue,
-                                    institutionSpinnerValue,
-                                    viewStateGenerator
-
-
-                            };
-                            if(isNetworkAvailable()){
-                                new AsyncRoomConfirmation(cookieManager, mActivity).execute(fieldData);
-                            }
-                            else{
-                                new AlertDialog.Builder(mActivity)
-                                        .setTitle("Connectivity Issue")
-                                        .setMessage(R.string.networkerrordialogue)
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                // Do nothing
-                                            }
-                                        })
-                                        .setIcon(R.drawable.ic_dialog_alert)
-                                        .show();
-                            }
-                        }
-                        else{
-                            String errorDescript = "Was about to book, but the values in Shared Pref were null, was handled";
-                            Timber.e(new IllegalStateException(errorDescript), errorDescript);
-                            Toast.makeText(mActivity, R.string.error_shared_pref_values_incorrect, Toast.LENGTH_LONG).show();
-                        }
-
-                    }
-                }
-            });
-
-            dateField.setText(date);
-			ArrayAdapter<CharSequence> durationAdapter = ArrayAdapter.createFromResource(this,
-                    R.array.duration, android.R.layout.simple_spinner_item);
-			durationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			durationSpinner.setAdapter(durationAdapter);
-			durationSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
-
-				@Override
-				public void onItemSelected(AdapterView<?> adapter, View view,
-						int position, long id) {
-					String[] timeToDecimal = new String[]{null, "0.5", "1.0", "1.5", "2"};
-					durationSpinnerValue = timeToDecimal[position];
-				}
-
-				@Override
-				public void onNothingSelected(AdapterView<?> adapter) {
-
-					
-				}
-				
-			});
-
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Calendar Interaction")
-                            .setAction("CreateBooking")
-                            .setLabel(roomNumber)
-                            .build()
-            );
-
-
-			//JOIN OR LEAVE
-			//JOIN OR LEAVE
-			//JOIN OR LEAVE
-			//JOIN OR LEAVE
-			//JOIN OR LEAVE
-			//JOIN OR LEAVE
-			//JOIN OR LEAVE
-			
-		}
 		else if(bundleExtras.getString("type").equalsIgnoreCase("joinorleave")){
             Timber.i("JoinOrLeave SubRoutine Executing...");
 			setContentView(R.layout.bookinginteraction_joinorleave);
