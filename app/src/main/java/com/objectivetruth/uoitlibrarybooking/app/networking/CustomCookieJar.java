@@ -13,9 +13,8 @@ class CustomCookieJar implements CookieJar {
 
     @Override
     public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-        for(Cookie cookie: cookies) {
-            Timber.d("Cookies received: " + cookies.get(0).toString());
-            Timber.v(cookie.toString());
+        if(cookies == null) {
+            Timber.d("Tried to save cookies, but was NULL");
         }
         this.cookies =  cookies;
     }
@@ -23,7 +22,9 @@ class CustomCookieJar implements CookieJar {
     @Override
     public List<Cookie> loadForRequest(HttpUrl url) {
         if (cookies != null){
-            Timber.d("Cookies requested: " + cookies.get(0).toString());
+            for(Cookie cookie: cookies) {
+                Timber.d("Cookies requested: " + cookie.toString());
+            }
             return cookies;
         }
         return new ArrayList<Cookie>();

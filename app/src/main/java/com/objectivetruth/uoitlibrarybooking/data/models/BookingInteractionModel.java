@@ -5,6 +5,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
+import com.objectivetruth.uoitlibrarybooking.statelessutilities.LeftOrRight;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -124,39 +125,38 @@ public class BookingInteractionModel {
                     }
                 })
 
-/*                // Parse the form webpage for State information/validators
-                .flatMap(new Func1<Pair<String, HttpCookie>, Observable<Pair<CalendarDay, HttpCookie>>>() {
+                // Parse the form webpage for fresh State information/validators
+                .flatMap(new Func1<String, Observable<CalendarDay>>() {
                     @Override
-                    public Observable<Pair<CalendarDay, HttpCookie>> call(final Pair<String, HttpCookie> stringHttpCookiePair) {
+                    public Observable<CalendarDay> call(final String rawWebpage) {
                         return CalendarParser
-                                .parseRawWebpageForViewStateGeneratorAndEventValidation(stringHttpCookiePair.first)
-                                .map(new Func1<CalendarDay, Pair<CalendarDay, HttpCookie>>() {
+                                .parseRawWebpageForViewStateGeneratorAndEventValidation(rawWebpage);
+                    }
+                })
+
+                // Do the Post that actually attempts to book the room
+                .flatMap(new Func1<CalendarDay, Observable<LeftOrRight<String, String>>>() {
+                    @Override
+                    public Observable<LeftOrRight<String, String>> call(CalendarDay calendarDay) {
+                        return bookingInteractionWebService.createNewBookingAndGetWebpage(
+                                calendarDay,
+                                userRequest.timeCell,
+                                userRequest.requestOptions,
+                                userModel.getUserCredentialsFromStorage())
+                                // Transform by grabbing just the error message or the success message
+                                .map(new Func1<String, LeftOrRight<String, String>>() {
                                     @Override
-                                    public Pair<CalendarDay, HttpCookie> call(CalendarDay calendarDay) {
-                                        return new Pair<CalendarDay, HttpCookie>(calendarDay,
-                                                stringHttpCookiePair.second);
+                                    public LeftOrRight<String, String> call(String rawWebpage) {
+                                        return BookingInteractionParser.parseWebpageForMessageLabel(rawWebpage);
                                     }
                                 });
                     }
                 })
 
-                // Do the Post that actually attempts to book the room
-                .flatMap(new Func1<Pair<CalendarDay, HttpCookie>, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(Pair<CalendarDay, HttpCookie> calendarDayHttpCookiePair) {
-                        return bookingInteractionWebService.createNewBookingAndGetWebpage(
-                                calendarDayHttpCookiePair.first,
-                                userRequest.timeCell,
-                                userRequest.requestOptions,
-                                userModel.getUserCredentialsFromStorage(),
-                                calendarDayHttpCookiePair.second);
-                    }
-                })*/
-
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
 
-                .subscribe(new Observer<String>() {
+                .subscribe(new Observer<LeftOrRight<String, String>>() {
                     @Override
                     public void onCompleted() {
 
@@ -168,14 +168,30 @@ public class BookingInteractionModel {
                     }
 
                     @Override
-                    public void onNext(String s) {
-                        Timber.v(s);
-                        getBookingInteractionEventReplaySubject()
-                                .onNext(new BookingInteractionEvent(userRequest.timeCell,
+                    public void onNext(LeftOrRight<String, String> result) {
+                        if(result.hasLeft()) {
+                            Timber.w("Bad Result from booking: " + result.getLeft());
+                            BookingInteractionEvent eventToFire =
+                                    new BookingInteractionEvent(
+                                            userRequest.timeCell,
+                                            BookingInteractionEventType.ERROR,
+                                            userRequest.dayOfMonthNumber,
+                                            userRequest.monthWord);
+                            eventToFire.message = result.getLeft();
+                            getBookingInteractionEventReplaySubject()
+                                    .onNext(eventToFire);
+                        }else {
+                            Timber.i("Good Result from booking: " + result.getRight());
+                            BookingInteractionEvent eventToFire =
+                                    new BookingInteractionEvent(
+                                        userRequest.timeCell,
                                         BookingInteractionEventType.SUCCESS,
                                         userRequest.dayOfMonthNumber,
-                                        userRequest.monthWord));
-
+                                        userRequest.monthWord);
+                            eventToFire.message = result.getRight();
+                            getBookingInteractionEventReplaySubject()
+                                    .onNext(eventToFire);
+                        }
                     }
                 });
     }

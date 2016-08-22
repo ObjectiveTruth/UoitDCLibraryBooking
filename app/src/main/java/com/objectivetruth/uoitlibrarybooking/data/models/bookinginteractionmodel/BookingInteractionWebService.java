@@ -14,12 +14,10 @@ import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import rx.Observable;
 import rx.functions.Func0;
-import rx.functions.Func1;
 import timber.log.Timber;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpCookie;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,8 +52,7 @@ public class BookingInteractionWebService {
     public Observable<String> createNewBookingAndGetWebpage(final CalendarDay calendarDay,
                                                             final TimeCell timeCell,
                                                             final RequestOptions requestOptions,
-                                                            final UserCredentials userCredentials,
-                                                            final HttpCookie httpCookie) {
+                                                            final UserCredentials userCredentials) {
         return Observable.defer(new Func0<Observable<String>>() {
             @Override
             public Observable<String> call() {
@@ -78,69 +75,16 @@ public class BookingInteractionWebService {
                     urlFormData.put("ctl00$ContentPlaceHolder1$RadioButtonListInstitutions", userCredentials.institutionId);
                     urlFormData.put("ctl00$ContentPlaceHolder1$ButtonReserve", "Create+group");
 
-                    return Observable.just(_getRedirectForPostByBlocking(httpCookie, urlFormData, timeCell))
-                            .flatMap(new Func1<String, Observable<String>>() {
-                                @Override
-                                public Observable<String> call(String s) {
-                                    Timber.i(s);
-                                    try {
-                                        return Observable.just(_getMessageFromRedirect(httpCookie, timeCell));
-                                    } catch (InterruptedException | ExecutionException e) {
-                                        Timber.e(e, "Error while getting raw form with cookie: " + httpCookie.toString());
-                                        return Observable.error(e);
-                                    }
-                                }
-                            });
+                    return Observable.just(_getRedirectForPostByBlocking(urlFormData, timeCell));
                 } catch (InterruptedException | ExecutionException | ClassCastException e) {
-                    Timber.e(e, "Error while getting raw form with cookie: " + httpCookie.toString());
+                    Timber.e(e, "Error while getting final message.aspx");
                     return Observable.error(e);
                 }
             }
         });
     }
 
-    private String _getMessageFromRedirect(final HttpCookie httpCookie, final TimeCell timeCell)
-            throws InterruptedException, ExecutionException{
-        Timber.d("Starting the GET request to the final message.aspx");
-        RequestFuture<String> future = RequestFuture.newFuture();
-        String urlPath = MAIN_CALENDAR_RELATIVE_PATH + "message.aspx";
-        StringRequest stringRequest =
-                new StringRequest(Request.Method.GET, urlPath, future, future) {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String>  headers = new HashMap<String, String>();
-                        headers.put("Cookie", httpCookie.toString());
-                        headers.put("Referer", timeCell.param_next);
-                        return headers;
-                    }
-                };
-        requestQueue.add(stringRequest);
-        Timber.d("GET request finished for getting the final message.aspx");
-        return future.get();
-    }
-
-    private String _getFormFromRedirect(final HttpCookie httpCookie, final TimeCell timeCell)
-            throws InterruptedException, ExecutionException{
-        Timber.d("Starting the GET request to the form");
-        RequestFuture<String> future = RequestFuture.newFuture();
-        String urlPath = MAIN_CALENDAR_RELATIVE_PATH + timeCell.param_next;
-        StringRequest stringRequest =
-                new StringRequest(Request.Method.GET, urlPath, future, future) {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String>  headers = new HashMap<String, String>();
-                        headers.put("Cookie", httpCookie.toString());
-                        headers.put("Referer", MAIN_CALENDAR_URL);
-                        return headers;
-                    }
-                };
-        requestQueue.add(stringRequest);
-        Timber.d("GET request finished for getting the raw webpage with form");
-        return future.get();
-    }
-
-    private String _getRedirectForPostByBlocking(final HttpCookie httpCookie,
-                                                 final HashMap<String, String> urlFormData,
+    private String _getRedirectForPostByBlocking(final HashMap<String, String> urlFormData,
                                                  TimeCell timeCell)
             throws InterruptedException, ExecutionException{
         Timber.i("Starting the POST request to the booking endpoint");
@@ -154,7 +98,6 @@ public class BookingInteractionWebService {
                         Map<String, String> headers = new HashMap<>();
                         headers.put("Content-Type", "application/x-www-form-urlencoded");
                         headers.put("Referer", urlPath);
-                        //headers.put("Cookie", httpCookie.toString());
                         return headers;
                     }
 

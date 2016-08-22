@@ -20,6 +20,11 @@ public enum BookingInteractionEventType {
     SUCCESS,
 
     /**
+     * An Error occured trying to do a request
+     */
+    ERROR,
+
+    /**
      * Incase a cell contains unknown information, should error gracefully if this happens
      */
     UNKNOWN

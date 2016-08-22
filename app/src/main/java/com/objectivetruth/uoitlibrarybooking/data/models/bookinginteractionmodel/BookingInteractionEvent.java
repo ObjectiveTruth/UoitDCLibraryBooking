@@ -7,6 +7,7 @@ public class BookingInteractionEvent {
     public BookingInteractionEventType type;
     public String dayOfMonthNumber;
     public String monthWord;
+    public String message;
 
     public BookingInteractionEvent(TimeCell timeCell, BookingInteractionEventType type,
                                    String dayOfMonthNumber, String monthWord) {
