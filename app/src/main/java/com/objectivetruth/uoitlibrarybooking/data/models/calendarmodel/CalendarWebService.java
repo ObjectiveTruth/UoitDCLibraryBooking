@@ -13,7 +13,6 @@ import timber.log.Timber;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpCookie;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,12 +69,12 @@ public class CalendarWebService {
         });
     }
 
-    public Observable<HttpCookie> getCookieFromCalendarDay(final CalendarDay calendarDay) {
-        return Observable.defer(new Func0<Observable<HttpCookie>>() {
+    public Observable<String> getRawCaledarDayPageUsingCalendarDay(final CalendarDay calendarDay) {
+        return Observable.defer(new Func0<Observable<String>>() {
             @Override
-            public Observable<HttpCookie> call() {
+            public Observable<String> call() {
                 try {
-                    return Observable.just(_getCookieFromRequestByBlocking(calendarDay));
+                    return Observable.just(_getRawCalendarDayPage(calendarDay));
                 } catch (InterruptedException | ExecutionException e) {
                     Timber.e(e, "Error while getting cookie" + calendarDay.toString());
                     return Observable.error(e);
@@ -84,16 +83,17 @@ public class CalendarWebService {
         });
     }
 
-    private HttpCookie _getCookieFromRequestByBlocking(final CalendarDay calendarDay)
+    private String _getRawCalendarDayPage(final CalendarDay calendarDay)
             throws InterruptedException, ExecutionException{
         Timber.d("Starting the POST request to the clickable date " + calendarDay.extDayOfMonthNumber + "...");
-        RequestFuture<HttpCookie> future = RequestFuture.newFuture();
-        CookieRequest cookieRequest =
-                new CookieRequest(Request.Method.POST, MAIN_CALENDAR_URL, future, future) {
+        RequestFuture<String> future = RequestFuture.newFuture();
+        StringRequest stringRequest =
+                new StringRequest(Request.Method.POST, MAIN_CALENDAR_URL, future, future) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String>  headers = new HashMap<String, String>();
                         headers.put("Content-Type", "application/x-www-form-urlencoded");
+                        headers.put("Referer", MAIN_CALENDAR_URL);
                         return headers;
                     }
 
@@ -102,9 +102,10 @@ public class CalendarWebService {
                         return _getBodyInBytesForCalendarDayData(calendarDay);
                     }
                 };
-        requestQueue.add(cookieRequest);
+        requestQueue.add(stringRequest);
+        String rawWebPage = future.get();
         Timber.i("POST request finished when searching for cookie on day: " + calendarDay.extDayOfMonthNumber);
-        return future.get();
+        return rawWebPage;
     }
 
     /**
@@ -153,8 +154,9 @@ public class CalendarWebService {
                     }
                 };
         requestQueue.add(stringRequest);
+        String rawWebpage = future.get();
         Timber.i("POST request finished for clickable date " + calendarDay.extDayOfMonthNumber);
-        return future.get();
+        return rawWebpage;
     }
 
     /**
@@ -177,8 +179,9 @@ public class CalendarWebService {
         };
 
         requestQueue.add(stringRequest);
+        String rawWebpage = future.get();
         Timber.i("GET request to the initial uoitlibrary webpage finished");
-        return future.get();
+        return rawWebpage;
     }
 
     /**

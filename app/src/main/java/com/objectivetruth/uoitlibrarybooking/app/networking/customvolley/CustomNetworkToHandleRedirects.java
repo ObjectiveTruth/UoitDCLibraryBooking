@@ -19,7 +19,7 @@ import java.util.*;
 public class CustomNetworkToHandleRedirects implements Network{
     protected static final boolean DEBUG = VolleyLog.DEBUG;
 
-    private static int SLOW_REQUEST_THRESHOLD_MS = 3000;
+    private static int SLOW_REQUEST_THRESHOLD_MS = 5000;
 
     private static int DEFAULT_POOL_SIZE = 4096;
 

@@ -15,11 +15,10 @@ import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
 import timber.log.Timber;
 
-import java.net.HttpCookie;
-
 public class BookingInteractionModel {
     BookingInteractionWebService bookingInteractionWebService;
     CalendarWebService calendarWebService;
+    UserModel userModel;
 
     private ReplaySubject<BookingInteractionEvent> bookingInteractionEventReplaySubject;
     private Observable<BookingInteractionEvent> bookingInteractionEventObservable;
@@ -31,9 +30,11 @@ public class BookingInteractionModel {
 
     public BookingInteractionModel(UOITLibraryBookingApp mApplication,
                                    BookingInteractionWebService bookingInteractionWebService,
-                                   CalendarWebService calendarWebService) {
+                                   CalendarWebService calendarWebService,
+                                   UserModel userModel) {
         this.bookingInteractionWebService = bookingInteractionWebService;
         this.calendarWebService = calendarWebService;
+        this.userModel = userModel;
     }
 
     /**
@@ -102,26 +103,56 @@ public class BookingInteractionModel {
                     }
                 })
 
-                // Do a simple request to retrieve the cookie for subsequent requests
-                .flatMap(new Func1<CalendarDay, Observable<HttpCookie>>() {
+                // Simulate Clicking on the Day on the calendar to get the list of open slots
+                .flatMap(new Func1<CalendarDay, Observable<String>>() {
                     @Override
-                    public Observable<HttpCookie> call(CalendarDay calendarDay) {
+                    public Observable<String> call(CalendarDay calendarDay) {
                         calendarDay.extEventTarget = userRequest.timeCell.param_eventtarget;
                         calendarDay.extEventArgument = userRequest.timeCell.param_eventargument;
 
                         calendarDay.extDayOfMonthNumber = userRequest.dayOfMonthNumber;
 
-                        return calendarWebService.getCookieFromCalendarDay(calendarDay);
+                        return calendarWebService.getRawCaledarDayPageUsingCalendarDay(calendarDay);
                     }
                 })
 
-                // Get the form to fill out
-                .flatMap(new Func1<HttpCookie, Observable<String>>() {
+                // Get the page with the form to fill out
+                .flatMap(new Func1<String, Observable<String>>() {
                     @Override
-                    public Observable<String> call(HttpCookie httpCookie) {
-                        return bookingInteractionWebService.getRawWebpageWithForm(httpCookie, userRequest.timeCell);
+                    public Observable<String> call(String rawWebpage) {
+                        return bookingInteractionWebService.getRawWebpageWithForm(userRequest.timeCell);
                     }
                 })
+
+/*                // Parse the form webpage for State information/validators
+                .flatMap(new Func1<Pair<String, HttpCookie>, Observable<Pair<CalendarDay, HttpCookie>>>() {
+                    @Override
+                    public Observable<Pair<CalendarDay, HttpCookie>> call(final Pair<String, HttpCookie> stringHttpCookiePair) {
+                        return CalendarParser
+                                .parseRawWebpageForViewStateGeneratorAndEventValidation(stringHttpCookiePair.first)
+                                .map(new Func1<CalendarDay, Pair<CalendarDay, HttpCookie>>() {
+                                    @Override
+                                    public Pair<CalendarDay, HttpCookie> call(CalendarDay calendarDay) {
+                                        return new Pair<CalendarDay, HttpCookie>(calendarDay,
+                                                stringHttpCookiePair.second);
+                                    }
+                                });
+                    }
+                })
+
+                // Do the Post that actually attempts to book the room
+                .flatMap(new Func1<Pair<CalendarDay, HttpCookie>, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(Pair<CalendarDay, HttpCookie> calendarDayHttpCookiePair) {
+                        return bookingInteractionWebService.createNewBookingAndGetWebpage(
+                                calendarDayHttpCookiePair.first,
+                                userRequest.timeCell,
+                                userRequest.requestOptions,
+                                userModel.getUserCredentialsFromStorage(),
+                                calendarDayHttpCookiePair.second);
+                    }
+                })*/
+
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
 
@@ -134,18 +165,17 @@ public class BookingInteractionModel {
                     @Override
                     public void onError(Throwable e) {
                         Timber.e(e, "Yo this is whack");
-
                     }
 
                     @Override
-                    public void onNext(String webpage) {
-                        Timber.v(webpage);
-
+                    public void onNext(String s) {
+                        Timber.v(s);
                         getBookingInteractionEventReplaySubject()
                                 .onNext(new BookingInteractionEvent(userRequest.timeCell,
                                         BookingInteractionEventType.SUCCESS,
                                         userRequest.dayOfMonthNumber,
                                         userRequest.monthWord));
+
                     }
                 });
     }
@@ -204,5 +234,4 @@ public class BookingInteractionModel {
             return bookingInteractionEventReplaySubject;
         }
     }
-
 }

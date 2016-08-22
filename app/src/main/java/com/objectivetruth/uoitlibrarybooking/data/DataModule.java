@@ -3,7 +3,6 @@ package com.objectivetruth.uoitlibrarybooking.data;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.app.networking.MockHttpStack;
@@ -45,8 +44,9 @@ public class DataModule {
     @Provides
     @Singleton
     BookingInteractionModel providesBookingInteractionModel(BookingInteractionWebService bookingInteractionWebService,
-                                                            CalendarWebService calendarWebService) {
-        return new BookingInteractionModel(mApplication, bookingInteractionWebService, calendarWebService);
+                                                            CalendarWebService calendarWebService,
+                                                            UserModel userModel) {
+        return new BookingInteractionModel(mApplication, bookingInteractionWebService, calendarWebService, userModel);
     }
 
     @Provides
@@ -72,7 +72,7 @@ public class DataModule {
     protected RequestQueue providesRequestQueue() {
         if(BuildConfig.DEBUG && _hasUserRequestedMockingOfHTTP()) {
             Timber.i("Using Mock Http Stack");
-            return Volley.newRequestQueue(mApplication, new MockHttpStack(mApplication));
+            return CustomVolleyToHandleRedirects.newRequestQueue(mApplication, new MockHttpStack(mApplication));
         }else {
             return CustomVolleyToHandleRedirects.newRequestQueue(mApplication, new OkHttp3Stack());
         }
