@@ -6,27 +6,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.text.Html;
-import android.view.*;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AlphaAnimation;
-import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.squareup.otto.Subscribe;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -88,7 +85,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		Intent intent = getIntent();
 		bundleExtras = intent.getExtras();
 		mActivity = this;
-        OttoBusSingleton.getInstance().register(this);
         //TODO added the eventViewstateGenerrator to the calendar_action_icons_menu head part, now use it in the book instance
         if (bundleExtras != null){
             eventValidation = bundleExtras.getString("eventValidation");
@@ -562,7 +558,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 
     @Override
     protected void onDestroy() {
-        OttoBusSingleton.getInstance().unregister(this);
         super.onDestroy();
     }
 
@@ -631,128 +626,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
         }
     }
 
-    public static class commentDiaFrag extends DialogFragment{
-        EditText commentsEditText;
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.diafrag_comments, container, false);
-            Button okButton = (Button) rootView.findViewById(R.id.comments_ok_button);
-            commentsEditText = (EditText) rootView.findViewById(R.id.diafrag_comments_actual);
-            commentsEditText.setText(commentsStringActual);
-            okButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    getDialog().dismiss();
-
-                }
-            });
-            getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
-            getDialog().setTitle(R.string.my_account_frag_title);
-            getDialog().getWindow()
-                    .getAttributes().windowAnimations = R.style.DialogAnimation;
-            return rootView;
-        }
-
-        @Override
-        public void onStop() {
-            if(commentsEditText != null){
-                commentsEditText.onEditorAction(EditorInfo.IME_ACTION_DONE);
-                OttoBusSingleton.getInstance().post(new CommentsUpdateEvent(commentsEditText.getText().toString()));
-            }
-            super.onStop();
-        }
-    }
-
-    //Received a callback whenever the comments close
-    @Subscribe
-    public void CommentsUpdated(CommentsUpdateEvent event){
-        commentsStringActual = event.commentsData;
-    }
-
-
-    /*public static class PremiumPromoFragment extends DialogFragment{
-    	final static String TAG = "PremiumPromoFragment";
-    	String returnMessage;
-    	boolean isCalendarable;
-    	
-    	static PremiumPromoFragment newInstance(String returnMessage, boolean isCalendarable){
-    		
-    		PremiumPromoFragment frag = new PremiumPromoFragment();
-    		frag.returnMessage = returnMessage;
-    		frag.isCalendarable = isCalendarable;
-    		return frag;
-    	}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.premium_promo, container, false);
-			Button negativeButton = (Button) rootView.findViewById(R.id.cancel);
-			negativeButton.setOnClickListener(new OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					getDialog().dismiss();
-					
-				}
-				
-			});
-			Button upgradeOK = (Button) rootView.findViewById(R.id.upgradeok);
-			upgradeOK.setOnClickListener(new OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-		        	((UOITLibraryBookingApp)getActivity().getApplication()).getIABHelper().launchPurchaseFlow(getActivity(), MainActivity.SKU_PREMIUM, 10001,   
-		        			new IabHelper.OnIabPurchaseFinishedListener() {
-		        		 public void onIabPurchaseFinished(IabResult result, Purchase purchase) 
-		        		 {
-		        		    if (result.isFailure()) {
-		        		       	*//*Toast.makeText(getActivity(), "Error purchasing",
-		        		 			   Toast.LENGTH_SHORT).show();*//*
-		        		       	
-		        		       return;
-		        		    }      
-		        		    else if (purchase.getSku().equals(MainActivity.SKU_PREMIUM)) {
-		        		    	Toast.makeText(getActivity(), "Purchased! Thank you!", 
-			        		 			   Toast.LENGTH_SHORT).show();
-		        		    	((UOITLibraryBookingApp)getActivity().getApplication()).setIsPremium(true);
-		        		    	try{
-		        		    		((ActivityRoomInteraction)getActivity()).InteractionSuccess(returnMessage, isCalendarable);
-		        		    		((ActivityRoomInteraction)getActivity()).justPurchased = true;
-		        		    		PremiumPromoFragment promoFrag = ((ActivityRoomInteraction)getActivity()).promoFrag;
-		        		    		if(promoFrag.isVisible()){
-		        		    			promoFrag.dismiss();
-		        		    		}
-		        		    	}catch(Exception e){
-		        		    		e.printStackTrace();
-		        		    	}
-		        		    	
-		        		    	
-		        		    		
-		        		    
-		        		       //Timber.i("purchased!");
-		        		       
-		        		       
-		        		       
-		        		    }
-
-		        		 }
-		        		}, "");
-					
-					
-				}
-				
-			});
-
-			getDialog().setTitle("Upgrade to Premium");
-			return rootView;
-			
-		}
-    	
-    	
-    }*/
 /*    @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
