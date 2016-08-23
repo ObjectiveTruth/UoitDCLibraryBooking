@@ -10,6 +10,11 @@ public enum BookingInteractionEventType {
     BOOK,
 
     /**
+     * An Error occured trying to do a book request
+     */
+    BOOK_ERROR,
+
+    /**
      * When the user clicks on a booking that is being competed for, they can join it or leave
      */
     JOIN_OR_LEAVE,
@@ -18,11 +23,6 @@ public enum BookingInteractionEventType {
      * When an interaction flow succeeds
      */
     SUCCESS,
-
-    /**
-     * An Error occured trying to do a request
-     */
-    ERROR,
 
     /**
      * Incase a cell contains unknown information, should error gracefully if this happens

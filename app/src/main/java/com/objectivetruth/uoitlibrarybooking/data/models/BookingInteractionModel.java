@@ -17,9 +17,9 @@ import rx.subjects.ReplaySubject;
 import timber.log.Timber;
 
 public class BookingInteractionModel {
-    BookingInteractionWebService bookingInteractionWebService;
-    CalendarWebService calendarWebService;
-    UserModel userModel;
+    private BookingInteractionWebService bookingInteractionWebService;
+    private CalendarWebService calendarWebService;
+    private UserModel userModel;
 
     private ReplaySubject<BookingInteractionEvent> bookingInteractionEventReplaySubject;
     private Observable<BookingInteractionEvent> bookingInteractionEventObservable;
@@ -140,7 +140,7 @@ public class BookingInteractionModel {
                     @Override
                     public Observable<LeftOrRight<String, String>> call(CalendarDay calendarDay) {
                         Timber.i("Booking Request Flow: Parsing Complete, doing the final sending of options to server");
-                        return bookingInteractionWebService.createNewBookingAndGetWebpage(
+                        return bookingInteractionWebService.createNewBookingAndGetResultWebpage(
                                 calendarDay,
                                 userRequest.timeCell,
                                 userRequest.requestOptions,
@@ -173,7 +173,7 @@ public class BookingInteractionModel {
                         BookingInteractionEvent eventToFire =
                                 new BookingInteractionEvent(
                                         userRequest.timeCell,
-                                        BookingInteractionEventType.ERROR,
+                                        BookingInteractionEventType.BOOK_ERROR,
                                         userRequest.dayOfMonthNumber,
                                         userRequest.monthWord);
                         eventToFire.message = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
@@ -189,7 +189,7 @@ public class BookingInteractionModel {
                             BookingInteractionEvent eventToFire =
                                     new BookingInteractionEvent(
                                             userRequest.timeCell,
-                                            BookingInteractionEventType.ERROR,
+                                            BookingInteractionEventType.BOOK_ERROR,
                                             userRequest.dayOfMonthNumber,
                                             userRequest.monthWord);
                             eventToFire.message = result.getLeft();

@@ -49,7 +49,7 @@ public class BookingInteractionWebService {
         });
     }
 
-    public Observable<String> createNewBookingAndGetWebpage(final CalendarDay calendarDay,
+    public Observable<String> createNewBookingAndGetResultWebpage(final CalendarDay calendarDay,
                                                             final TimeCell timeCell,
                                                             final RequestOptions requestOptions,
                                                             final UserCredentials userCredentials) {
@@ -75,7 +75,7 @@ public class BookingInteractionWebService {
                     urlFormData.put("ctl00$ContentPlaceHolder1$RadioButtonListInstitutions", userCredentials.institutionId);
                     urlFormData.put("ctl00$ContentPlaceHolder1$ButtonReserve", "Create+group");
 
-                    return Observable.just(_getRedirectForPostByBlocking(urlFormData, timeCell));
+                    return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, timeCell));
                 } catch (InterruptedException | ExecutionException | ClassCastException e) {
                     Timber.e(e, "Error while getting final message.aspx");
                     return Observable.error(e);
@@ -84,7 +84,7 @@ public class BookingInteractionWebService {
         });
     }
 
-    private String _getRedirectForPostByBlocking(final HashMap<String, String> urlFormData,
+    private String _getResultWebpageForPostByBlocking(final HashMap<String, String> urlFormData,
                                                  TimeCell timeCell)
             throws InterruptedException, ExecutionException{
         Timber.i("Starting the POST request to the booking endpoint");

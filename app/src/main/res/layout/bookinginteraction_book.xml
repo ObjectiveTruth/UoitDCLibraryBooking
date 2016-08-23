@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
         <ImageView
-            android:id="@+id/room_landing_room_picture"
+            android:id="@+id/bookingInteraction_book_room_picture"
             android:layout_width="350dp"
             android:layout_height="100dp"
             android:layout_marginTop="10dp"
@@ -15,16 +15,17 @@
             android:layout_centerHorizontal="true"
             android:contentDescription="Picture of the room"
             android:scaleType="centerCrop"
+            android:visibility="visible"
             android:src="@drawable/unknown_room" />
 
         <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
             android:id="@+id/textView1"
-            android:layout_below="@+id/room_landing_room_picture"
+            android:layout_below="@+id/bookingInteraction_book_room_picture"
             android:layout_width="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="right"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/room_landing_room_picture"
+            android:layout_alignLeft="@+id/bookingInteraction_book_room_picture"
             android:layout_marginLeft="110dp"
             android:text="Room: "
             android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -33,7 +34,7 @@
             android:id="@+id/bookingInteraction_book_roomnumber"
             android:layout_width="wrap_content"
             android:layout_alignTop="@+id/textView1"
-            android:layout_below="@+id/room_landing_room_picture"
+            android:layout_below="@+id/bookingInteraction_book_room_picture"
             android:layout_toRightOf="@+id/textView1"
             android:layout_marginLeft="10dp"
             android:textColor="#0099CC"
@@ -44,12 +45,11 @@
 
         <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
             android:layout_marginTop="20dp"
-            android:id="@+id/book_error_message_actual"
+            android:id="@+id/bookingInteraction_book_error_text"
             android:visibility="invisible"
             android:layout_width="350dp"
             android:layout_height="100dp"
             android:layout_centerHorizontal="true"
-            android:layout_below="@+id/book_date_actual"
             android:minLines="3"
             android:textColor="@color/booked_red"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -105,7 +105,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/bookingInteraction_book_create_button"
             android:layout_below="@+id/book_spinner_duration"
-            android:layout_alignLeft="@+id/room_landing_room_picture"
+            android:layout_alignLeft="@+id/bookingInteraction_book_room_picture"
             android:layout_marginLeft="50dp"
             android:layout_marginTop="25dp"
             android:text="Create Group" />

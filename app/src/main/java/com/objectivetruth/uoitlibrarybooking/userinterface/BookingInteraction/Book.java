@@ -15,10 +15,14 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.BookRequestOptions;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
+import rx.Subscription;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -35,6 +39,9 @@ public class Book extends Fragment{
     private EditText groupNameET;
     private EditText groupCodeET;
     private ImageButton groupCodeInfoImageButton;
+    private TextView errorTextView;
+    private ImageView pictureOfRoom;
+    private Subscription errorTextViewSubscription;
     private String durationSpinnerValue = "1.0"; // a default value to avoid NPE. Stands for 1 hour
     @Inject BookingInteractionModel bookingInteractionModel;
 
@@ -45,23 +52,21 @@ public class Book extends Fragment{
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.bookinginteraction_book, container, false);
 
+        errorTextView = (TextView) view.findViewById(R.id.bookingInteraction_book_error_text);
+        pictureOfRoom = (ImageView) view.findViewById(R.id.bookingInteraction_book_room_picture);
+        groupCodeET = (EditText) view.findViewById(R.id.book_group_code_actual);
+        groupNameET = (EditText) view.findViewById(R.id.bookingInteraction_book_groupname);
+
         TextView roomNumberTextView = (TextView) view.findViewById(R.id.bookingInteraction_book_roomnumber);
         if(roomNumberTextView != null) {roomNumberTextView.setText(timeCell.param_room.toUpperCase());}
-
-        TextView errorTextView = (TextView) view.findViewById(R.id.book_error_message_actual);
-
-        groupNameET = (EditText) view.findViewById(R.id.bookingInteraction_book_groupname);
 
         ImageButton commentButton = (ImageButton) view.findViewById(R.id.bookingInteraction_book_comment_button);
         _setupCommentButton(commentButton);
 
-        groupCodeET = (EditText) view.findViewById(R.id.book_group_code_actual);
-
         Button createButton = (Button) view.findViewById(R.id.bookingInteraction_book_create_button);
         _setupCreateButton(createButton);
 
-        groupCodeInfoImageButton = (ImageButton) view
-                .findViewById(R.id.bookingInteraction_book_group_code_info);
+        groupCodeInfoImageButton = (ImageButton) view.findViewById(R.id.bookingInteraction_book_group_code_info);
         _setupGroupCodeInfoButton(groupCodeInfoImageButton);
 
         Spinner durationSpinner = (Spinner) view.findViewById(R.id.book_spinner_duration);
@@ -75,6 +80,54 @@ public class Book extends Fragment{
         fragment.monthWord = bookinginteractionEventWithDateInfo.monthWord;
         fragment.dayOfMonthNumber = bookinginteractionEventWithDateInfo.dayOfMonthNumber;
         return fragment;
+    }
+
+    @Override
+    public void onStart() {
+        Timber.d(getClass().getSimpleName() + " onStart");
+        _setupViewBindings();
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        Timber.d(getClass().getSimpleName() + " onStop");
+        _teardownViewBindings();
+        super.onStop();
+    }
+
+    private void _setupViewBindings() {
+        errorTextViewSubscription = bookingInteractionModel.getBookingInteractionEventObservable()
+                .filter(new Func1<BookingInteractionEvent, Boolean>() {
+                    @Override
+                    public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
+                        return bookingInteractionEvent.type == BookingInteractionEventType.BOOK_ERROR;
+                    }
+                })
+                .subscribe(new Action1<BookingInteractionEvent>() {
+                    @Override
+                    public void call(BookingInteractionEvent bookingInteractionEvent) {
+                        _showErrorMessage(bookingInteractionEvent.message);
+                    }
+                });
+    }
+
+    private void _teardownViewBindings() {
+        if(errorTextViewSubscription != null) {errorTextViewSubscription.unsubscribe();}
+    }
+
+    private void _showErrorMessage(String message) {
+        Float SEE_THROUGH = 0.5f;
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(message);
+        pictureOfRoom.setAlpha(SEE_THROUGH);
+    }
+
+    private void _hideErrorMessage() {
+        Float FULLY_VISIBLE = 1.0f;
+        errorTextView.setVisibility(View.INVISIBLE);
+        errorTextView.setText("");
+        pictureOfRoom.setAlpha(FULLY_VISIBLE);
     }
 
     @Override
@@ -153,6 +206,7 @@ public class Book extends Fragment{
                 @Override
                 public void onClick(View view) {
                     if(_isFormFilledCorrectly()) {
+                        _hideErrorMessage();
                         BookRequestOptions requestOptions = new BookRequestOptions(
                                 groupNameET.getText().toString().trim(),
                                 groupCodeET.getText().toString().trim(),

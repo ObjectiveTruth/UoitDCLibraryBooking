@@ -130,6 +130,7 @@ public class BookingInteraction extends Fragment {
 
         switch(bookingInteractionEvent.type) {
             case BOOK:
+            case BOOK_ERROR:
                 return !(currentFragmentInContentFrame instanceof Book);
             case SUCCESS:
                 return !(currentFragmentInContentFrame instanceof Success);
@@ -137,8 +138,10 @@ public class BookingInteraction extends Fragment {
                 return !(currentFragmentInContentFrame instanceof JoinOrLeave);
             default:
                 Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();
-                Timber.w("Tried to load a bookinginteractionevent, but it didn't contain any expected " +
-                        "values in the param_next field: " + bookingInteractionEvent.timeCell.toString());
+                Timber.w(new Throwable(new IllegalStateException("No expected values match type: "
+                                + bookingInteractionEvent.type + ", Event: " + bookingInteractionEvent.timeCell.toString())),
+                        "Got a booking interaction event, but there was no expected values in the type field. " +
+                                "Sending user back to where they came from");
                 _popFragmentBackstack();
                 return false;
         }
