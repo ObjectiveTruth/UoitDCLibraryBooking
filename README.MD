@@ -131,6 +131,18 @@ IntelliJ is [free for students](https://www.jetbrains.com/student/). :books:
 
 5. Profit :boom:
 
+### Tests
+
+#### Unit Tests with test Reports
+
+```./gradlew jacocoTestDebugUnitTestReport```
+
+#### Instrumentation Tests 
+
+    Requires device or emulator running
+
+```./gradlew spoon```
+
 ## Code Pipeline
 
 ![commit_pipeline](readme_pictures/UoitDCLibraryBookingCommitPipelines.png)

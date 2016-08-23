@@ -107,13 +107,13 @@ public class BookingInteraction extends Fragment {
                return Book.newInstance(bookingInteractionEvent);
            case SUCCESS:
                Timber.i("Showing: Success");
-               return Success.newInstance();
+               return Success.newInstance(bookingInteractionEvent);
            case JOIN_OR_LEAVE:
                Timber.i("Showing: JoinOrLeave");
                return JoinOrLeave.newInstance(bookingInteractionEvent);
            default:
                Timber.w("No valid Fragment requested, showing Success");
-               return Success.newInstance();
+               return Success.newInstance(bookingInteractionEvent);
        }
     }
 
