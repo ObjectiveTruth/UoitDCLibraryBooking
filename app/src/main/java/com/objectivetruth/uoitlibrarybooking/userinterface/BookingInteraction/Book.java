@@ -3,7 +3,6 @@ package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.BookRequestOptions;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
+import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -27,7 +27,7 @@ import timber.log.Timber;
 
 import javax.inject.Inject;
 
-public class Book extends Fragment{
+public class Book extends InteractionFragment{
     private TimeCell timeCell;
     private String monthWord = "";
     private String dayOfMonthNumber = "";
@@ -82,21 +82,7 @@ public class Book extends Fragment{
         return fragment;
     }
 
-    @Override
-    public void onStart() {
-        Timber.d(getClass().getSimpleName() + " onStart");
-        _setupViewBindings();
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        Timber.d(getClass().getSimpleName() + " onStop");
-        _teardownViewBindings();
-        super.onStop();
-    }
-
-    private void _setupViewBindings() {
+    protected void setupViewBindings() {
         errorTextViewSubscription = bookingInteractionModel.getBookingInteractionEventObservable()
                 .filter(new Func1<BookingInteractionEvent, Boolean>() {
                     @Override
@@ -112,7 +98,7 @@ public class Book extends Fragment{
                 });
     }
 
-    private void _teardownViewBindings() {
+    protected void teardownViewBindings() {
         if(errorTextViewSubscription != null) {errorTextViewSubscription.unsubscribe();}
     }
 

@@ -2,7 +2,6 @@ package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +9,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
 import timber.log.Timber;
 
-public class Success extends Fragment{
-    BookingInteractionEvent bookingInteractionEvent;
+public class Success extends InteractionFragment{
+    private BookingInteractionEvent bookingInteractionEvent;
 
     @Nullable
     @Override
@@ -62,5 +62,15 @@ public class Success extends Fragment{
     private void _popFragmentBackstack() {
         Timber.d("Popping backstack");
         getActivity().getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    protected void setupViewBindings() {
+
+    }
+
+    @Override
+    protected void teardownViewBindings() {
+
     }
 }

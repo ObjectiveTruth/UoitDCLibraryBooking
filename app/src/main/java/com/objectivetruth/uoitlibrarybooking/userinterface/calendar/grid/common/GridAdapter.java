@@ -119,16 +119,16 @@ public class GridAdapter extends FixedTableAdapter {
                 holder.textViewOnly.setOnClickListener(null); break;
 
             case BOOKING_LIBRARY_CLOSED:
-                holder.textViewOnly.setText("Closed");
+                holder.textViewOnly.setText(R.string.timecell_calendar_label_closed);
                 holder.textViewOnly.setOnClickListener(null); break;
 
             case BOOKING_OPEN:
-                holder.textViewOnly.setText("Open");
+                holder.textViewOnly.setText(R.string.timecell_calendar_label_book);
                 holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
                         bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_COMPETING:
-                holder.textViewOnly.setText("Open");
+                holder.textViewOnly.setText(R.string.timecell_calendar_label_book_joinorleave);
                 holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
                         bookingInteractionModel, calendarDay)); break;
 
