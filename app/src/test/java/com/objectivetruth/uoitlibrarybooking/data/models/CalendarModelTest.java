@@ -85,7 +85,7 @@ public class CalendarModelTest {
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         CalendarDataRefreshState currentState =
                 calendarModel.getCalendarDataRefreshObservable().first()
@@ -107,7 +107,7 @@ public class CalendarModelTest {
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         CalendarDataRefreshState currentState =
                 calendarModel.getCalendarDataRefreshObservable().first()
@@ -129,7 +129,7 @@ public class CalendarModelTest {
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         CalendarDataRefreshState currentState =
                 calendarModel.getCalendarDataRefreshObservable().first()
@@ -155,7 +155,7 @@ public class CalendarModelTest {
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-        Thread.sleep(300);
+        Thread.sleep(2000);
 
         CalendarDataRefreshState currentState =
                 calendarModel.getCalendarDataRefreshObservable().first()

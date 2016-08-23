@@ -35,7 +35,7 @@ public class BookingInteractionWebService {
         mApplication.getComponent().inject(this);
     }
 
-    public Observable<String> getRawWebpageWithForm(final TimeCell timeCell) {
+    public Observable<String> getRawWebpageWithEmptyForm(final TimeCell timeCell) {
         return Observable.defer(new Func0<Observable<String>>() {
             @Override
             public Observable<String> call() {
@@ -114,16 +114,15 @@ public class BookingInteractionWebService {
 
     private String _getRawPageWithForm(final TimeCell timeCell)
             throws InterruptedException, ExecutionException, UnsupportedEncodingException {
-        Timber.d("Starting the GET request to the form");
+        Timber.d("Starting a GET request for empty form...");
         RequestFuture<String> future = RequestFuture.newFuture();
 
-        Map<String, String> queryParams = new HashMap<String, String>();
+        Map<String, String> queryParams = new HashMap<>();
         queryParams.put("starttime", timeCell.param_starttime);
         queryParams.put("room", timeCell.param_room);
         queryParams.put("next", timeCell.param_next);
 
         String urlPath = MAIN_CALENDAR_RELATIVE_PATH + timeCell.param_get_link + _mapToQueryString(queryParams);
-        Timber.v("URL: " + urlPath);
         StringRequest stringRequest =
                 new StringRequest(Request.Method.GET, urlPath, future, future) {
                     @Override
@@ -134,7 +133,7 @@ public class BookingInteractionWebService {
                     }
                 };
         requestQueue.add(stringRequest);
-        Timber.d("GET request finished for getting the form");
+        Timber.d("Finished Get request for empty form");
         return future.get();
     }
 

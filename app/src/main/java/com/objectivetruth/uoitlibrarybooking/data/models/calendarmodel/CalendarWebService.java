@@ -69,7 +69,7 @@ public class CalendarWebService {
         });
     }
 
-    public Observable<String> getRawCaledarDayPageUsingCalendarDay(final CalendarDay calendarDay) {
+    public Observable<String> getRawClickableCalendarDayPageUsingCalendarDay(final CalendarDay calendarDay) {
         return Observable.defer(new Func0<Observable<String>>() {
             @Override
             public Observable<String> call() {
