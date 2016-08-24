@@ -32,6 +32,7 @@ public class JoinOrLeave extends InteractionFragment{
     private TextView errorTextView;
     private Spinner joinSpinner;
     private Spinner leaveSpinner;
+    private ImageView pictureOfRoom;
     private String currentJoinSpinnerValue;
     private String currentLeaveSpinnerValue;
     CompositeSubscription subscriptions = new CompositeSubscription();
@@ -52,7 +53,7 @@ public class JoinOrLeave extends InteractionFragment{
         Button joinButton = (Button) view.findViewById(R.id.joinorleave_join_button);
         errorTextView = (TextView) view.findViewById(R.id.joinorleave_error_text);
 
-        ImageView roomPicture = (ImageView) view.findViewById(R.id.room_landing_room_picture);
+        pictureOfRoom = (ImageView) view.findViewById(R.id.room_landing_room_picture);
 
         roomNumberTextView.setText(timeCell.param_room);
 
@@ -97,11 +98,9 @@ public class JoinOrLeave extends InteractionFragment{
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
     }
 
-    @Override
-    protected void setupViewBindings() {
+    private void _setupSpinnerSuccessCase() {
         subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
                 .filter(new Func1<BookingInteractionEvent, Boolean>() {
-
                     @Override
                     public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
                         return bookingInteractionEvent.type ==
@@ -118,6 +117,56 @@ public class JoinOrLeave extends InteractionFragment{
                                 bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getMiddle());
                     }
                 }));
+    }
+
+    private void _setupSpinnerErrorCase() {
+        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
+                .filter(new Func1<BookingInteractionEvent, Boolean>() {
+                    @Override
+                    public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
+                        return bookingInteractionEvent.type ==
+                                BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new Action1<BookingInteractionEvent>() {
+                    @Override
+                    public void call(BookingInteractionEvent bookingInteractionEvent) {
+                        HashMap<String, String> errorSpinnerValues = new HashMap<>();
+                        errorSpinnerValues.put("ERROR", "error");
+                        _setupSpinnerWithValues(errorSpinnerValues, errorSpinnerValues);
+                        _showErrorMessage(bookingInteractionEvent.message);
+                    }
+                }));
+    }
+
+    private void _setupSpinnerRunningCase() {
+        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
+                .filter(new Func1<BookingInteractionEvent, Boolean>() {
+                    @Override
+                    public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
+                        return bookingInteractionEvent.type ==
+                                BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new Action1<BookingInteractionEvent>() {
+                    @Override
+                    public void call(BookingInteractionEvent bookingInteractionEvent) {
+                        HashMap<String, String> loadingSpinnerValues = new HashMap<>();
+                        loadingSpinnerValues.put("Loading...", "loading");
+                        _setupSpinnerWithValues(loadingSpinnerValues, loadingSpinnerValues);
+                    }
+                }));
+    }
+
+    @Override
+    protected void setupViewBindings() {
+        _setupSpinnerSuccessCase();
+        _setupSpinnerRunningCase();
+        _setupSpinnerErrorCase();
     }
 
     @SuppressWarnings("Duplicates")
@@ -187,5 +236,19 @@ public class JoinOrLeave extends InteractionFragment{
                                 dayOfMonthNumber,
                                 monthWord,
                                 null));
+    }
+
+    private void _showErrorMessage(String message) {
+        Float SEE_THROUGH = 0.5f;
+        errorTextView.setVisibility(View.VISIBLE);
+        errorTextView.setText(message);
+        pictureOfRoom.setAlpha(SEE_THROUGH);
+    }
+
+    private void _hideErrorMessage() {
+        Float FULLY_VISIBLE = 1.0f;
+        errorTextView.setVisibility(View.INVISIBLE);
+        errorTextView.setText("");
+        pictureOfRoom.setAlpha(FULLY_VISIBLE);
     }
 }

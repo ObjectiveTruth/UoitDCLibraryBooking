@@ -20,9 +20,9 @@ import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.BookRequestOptions;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
-import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
 import javax.inject.Inject;
@@ -41,7 +41,7 @@ public class Book extends InteractionFragment{
     private ImageButton groupCodeInfoImageButton;
     private TextView errorTextView;
     private ImageView pictureOfRoom;
-    private Subscription errorTextViewSubscription;
+    private CompositeSubscription subscriptions = new CompositeSubscription();
     private String durationSpinnerValue = "1.0"; // a default value to avoid NPE. Stands for 1 hour
     @Inject BookingInteractionModel bookingInteractionModel;
 
@@ -83,7 +83,7 @@ public class Book extends InteractionFragment{
     }
 
     protected void setupViewBindings() {
-        errorTextViewSubscription = bookingInteractionModel.getBookingInteractionEventObservable()
+        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
                 .filter(new Func1<BookingInteractionEvent, Boolean>() {
                     @Override
                     public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
@@ -95,11 +95,11 @@ public class Book extends InteractionFragment{
                     public void call(BookingInteractionEvent bookingInteractionEvent) {
                         _showErrorMessage(bookingInteractionEvent.message);
                     }
-                });
+                }));
     }
 
     protected void teardownViewBindings() {
-        if(errorTextViewSubscription != null) {errorTextViewSubscription.unsubscribe();}
+        subscriptions.unsubscribe();
     }
 
     private void _showErrorMessage(String message) {
