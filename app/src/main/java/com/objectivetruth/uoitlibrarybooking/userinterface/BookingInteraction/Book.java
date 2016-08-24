@@ -199,7 +199,7 @@ public class Book extends InteractionFragment{
                                 durationSpinnerValue,
                                 comment
                         );
-                        bookingInteractionModel.getBookingInteractionEventUserRequest()
+                        bookingInteractionModel.getBookingInteractionEventUserRequestSubject()
                                 .onNext(new BookingInteractionEventUserRequest(
                                         timeCell,
                                         BookingInteractionEventUserRequestType.BOOK_REQUEST,

@@ -62,7 +62,7 @@ public class BookingInteractionModel {
      * Interaction Flow
      * @return
      */
-    public PublishSubject<BookingInteractionEventUserRequest> getBookingInteractionEventUserRequest() {
+    public PublishSubject<BookingInteractionEventUserRequest> getBookingInteractionEventUserRequestSubject() {
         if(bookingInteractionEventUserRequestPublishSubject == null ||
                 bookingInteractionEventUserRequestPublishSubject.hasCompleted()) {
             bookingInteractionEventUserRequestPublishSubject = PublishSubject.create();
@@ -77,6 +77,8 @@ public class BookingInteractionModel {
     private void _bindUserRequestEventToWebCalls(
             PublishSubject<BookingInteractionEventUserRequest> bookingInteractionEventUserRequestPublishSubject) {
         bookingInteractionEventUserRequestPublishSubject
+                .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
                 .subscribe(new Action1<BookingInteractionEventUserRequest>() {
                     @Override
                     public void call(BookingInteractionEventUserRequest s) {
@@ -89,11 +91,100 @@ public class BookingInteractionModel {
         switch(userRequest.type) {
             case BOOK_REQUEST:
                 _doBookRequest(userRequest);
+                break;
+            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_REQUEST:
+                _doJoinOrLeaveGettingSpinnerValuesRequest(userRequest);
         }
     }
 
+    private void _doJoinOrLeaveGettingSpinnerValuesRequest(final BookingInteractionEventUserRequest userRequest) {
+        final String LOG_PREFIX = "JoinOrLeave Getting SpinnerValues Flow: ";
+
+        BookingInteractionEvent eventToFire = new BookingInteractionEvent(userRequest.timeCell,
+                BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING, userRequest.dayOfMonthNumber,
+                userRequest.monthWord);
+        getBookingInteractionEventReplaySubject().onNext(eventToFire);
+
+        Timber.i(LOG_PREFIX + "Starting by calling the initial main webpage");
+        calendarWebService.getRawInitialWebPageObs()
+
+                .flatMap(new Func1<String, Observable<CalendarDay>>() {
+                    @Override
+                    public Observable<CalendarDay> call(String s) {
+                        Timber.i(LOG_PREFIX + "Initial Webpage Received, sending to parser to get state info");
+                        return CalendarParser.parseRawWebpageForViewStateGeneratorAndEventValidation(s);
+                    }
+                })
+
+                .flatMap(new Func1<CalendarDay, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(CalendarDay calendarDay) {
+                        Timber.i(LOG_PREFIX + "Parsing Complete, clicking the day on the calendar");
+                        calendarDay.extEventTarget = userRequest.timeCell.param_eventtarget;
+                        calendarDay.extEventArgument = userRequest.timeCell.param_eventargument;
+
+                        calendarDay.extDayOfMonthNumber = userRequest.dayOfMonthNumber;
+
+                        return calendarWebService.getRawClickableCalendarDayPageUsingCalendarDay(calendarDay);
+                    }
+                })
+
+                .flatMap(new Func1<String, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(String rawWebpage) {
+                        Timber.i(LOG_PREFIX + "Received webpage for day on calendar, Clicking the time slot requested");
+                        return bookingInteractionWebService.getRawWebpageWithEmptyForm(userRequest.timeCell);
+                    }
+                })
+
+/*                .flatMap(new Func1<String, Observable<CalendarDay>>() {
+                    @Override
+                    public Observable<CalendarDay> call(final String rawWebpage) {
+                        Timber.i(LOG_PREFIX + "Received webpage with the empty form for time slot, " +
+                                "sending to parser to get state info");
+                        return CalendarParser
+                                .parseRawWebpageForViewStateGeneratorAndEventValidation(rawWebpage);
+                    }
+                })*/
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onCompleted() {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.w(e, LOG_PREFIX + "Error from booking");
+
+                        BookingInteractionEvent eventToFire =
+                                new BookingInteractionEvent(
+                                        userRequest.timeCell,
+                                        BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR,
+                                        userRequest.dayOfMonthNumber,
+                                        userRequest.monthWord);
+                        eventToFire.message = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+
+                        getBookingInteractionEventReplaySubject().onNext(eventToFire);
+                    }
+
+                    @Override
+                    public void onNext(String webpage) {
+                        Timber.i(webpage);
+                    }
+                });
+    }
+
     private void _doBookRequest(final BookingInteractionEventUserRequest userRequest) {
-        Timber.i("Booking Request Flow: Starting by calling the initial main webpage");
+        final String LOG_PREFIX = "Booking Request Flow: ";
+
+        BookingInteractionEvent eventToFire = new BookingInteractionEvent(userRequest.timeCell,
+                        BookingInteractionEventType.BOOK_RUNNING, userRequest.dayOfMonthNumber, userRequest.monthWord);
+        getBookingInteractionEventReplaySubject().onNext(eventToFire);
+
+        Timber.i(LOG_PREFIX + "Starting by calling the initial main webpage");
         calendarWebService.getRawInitialWebPageObs()
 
                 .flatMap(new Func1<String, Observable<CalendarDay>>() {
@@ -107,7 +198,7 @@ public class BookingInteractionModel {
                 .flatMap(new Func1<CalendarDay, Observable<String>>() {
                     @Override
                     public Observable<String> call(CalendarDay calendarDay) {
-                        Timber.i("Booking Request Flow: Parsing Complete, clicking the day on the calendar");
+                        Timber.i(LOG_PREFIX + "Parsing Complete, clicking the day on the calendar");
                         calendarDay.extEventTarget = userRequest.timeCell.param_eventtarget;
                         calendarDay.extEventArgument = userRequest.timeCell.param_eventargument;
 
@@ -120,8 +211,7 @@ public class BookingInteractionModel {
                 .flatMap(new Func1<String, Observable<String>>() {
                     @Override
                     public Observable<String> call(String rawWebpage) {
-                        Timber.i("Booking Request Flow: Received webpage for day on calendar, Clicking the time slot " +
-                                "requested");
+                        Timber.i(LOG_PREFIX + "Received webpage for day on calendar, Clicking the time slot requested");
                         return bookingInteractionWebService.getRawWebpageWithEmptyForm(userRequest.timeCell);
                     }
                 })
@@ -129,7 +219,7 @@ public class BookingInteractionModel {
                 .flatMap(new Func1<String, Observable<CalendarDay>>() {
                     @Override
                     public Observable<CalendarDay> call(final String rawWebpage) {
-                        Timber.i("Booking Request Flow: Received webpage with the empty form for time slot, " +
+                        Timber.i(LOG_PREFIX + "Received webpage with the empty form for time slot, " +
                                 "sending to parser to get state info");
                         return CalendarParser
                                 .parseRawWebpageForViewStateGeneratorAndEventValidation(rawWebpage);
@@ -139,7 +229,7 @@ public class BookingInteractionModel {
                 .flatMap(new Func1<CalendarDay, Observable<LeftOrRight<String, String>>>() {
                     @Override
                     public Observable<LeftOrRight<String, String>> call(CalendarDay calendarDay) {
-                        Timber.i("Booking Request Flow: Parsing Complete, doing the final sending of options to server");
+                        Timber.i(LOG_PREFIX + "Parsing Complete, doing the final sending of options to server");
                         return bookingInteractionWebService.createNewBookingAndGetResultWebpage(
                                 calendarDay,
                                 userRequest.timeCell,
@@ -149,7 +239,7 @@ public class BookingInteractionModel {
                                 .map(new Func1<String, LeftOrRight<String, String>>() {
                                     @Override
                                     public LeftOrRight<String, String> call(String rawWebpage) {
-                                        Timber.i("Booking Request Flow: Received result page, parsing before passing " +
+                                        Timber.i(LOG_PREFIX + "Received result page, parsing before passing " +
                                                 "back. That will be the final step");
                                         return BookingInteractionParser.parseWebpageForMessageLabel(rawWebpage);
                                     }
@@ -168,7 +258,7 @@ public class BookingInteractionModel {
 
                     @Override
                     public void onError(Throwable e) {
-                        Timber.w(e, "Error from booking");
+                        Timber.w(e, LOG_PREFIX + "Error from booking");
 
                         BookingInteractionEvent eventToFire =
                                 new BookingInteractionEvent(
@@ -184,7 +274,7 @@ public class BookingInteractionModel {
                     @Override
                     public void onNext(LeftOrRight<String, String> result) {
                         if(result.hasLeft()) {
-                            Timber.w("Bad Result from booking: " + result.getLeft());
+                            Timber.w(LOG_PREFIX + "Bad Result from booking: " + result.getLeft());
 
                             BookingInteractionEvent eventToFire =
                                     new BookingInteractionEvent(
@@ -197,7 +287,7 @@ public class BookingInteractionModel {
                             getBookingInteractionEventReplaySubject().onNext(eventToFire);
 
                         }else {
-                            Timber.i("Good Result from booking: " + result.getRight());
+                            Timber.i(LOG_PREFIX + "Good Result from booking: " + result.getRight());
 
                             BookingInteractionEvent eventToFire =
                                     new BookingInteractionEvent(

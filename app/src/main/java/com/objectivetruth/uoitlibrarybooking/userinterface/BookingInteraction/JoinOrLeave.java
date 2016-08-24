@@ -7,10 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
 import timber.log.Timber;
+
+import javax.inject.Inject;
 
 public class JoinOrLeave extends InteractionFragment{
     private TimeCell timeCell;
@@ -18,6 +24,7 @@ public class JoinOrLeave extends InteractionFragment{
     private String dayOfMonthNumber = "";
     private BookingInteractionEvent bookingInteractionEvent;
     private TextView errorTextView;
+    @Inject BookingInteractionModel bookingInteractionModel;
 
     @Nullable
     @Override
@@ -48,6 +55,8 @@ public class JoinOrLeave extends InteractionFragment{
                 Timber.w("Create Button Clicked, Not Implemented");
             }
         });
+
+        _doInitialRequestToGetSpinnerValues(bookingInteractionModel);
 
 
 /*        ArrayAdapter<String> joinAdapter =
@@ -120,10 +129,32 @@ public class JoinOrLeave extends InteractionFragment{
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
+    }
+
+    @Override
     protected void setupViewBindings() {
     }
 
     @Override
     protected void teardownViewBindings() {
+    }
+
+    /**
+     * When the view is initially called, this will fire, to get the spinner values asynchronously
+     * @param bookingInteractionModel
+     */
+    private void _doInitialRequestToGetSpinnerValues(BookingInteractionModel bookingInteractionModel) {
+        bookingInteractionModel
+                .getBookingInteractionEventUserRequestSubject()
+                .onNext(
+                        new BookingInteractionEventUserRequest(
+                                timeCell,
+                                BookingInteractionEventUserRequestType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_REQUEST,
+                                dayOfMonthNumber,
+                                monthWord,
+                                null));
     }
 }

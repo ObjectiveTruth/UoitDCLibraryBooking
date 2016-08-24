@@ -103,12 +103,19 @@ public class BookingInteraction extends Fragment {
     private Fragment _getFragmentForEvent(BookingInteractionEvent bookingInteractionEvent) {
        switch(bookingInteractionEvent.type) {
            case BOOK:
+           case BOOK_RUNNING:
+           case BOOK_ERROR:
                Timber.i("Showing: Book");
                return Book.newInstance(bookingInteractionEvent);
            case SUCCESS:
                Timber.i("Showing: Success");
                return Success.newInstance(bookingInteractionEvent);
            case JOIN_OR_LEAVE:
+           case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR:
+           case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING:
+           case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS:
+           case JOIN_OR_LEAVE_ERROR:
+           case JOIN_OR_LEAVE_RUNNING:
                Timber.i("Showing: JoinOrLeave");
                return JoinOrLeave.newInstance(bookingInteractionEvent);
            default:
@@ -130,11 +137,17 @@ public class BookingInteraction extends Fragment {
 
         switch(bookingInteractionEvent.type) {
             case BOOK:
+            case BOOK_RUNNING:
             case BOOK_ERROR:
                 return !(currentFragmentInContentFrame instanceof Book);
             case SUCCESS:
                 return !(currentFragmentInContentFrame instanceof Success);
             case JOIN_OR_LEAVE:
+            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR:
+            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING:
+            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS:
+            case JOIN_OR_LEAVE_ERROR:
+            case JOIN_OR_LEAVE_RUNNING:
                 return !(currentFragmentInContentFrame instanceof JoinOrLeave);
             default:
                 Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();

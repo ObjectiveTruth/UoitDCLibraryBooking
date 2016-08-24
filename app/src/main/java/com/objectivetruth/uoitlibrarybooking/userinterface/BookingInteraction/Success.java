@@ -2,6 +2,8 @@ package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +25,7 @@ public class Success extends InteractionFragment{
         View view = inflater.inflate(R.layout.bookinginteraction_success, container, false);
         TextView body = (TextView) view.findViewById(R.id.bookingInteraction_success_body);
 
-        body.setText(_setMessageOrDefault(bookingInteractionEvent.message));
+        body.setText(_getMessageOrDefault(bookingInteractionEvent.message));
 
         TextView title = (TextView) view.findViewById(R.id.bookingInteraction_success_title);
 
@@ -35,8 +37,14 @@ public class Success extends InteractionFragment{
         return view;
     }
 
-    private String _setMessageOrDefault(String message) {
-        return message == null ? "No Information Available" : message;
+    private Spanned _getMessageOrDefault(String message) {
+        String returnMessage = message == null ? "No Information Available" : message;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            return Html.fromHtml(returnMessage, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(returnMessage);
+        }
     }
 
     public static Success newInstance(BookingInteractionEvent bookingInteractionEvent) {
