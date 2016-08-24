@@ -230,15 +230,16 @@ public class Book extends InteractionFragment{
             @Override
             public void onItemSelected(AdapterView<?> adapter, View view,
                                        int position, long id) {
-                String[] timeToDecimal = new String[]{"0.5", "1.0", "1.5", "2"};
+                String[] timeToDecimal = new String[]{"0.5", "1", "1.5", "2"};
                 durationSpinnerValue = timeToDecimal[position];
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapter) { }
+            public void onNothingSelected(AdapterView<?> adapter) {
+                durationSpinnerValue = "1";
+            }
         });
         durationSpinner.setSelection(1);
-        durationSpinnerValue = "1.0";
     }
 
     @Override

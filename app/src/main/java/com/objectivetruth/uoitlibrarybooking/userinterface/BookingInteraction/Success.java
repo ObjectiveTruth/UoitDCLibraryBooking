@@ -22,6 +22,7 @@ public class Success extends InteractionFragment{
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.bookinginteraction_success, container, false);
         TextView body = (TextView) view.findViewById(R.id.bookingInteraction_success_body);
+
         body.setText(_setMessageOrDefault(bookingInteractionEvent.message));
 
         TextView title = (TextView) view.findViewById(R.id.bookingInteraction_success_title);
@@ -30,7 +31,6 @@ public class Success extends InteractionFragment{
 
         Button okButton = (Button) view.findViewById(R.id.bookingInteraction_success_ok_button);
         _setupOkButton(okButton);
-
 
         return view;
     }
@@ -42,7 +42,7 @@ public class Success extends InteractionFragment{
     public static Success newInstance(BookingInteractionEvent bookingInteractionEvent) {
         Success fragment = new Success();
         fragment.bookingInteractionEvent = bookingInteractionEvent;
-        return new Success();
+        return fragment;
     }
 
     private void _setupOkButton(Button button) {
