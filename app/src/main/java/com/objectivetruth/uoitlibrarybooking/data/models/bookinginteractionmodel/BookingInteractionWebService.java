@@ -107,8 +107,10 @@ public class BookingInteractionWebService {
                     }
                 };
         requestQueue.add(stringRequest);
+        String webpage = future.get();
         Timber.i("POST request to the booking endpoint is finished");
-        return future.get();
+        Timber.v(webpage);
+        return webpage;
 
     }
 
@@ -133,8 +135,10 @@ public class BookingInteractionWebService {
                     }
                 };
         requestQueue.add(stringRequest);
+        String webpage = future.get();
         Timber.d("Finished Get request for empty form");
-        return future.get();
+        Timber.v(webpage);
+        return webpage;
     }
 
     private byte[] _getBodyInBytesUsingMap(HashMap<String, String> urlEncodedFormElements) {

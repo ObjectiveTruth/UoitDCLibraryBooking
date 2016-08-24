@@ -1,6 +1,10 @@
 package com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel;
 
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
+import com.objectivetruth.uoitlibrarybooking.statelessutilities.Triple;
+
+import java.util.HashMap;
 
 public class BookingInteractionEvent {
     public TimeCell timeCell;
@@ -8,6 +12,7 @@ public class BookingInteractionEvent {
     public String dayOfMonthNumber;
     public String monthWord;
     public String message;
+    public Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay> joinOrLeaveGetSpinnerResult;
 
     public BookingInteractionEvent(TimeCell timeCell, BookingInteractionEventType type,
                                    String dayOfMonthNumber, String monthWord) {

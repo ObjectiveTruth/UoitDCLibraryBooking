@@ -1,11 +1,13 @@
 package com.objectivetruth.uoitlibrarybooking.data.models;
 
+import android.support.v4.util.Pair;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.*;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
 import com.objectivetruth.uoitlibrarybooking.statelessutilities.LeftOrRight;
+import com.objectivetruth.uoitlibrarybooking.statelessutilities.Triple;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -15,6 +17,8 @@ import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
 import timber.log.Timber;
+
+import java.util.HashMap;
 
 public class BookingInteractionModel {
     private BookingInteractionWebService bookingInteractionWebService;
@@ -137,19 +141,47 @@ public class BookingInteractionModel {
                     }
                 })
 
-/*                .flatMap(new Func1<String, Observable<CalendarDay>>() {
+                .flatMap(new Func1<String, Observable<Pair<String, CalendarDay>>>() {
                     @Override
-                    public Observable<CalendarDay> call(final String rawWebpage) {
+                    public Observable<Pair<String, CalendarDay>> call(final String rawWebpage) {
                         Timber.i(LOG_PREFIX + "Received webpage with the empty form for time slot, " +
                                 "sending to parser to get state info");
+                        // Enrich the returned state information with the webpage received
                         return CalendarParser
-                                .parseRawWebpageForViewStateGeneratorAndEventValidation(rawWebpage);
+                                .parseRawWebpageForViewStateGeneratorAndEventValidation(rawWebpage)
+                                .map(new Func1<CalendarDay, Pair<String, CalendarDay>>() {
+                                    @Override
+                                    public Pair<String, CalendarDay> call(CalendarDay calendarDay) {
+                                        return new Pair<String, CalendarDay>(rawWebpage, calendarDay);
+                                    }
+                                });
                     }
-                })*/
+                })
+
+                .flatMap(new Func1<Pair<String, CalendarDay>,
+                        Observable<Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay>>>() {
+                    @Override
+                    public Observable<Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay>>
+                    call(final Pair<String, CalendarDay> stringCalendarDayPair) {
+                        return BookingInteractionParser.parseJoinOrLeaveFormForSpinners(stringCalendarDayPair.first)
+                                // Convert the received Pair into a triple for easy usage in the next step
+                                .map(new Func1<Pair<HashMap<String, String>, HashMap<String, String>>, Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay>>() {
+                                    @Override
+                                    public Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay>
+                                    call(Pair<HashMap<String, String>, HashMap<String, String>> SpinnerJoinLeavePair) {
+                                        return new Triple<>(
+                                                SpinnerJoinLeavePair.first,
+                                                SpinnerJoinLeavePair.second,
+                                                stringCalendarDayPair.second);
+                                    }
+                                });
+                    }
+                })
+
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
 
-                .subscribe(new Observer<String>() {
+                .subscribe(new Observer<Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay>>() {
                     @Override
                     public void onCompleted() {
                         // Do nothing
@@ -171,8 +203,15 @@ public class BookingInteractionModel {
                     }
 
                     @Override
-                    public void onNext(String webpage) {
-                        Timber.i(webpage);
+                    public void onNext(Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay> result) {
+                        BookingInteractionEvent eventToFire =
+                                new BookingInteractionEvent(
+                                        userRequest.timeCell,
+                                        BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS,
+                                        userRequest.dayOfMonthNumber,
+                                        userRequest.monthWord);
+                        eventToFire.joinOrLeaveGetSpinnerResult = result;
+                        getBookingInteractionEventReplaySubject().onNext(eventToFire);
                     }
                 });
     }

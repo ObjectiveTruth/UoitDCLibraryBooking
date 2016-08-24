@@ -10,13 +10,19 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 
 public class JoinOrLeave extends InteractionFragment{
     private TimeCell timeCell;
@@ -24,6 +30,11 @@ public class JoinOrLeave extends InteractionFragment{
     private String dayOfMonthNumber = "";
     private BookingInteractionEvent bookingInteractionEvent;
     private TextView errorTextView;
+    private Spinner joinSpinner;
+    private Spinner leaveSpinner;
+    private String currentJoinSpinnerValue;
+    private String currentLeaveSpinnerValue;
+    CompositeSubscription subscriptions = new CompositeSubscription();
     @Inject BookingInteractionModel bookingInteractionModel;
 
     @Nullable
@@ -35,12 +46,10 @@ public class JoinOrLeave extends InteractionFragment{
 
         TextView roomNumberTextView = (TextView) view.findViewById(R.id.joinorleave_room_number);
         Button createButton = (Button) view.findViewById(R.id.joinorleave_create_group_button);
-        Spinner joinSpinner = (Spinner) view.findViewById(R.id.joinorleave_join_spinner);
-        Spinner leaveSpinner = (Spinner) view.findViewById(R.id.joinorleave_leave_spinner);
+        joinSpinner = (Spinner) view.findViewById(R.id.joinorleave_join_spinner);
+        leaveSpinner = (Spinner) view.findViewById(R.id.joinorleave_leave_spinner);
         Button leaveButton = (Button) view.findViewById(R.id.joinorleave_leave_grou_button);
         Button joinButton = (Button) view.findViewById(R.id.joinorleave_join_button);
-/*        String[] joinSpinnerArr = (String[]) bundleExtras.get("joinSpinnerArr");
-        String[] leaveSpinnerArr = (String[]) bundleExtras.get("leaveSpinnerArr");*/
         errorTextView = (TextView) view.findViewById(R.id.joinorleave_error_text);
 
         ImageView roomPicture = (ImageView) view.findViewById(R.id.room_landing_room_picture);
@@ -58,52 +67,6 @@ public class JoinOrLeave extends InteractionFragment{
 
         _doInitialRequestToGetSpinnerValues(bookingInteractionModel);
 
-
-/*        ArrayAdapter<String> joinAdapter =
-                new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, joinSpinnerArr);
-        joinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        joinSpinner.setAdapter(joinAdapter);
-
-        ArrayAdapter<String> leaveAdapter =
-                new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, leaveSpinnerArr);
-        leaveAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        leaveSpinner.setAdapter(leaveAdapter);
-
-        leaveSpinnerValue = leaveSpinnerArr[0].split(":")[3].substring(1, 5);
-        //Timber.i(leaveSpinnerValue);
-        joinSpinnerValue = joinSpinnerArr[0].split(":")[3].substring(1, 5);
-        spinnerJoinString = joinSpinnerArr[0];
-        int foundAt = joinSpinnerArr[0].indexOf("(");
-        calendarGroupName = joinSpinnerArr[0].substring(0, foundAt - 1);*/
-
-
-        joinSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-            @Override
-            public void onItemSelected(AdapterView<?> adapter, View view,
-                                       int position, long id) {
-/*                spinnerJoinString = ((String) adapter.getItemAtPosition(position));
-                joinSpinnerValue = spinnerJoinString.split(":")[3].substring(1, 5);
-                int foundAt = spinnerJoinString.indexOf("(");
-                calendarGroupName = spinnerJoinString.substring(0, foundAt - 1);*/
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapter) {
-            }
-        });
-
-        leaveSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-            @Override
-            public void onItemSelected(AdapterView<?> adapter, View view,
-                                       int position, long id) {
-                //leaveSpinnerValue = ((String) adapter.getItemAtPosition(position)).split(":")[3].substring(1, 5);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapter) {
-            }
-        });
 
         joinButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -136,10 +99,78 @@ public class JoinOrLeave extends InteractionFragment{
 
     @Override
     protected void setupViewBindings() {
+        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
+                .filter(new Func1<BookingInteractionEvent, Boolean>() {
+
+                    @Override
+                    public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
+                        return bookingInteractionEvent.type ==
+                                BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new Action1<BookingInteractionEvent>() {
+                    @Override
+                    public void call(BookingInteractionEvent bookingInteractionEvent) {
+                        _setupSpinnerWithValues(
+                                bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getLeft(),
+                                bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getMiddle());
+                    }
+                }));
+    }
+
+    @SuppressWarnings("Duplicates")
+    private void _setupSpinnerWithValues(final HashMap<String, String> joinSpinnerValues,
+                                         final HashMap<String, String> leaveSpinnerValues) {
+        String[] joinSpinnerValueArr = joinSpinnerValues.keySet().toArray(new String[joinSpinnerValues.keySet().size()]);
+        String[] leaveSpinnerValueArr = leaveSpinnerValues.keySet().toArray(new String[joinSpinnerValues.keySet().size()]);
+
+        ArrayAdapter<String> joinAdapter =
+                new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, joinSpinnerValueArr);
+        joinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        joinSpinner.setAdapter(joinAdapter);
+
+        ArrayAdapter<String> leaveAdapter =
+                new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, leaveSpinnerValueArr);
+        leaveAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        leaveSpinner.setAdapter(leaveAdapter);
+
+        joinSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View view,
+                                       int position, long id) {
+                String labelOfSelection = ((String) adapter.getItemAtPosition(position));
+                currentJoinSpinnerValue = joinSpinnerValues.get(labelOfSelection);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapter) {
+                String labelOfSelection = ((String) adapter.getItemAtPosition(0));
+                currentJoinSpinnerValue = joinSpinnerValues.get(labelOfSelection);
+            }
+        });
+
+        leaveSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View view,
+                                       int position, long id) {
+                String labelOfSelection = ((String) adapter.getItemAtPosition(position));
+                currentLeaveSpinnerValue = leaveSpinnerValues.get(labelOfSelection);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapter) {
+                String labelOfSelection = ((String) adapter.getItemAtPosition(0));
+                currentLeaveSpinnerValue = leaveSpinnerValues.get(labelOfSelection);
+            }
+        });
+
     }
 
     @Override
     protected void teardownViewBindings() {
+        subscriptions.unsubscribe();
     }
 
     /**
