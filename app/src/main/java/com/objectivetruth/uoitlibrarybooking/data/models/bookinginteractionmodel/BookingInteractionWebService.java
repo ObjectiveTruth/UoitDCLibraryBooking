@@ -8,7 +8,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.BookRequestOptions;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.JoinOrLeaveLeaveRequest;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.JoinOrLeaveRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.RequestOptions;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
@@ -25,9 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.LEAVE_GROUP_WEBPAGE;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.MAIN_CALENDAR_RELATIVE_PATH;
-import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.MAIN_CALENDAR_URL;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.*;
 
 public class BookingInteractionWebService {
     @Inject RequestQueue requestQueue;
@@ -97,7 +95,7 @@ public class BookingInteractionWebService {
             @Override
             public Observable<String> call() {
                 try {
-                    JoinOrLeaveLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveLeaveRequest) requestOptions;
+                    JoinOrLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveRequest) requestOptions;
                     CalendarDay calendarDay = joinOrLeaveLeaveOptions.calendarDay;
                     TimeCell timeCell = joinOrLeaveLeaveOptions.timeCell;
                     String LEAVE_BUTTON_OPTION = "Leave the Group";
@@ -108,12 +106,43 @@ public class BookingInteractionWebService {
                     urlFormData.put("__VIEWSTATEGENERATOR", calendarDay.extViewStateGenerator);
                     urlFormData.put("__EVENTVALIDATION", calendarDay.extEventValidation);
                     urlFormData.put("ctl00$ContentPlaceHolder1$RadiobuttonListLeaveGroup",
-                            joinOrLeaveLeaveOptions.leaveGroupValue);
+                            joinOrLeaveLeaveOptions.groupValue);
                     urlFormData.put("ctl00$ContentPlaceHolder1$ButtonLeave", LEAVE_BUTTON_OPTION);
                     return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, timeCell.param_next, null));
                 } catch (InterruptedException | ExecutionException e) {
                     Timber.e(e, "Error while choosing the group to leave: " +
-                            ((JoinOrLeaveLeaveRequest) requestOptions).timeCell.toString());
+                            ((JoinOrLeaveRequest) requestOptions).timeCell.toString());
+                    return Observable.error(e);
+                } catch (ClassCastException e) {
+                    Timber.e(e, "Error while getting request options");
+                    return Observable.error(e);
+                }
+            }
+        });
+    }
+
+    public Observable<String> chooseJoinBookingAndGetResultWebpage(final RequestOptions requestOptions) {
+        return Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                try {
+                    JoinOrLeaveRequest joinOrLeaveRequest = (JoinOrLeaveRequest) requestOptions;
+                    CalendarDay calendarDay = joinOrLeaveRequest.calendarDay;
+                    TimeCell timeCell = joinOrLeaveRequest.timeCell;
+                    String LEAVE_BUTTON_OPTION = "Create or Join a Group";
+
+                    HashMap<String, String> urlFormData = new HashMap<>();
+                    // Construct the URL encoded Form Data
+                    urlFormData.put("__VIEWSTATE", calendarDay.extViewStateMain);
+                    urlFormData.put("__VIEWSTATEGENERATOR", calendarDay.extViewStateGenerator);
+                    urlFormData.put("__EVENTVALIDATION", calendarDay.extEventValidation);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$RadioButtonListJoinOrCreateGroup",
+                            joinOrLeaveRequest.groupValue);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$ButtonJoinOrCreate", LEAVE_BUTTON_OPTION);
+                    return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, timeCell.param_next, null));
+                } catch (InterruptedException | ExecutionException e) {
+                    Timber.e(e, "Error while choosing the group to join: " +
+                            ((JoinOrLeaveRequest) requestOptions).timeCell.toString());
                     return Observable.error(e);
                 } catch (ClassCastException e) {
                     Timber.e(e, "Error while getting request options");
@@ -130,10 +159,10 @@ public class BookingInteractionWebService {
             @Override
             public Observable<String> call() {
                 try {
-                    JoinOrLeaveLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveLeaveRequest) requestOptions;
-                    String groupName = joinOrLeaveLeaveOptions.leaveGroupLabel;
-                    String leaveButtonOption = "Leave " + groupName; // yes, we use a plus here.. before URLencoding
-                    String refererOverride = MAIN_CALENDAR_RELATIVE_PATH + "leavegroup.aspx";
+                    JoinOrLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveRequest) requestOptions;
+                    String groupName = joinOrLeaveLeaveOptions.groupLabel;
+                    String leaveButtonOption = "Leave " + groupName;
+                    String refererOverride = MAIN_CALENDAR_RELATIVE_PATH + LEAVE_GROUP_WEBPAGE;
 
                     HashMap<String, String> urlFormData = new HashMap<>();
                     // Construct the URL encoded Form Data
@@ -146,7 +175,40 @@ public class BookingInteractionWebService {
                     return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, LEAVE_GROUP_WEBPAGE,
                             refererOverride));
                 } catch (InterruptedException | ExecutionException e) {
-                    Timber.w(e, "Error while doing a leave for " + ((JoinOrLeaveLeaveRequest) requestOptions).timeCell.toString());
+                    Timber.w(e, "Error while doing a leave for " + ((JoinOrLeaveRequest) requestOptions).timeCell.toString());
+                    return Observable.error(e);
+                } catch (ClassCastException e) {
+                    Timber.e(e, "Error while getting request options");
+                    return Observable.error(e);
+                }
+            }
+        });
+    }
+
+    public Observable<String> fillJoinOrLeaveJoinFormAndGetResultWebpage(final UserCredentials userCredentials,
+                                                                          final RequestOptions requestOptions,
+                                                                          final CalendarDay calendarDay) {
+        return Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                try {
+                    JoinOrLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveRequest) requestOptions;
+                    String groupName = joinOrLeaveLeaveOptions.groupLabel;
+                    String joinButtonOption = "Join " + groupName;
+                    String refererOverride = MAIN_CALENDAR_RELATIVE_PATH + JOIN_GROUP_WEBPAGE;
+
+                    HashMap<String, String> urlFormData = new HashMap<>();
+                    // Construct the URL encoded Form Data
+                    urlFormData.put("__VIEWSTATE", calendarDay.extViewStateMain);
+                    urlFormData.put("__VIEWSTATEGENERATOR", calendarDay.extViewStateGenerator);
+                    urlFormData.put("__EVENTVALIDATION", calendarDay.extEventValidation);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$TextBoxID", userCredentials.username);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$TextBoxPassword", userCredentials.password);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$ButtonJoin", joinButtonOption);
+                    return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, JOIN_GROUP_WEBPAGE,
+                            refererOverride));
+                } catch (InterruptedException | ExecutionException e) {
+                    Timber.w(e, "Error while doing a join for " + ((JoinOrLeaveRequest) requestOptions).timeCell.toString());
                     return Observable.error(e);
                 } catch (ClassCastException e) {
                     Timber.e(e, "Error while getting request options");

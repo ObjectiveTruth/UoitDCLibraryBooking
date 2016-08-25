@@ -12,7 +12,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.JoinOrLeaveLeaveRequest;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.JoinOrLeaveRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
@@ -71,19 +71,29 @@ public class JoinOrLeave extends InteractionFragment{
         joinButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                Timber.i("Clicked JOINORLEAVE-JOIN button");
+                BookingInteractionEventUserRequest request = new BookingInteractionEventUserRequest(
+                        timeCell,
+                        BookingInteractionEventUserRequestType.JOINORLEAVE_JOIN_REQUEST,
+                        dayOfMonthNumber,
+                        monthWord,
+                        new JoinOrLeaveRequest(calendarDay, joinSpinner.getSelectedItem().toString(),
+                                currentJoinSpinnerValue, timeCell));
+
+                bookingInteractionModel.getBookingInteractionEventUserRequestSubject().onNext(request);
             }
         });
 
         leaveButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Timber.i("Clicked Leave button");
+                Timber.i("Clicked JOINORLEAVE-LEAVE button");
                 BookingInteractionEventUserRequest request = new BookingInteractionEventUserRequest(
                         timeCell,
                         BookingInteractionEventUserRequestType.JOINORLEAVE_LEAVE_REQUEST,
                         dayOfMonthNumber,
                         monthWord,
-                        new JoinOrLeaveLeaveRequest(calendarDay, leaveSpinner.getSelectedItem().toString(),
+                        new JoinOrLeaveRequest(calendarDay, leaveSpinner.getSelectedItem().toString(),
                                 currentLeaveSpinnerValue, timeCell));
 
                 bookingInteractionModel.getBookingInteractionEventUserRequestSubject().onNext(request);
@@ -137,6 +147,13 @@ public class JoinOrLeave extends InteractionFragment{
                                         bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getMiddle());
                                 calendarDay = bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getRight();
                                 break;
+                            case JOIN_OR_LEAVE_JOIN_ERROR:
+                                _showErrorMessage(bookingInteractionEvent.message);
+                                break;
+                            case JOIN_OR_LEAVE_LEAVE_ERROR:
+                                _showErrorMessage(bookingInteractionEvent.message);
+                                break;
+
                             // No default, should fall through
                         }
                     }

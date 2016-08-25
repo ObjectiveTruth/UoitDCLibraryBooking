@@ -110,16 +110,102 @@ public class BookingInteractionModel {
     }
 
     private void _doJoinOrLeaveJoinRequest(final BookingInteractionEventUserRequest userRequest) {
-        final String LOG_PREFIX = "JoinOrLeave Join Flow: ";
+        final String LOG_PREFIX = "JoinOrLeave-Join Flow: ";
 
         BookingInteractionEvent eventToFire = new BookingInteractionEvent(userRequest.timeCell,
                 BookingInteractionEventType.JOIN_OR_LEAVE_JOIN_RUNNING, userRequest.dayOfMonthNumber,
                 userRequest.monthWord);
         getBookingInteractionEventReplaySubject().onNext(eventToFire);
+
+        Timber.i(LOG_PREFIX + "Clicking on the room to join and getting page with form to fill username/password");
+        bookingInteractionWebService
+                .chooseJoinBookingAndGetResultWebpage(userRequest.requestOptions)
+
+                .flatMap(new Func1<String, Observable<CalendarDay>>() {
+                    @Override
+                    public Observable<CalendarDay> call(String rawWebpage) {
+                        Timber.i(LOG_PREFIX + "Parsing for state information");
+                        return CalendarParser.parseRawWebpageForViewStateGeneratorAndEventValidation(rawWebpage);
+                    }
+                })
+
+                .flatMap(new Func1<CalendarDay, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(CalendarDay calendarDay) {
+                        UserCredentials userCredentials = userModel.getUserCredentialsFromStorage();
+                        Timber.i(LOG_PREFIX + "Parsing complete, filling user information, and getting page");
+                        return bookingInteractionWebService
+                                .fillJoinOrLeaveJoinFormAndGetResultWebpage(
+                                        userCredentials, userRequest.requestOptions, calendarDay);
+                    }
+                })
+
+                .flatMap(new Func1<String, Observable<LeftOrRight<String, String>>>() {
+                    @Override
+                    public Observable<LeftOrRight<String, String>> call(String rawWebpage) {
+                        Timber.i(LOG_PREFIX + "User page received, parsing for error or success messages");
+                        return BookingInteractionParser.parseWebpageForMessageLabel(rawWebpage);
+                    }
+                })
+
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new Observer<LeftOrRight<String, String>>() {
+                    @Override
+                    public void onCompleted() {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.w(e, LOG_PREFIX + "Error");
+
+                        BookingInteractionEvent eventToFire =
+                                new BookingInteractionEvent(
+                                        userRequest.timeCell,
+                                        BookingInteractionEventType.JOIN_OR_LEAVE_JOIN_ERROR,
+                                        userRequest.dayOfMonthNumber,
+                                        userRequest.monthWord);
+                        eventToFire.message = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+
+                        getBookingInteractionEventReplaySubject().onNext(eventToFire);
+                    }
+
+                    @Override
+                    public void onNext(LeftOrRight<String, String> result) {
+                        if(result.hasLeft()) {
+                            Timber.w(LOG_PREFIX + "Bad Result: " + result.getLeft());
+
+                            BookingInteractionEvent eventToFire =
+                                    new BookingInteractionEvent(
+                                            userRequest.timeCell,
+                                            BookingInteractionEventType.JOIN_OR_LEAVE_JOIN_ERROR,
+                                            userRequest.dayOfMonthNumber,
+                                            userRequest.monthWord);
+                            eventToFire.message = result.getLeft();
+
+                            getBookingInteractionEventReplaySubject().onNext(eventToFire);
+
+                        }else {
+                            Timber.i(LOG_PREFIX + "Good Result: " + result.getRight());
+
+                            BookingInteractionEvent eventToFire =
+                                    new BookingInteractionEvent(
+                                            userRequest.timeCell,
+                                            BookingInteractionEventType.JOIN_OR_LEAVE_JOIN_SUCCESS,
+                                            userRequest.dayOfMonthNumber,
+                                            userRequest.monthWord);
+                            eventToFire.message = result.getRight();
+
+                            getBookingInteractionEventReplaySubject().onNext(eventToFire);
+                        }
+                    }
+                });
     }
 
     private void _doJoinOrLeaveLeaveRequest(final BookingInteractionEventUserRequest userRequest) {
-        final String LOG_PREFIX = "JoinOrLeave Leave Flow: ";
+        final String LOG_PREFIX = "JoinOrLeave-Leave Flow: ";
 
         BookingInteractionEvent eventToFire = new BookingInteractionEvent(userRequest.timeCell,
                 BookingInteractionEventType.JOIN_OR_LEAVE_LEAVE_RUNNING, userRequest.dayOfMonthNumber,
@@ -141,6 +227,7 @@ public class BookingInteractionModel {
                 .flatMap(new Func1<CalendarDay, Observable<String>>() {
                     @Override
                     public Observable<String> call(CalendarDay calendarDay) {
+                        Timber.i(LOG_PREFIX + "Parsing complete, filling user information, and getting page");
                         UserCredentials userCredentials = userModel.getUserCredentialsFromStorage();
                         return bookingInteractionWebService
                                 .fillJoinOrLeaveLeaveFormAndGetResultWebpage(
@@ -151,6 +238,7 @@ public class BookingInteractionModel {
                 .flatMap(new Func1<String, Observable<LeftOrRight<String, String>>>() {
                     @Override
                     public Observable<LeftOrRight<String, String>> call(String rawWebpage) {
+                        Timber.i(LOG_PREFIX + "User page received, parsing for error or success messages");
                         return BookingInteractionParser.parseWebpageForMessageLabel(rawWebpage);
                     }
                 })
@@ -166,7 +254,7 @@ public class BookingInteractionModel {
 
                     @Override
                     public void onError(Throwable e) {
-                        Timber.w(e, LOG_PREFIX + "Error from doing leave request for JoinrOrLeave");
+                        Timber.w(e, LOG_PREFIX + "Error");
 
                         BookingInteractionEvent eventToFire =
                                 new BookingInteractionEvent(
@@ -182,7 +270,7 @@ public class BookingInteractionModel {
                     @Override
                     public void onNext(LeftOrRight<String, String> result) {
                         if(result.hasLeft()) {
-                            Timber.w(LOG_PREFIX + "Bad Result from trying to leave: " + result.getLeft());
+                            Timber.w(LOG_PREFIX + "Bad Result: " + result.getLeft());
 
                             BookingInteractionEvent eventToFire =
                                     new BookingInteractionEvent(
@@ -195,7 +283,7 @@ public class BookingInteractionModel {
                             getBookingInteractionEventReplaySubject().onNext(eventToFire);
 
                         }else {
-                            Timber.i(LOG_PREFIX + "Good Result from booking: " + result.getRight());
+                            Timber.i(LOG_PREFIX + "Good Result: " + result.getRight());
 
                             BookingInteractionEvent eventToFire =
                                     new BookingInteractionEvent(
@@ -300,7 +388,7 @@ public class BookingInteractionModel {
 
                     @Override
                     public void onError(Throwable e) {
-                        Timber.w(e, LOG_PREFIX + "Error from booking");
+                        Timber.w(e, LOG_PREFIX + "Error");
 
                         BookingInteractionEvent eventToFire =
                                 new BookingInteractionEvent(

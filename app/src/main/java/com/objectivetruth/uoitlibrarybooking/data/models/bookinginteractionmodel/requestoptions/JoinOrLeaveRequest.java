@@ -3,17 +3,17 @@ package com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmode
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 
-public class JoinOrLeaveLeaveRequest implements RequestOptions{
+public class JoinOrLeaveRequest implements RequestOptions{
     public CalendarDay calendarDay;
-    public String leaveGroupValue;
-    public String leaveGroupLabel;
+    public String groupValue;
+    public String groupLabel;
     public TimeCell timeCell;
 
-    public JoinOrLeaveLeaveRequest(CalendarDay calendarDay, String leaveGroupLabel, String leaveGroupValue,
+    public JoinOrLeaveRequest(CalendarDay calendarDay, String groupLabel, String groupValue,
                                    TimeCell timeCell) {
         this.calendarDay = calendarDay;
-        this.leaveGroupValue = leaveGroupValue;
-        this.leaveGroupLabel = leaveGroupLabel;
+        this.groupValue = groupValue;
+        this.groupLabel = groupLabel;
         this.timeCell = timeCell;
     }
 }
