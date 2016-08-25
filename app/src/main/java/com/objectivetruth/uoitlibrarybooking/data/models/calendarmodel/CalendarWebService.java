@@ -35,7 +35,7 @@ public class CalendarWebService {
                 try {
                     return Observable.just(_getRawInitialWebpage());
                 } catch (InterruptedException | ExecutionException e) {
-                    Timber.e(e, "Error while trying to load main uoitlibrary webpage");
+                    Timber.w(e, "Error while trying to load main uoitlibrary webpage");
                     return Observable.error(e);
                 }
             }
@@ -76,7 +76,7 @@ public class CalendarWebService {
                 try {
                     return Observable.just(_getRawCalendarDayPage(calendarDay));
                 } catch (InterruptedException | ExecutionException e) {
-                    Timber.e(e, "Error while getting cookie" + calendarDay.toString());
+                    Timber.w(e, "Error while getting raw clickable date" + calendarDay.toString());
                     return Observable.error(e);
                 }
             }
@@ -121,7 +121,7 @@ public class CalendarWebService {
                 try {
                     return Observable.just(_getRawClickableDateWebPage(calendarDay, calendarData));
                 } catch (InterruptedException | ExecutionException e) {
-                    Timber.e(e, "Error while trying to load a clickable date here was the contents: " +
+                    Timber.w(e, "Error while trying to load a clickable date here was the contents: " +
                             calendarDay.toString());
                     return Observable.error(e);
                 }

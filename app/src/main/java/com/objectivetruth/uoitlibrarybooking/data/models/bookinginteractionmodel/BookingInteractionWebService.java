@@ -43,8 +43,11 @@ public class BookingInteractionWebService {
             public Observable<String> call() {
                 try {
                     return Observable.just(_getRawPageWithForm(timeCell));
-                } catch (InterruptedException | ExecutionException | UnsupportedEncodingException e) {
-                    Timber.e(e, "Error while getting raw form");
+                } catch (InterruptedException | ExecutionException e) {
+                    Timber.w(e, "Error while getting raw form");
+                    return Observable.error(e);
+                } catch (UnsupportedEncodingException e) {
+                    Timber.e(e, "Error while getting raw form. Really? Unsupported Encoding on UTF-8??");
                     return Observable.error(e);
                 }
             }
@@ -78,8 +81,11 @@ public class BookingInteractionWebService {
                     urlFormData.put("ctl00$ContentPlaceHolder1$ButtonReserve", "Create group");
 
                     return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, timeCell.param_next, null));
-                } catch (InterruptedException | ExecutionException | ClassCastException e) {
-                    Timber.e(e, "Error while getting final message.aspx");
+                } catch (InterruptedException | ExecutionException e) {
+                    Timber.w(e, "Error while getting final message.aspx");
+                    return Observable.error(e);
+                } catch (ClassCastException e) {
+                    Timber.e(e, "Error while getting request options");
                     return Observable.error(e);
                 }
             }
@@ -105,9 +111,12 @@ public class BookingInteractionWebService {
                             joinOrLeaveLeaveOptions.leaveGroupValue);
                     urlFormData.put("ctl00$ContentPlaceHolder1$ButtonLeave", LEAVE_BUTTON_OPTION);
                     return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, timeCell.param_next, null));
-                } catch (InterruptedException | ExecutionException | ClassCastException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     Timber.e(e, "Error while choosing the group to leave: " +
                             ((JoinOrLeaveLeaveRequest) requestOptions).timeCell.toString());
+                    return Observable.error(e);
+                } catch (ClassCastException e) {
+                    Timber.e(e, "Error while getting request options");
                     return Observable.error(e);
                 }
             }
@@ -136,8 +145,11 @@ public class BookingInteractionWebService {
                     urlFormData.put("ctl00$ContentPlaceHolder1$ButtonLeave", leaveButtonOption);
                     return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, LEAVE_GROUP_WEBPAGE,
                             refererOverride));
-                } catch (InterruptedException | ExecutionException | ClassCastException e) {
-                    Timber.e(e, "Error while doing a leave for " + ((JoinOrLeaveLeaveRequest) requestOptions).timeCell.toString());
+                } catch (InterruptedException | ExecutionException e) {
+                    Timber.w(e, "Error while doing a leave for " + ((JoinOrLeaveLeaveRequest) requestOptions).timeCell.toString());
+                    return Observable.error(e);
+                } catch (ClassCastException e) {
+                    Timber.e(e, "Error while getting request options");
                     return Observable.error(e);
                 }
             }
