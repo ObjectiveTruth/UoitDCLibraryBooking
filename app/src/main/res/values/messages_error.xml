@@ -2,4 +2,5 @@
 <resources>
     <string name="ERROR_TIMEOUT_FROM_SERVER">Server took too long to respond, try again</string>
     <string name="ERROR_GENERAL">Something unexpected went wrong</string>
+    <string name="ERROR_INVALID_EVENT">Event no longer exists</string>
 </resources>

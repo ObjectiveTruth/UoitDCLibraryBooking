@@ -103,7 +103,19 @@ public class BookingInteractionModel {
             case JOINORLEAVE_LEAVE_REQUEST:
                 _doJoinOrLeaveLeaveRequest(userRequest);
                 break;
+            case JOINORLEAVE_JOIN_REQUEST:
+                _doJoinOrLeaveJoinRequest(userRequest);
+                break;
         }
+    }
+
+    private void _doJoinOrLeaveJoinRequest(final BookingInteractionEventUserRequest userRequest) {
+        final String LOG_PREFIX = "JoinOrLeave Join Flow: ";
+
+        BookingInteractionEvent eventToFire = new BookingInteractionEvent(userRequest.timeCell,
+                BookingInteractionEventType.JOIN_OR_LEAVE_JOIN_RUNNING, userRequest.dayOfMonthNumber,
+                userRequest.monthWord);
+        getBookingInteractionEventReplaySubject().onNext(eventToFire);
     }
 
     private void _doJoinOrLeaveLeaveRequest(final BookingInteractionEventUserRequest userRequest) {
@@ -261,6 +273,7 @@ public class BookingInteractionModel {
                     @Override
                     public Observable<Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay>>
                     call(final Pair<String, CalendarDay> stringCalendarDayPair) {
+                        Timber.i(LOG_PREFIX + "State info received, parsing for join and leave spinner values");
                         return BookingInteractionParser.parseJoinOrLeaveFormForSpinners(stringCalendarDayPair.first)
                                 // Convert the received Pair into a triple for easy usage in the next step
                                 .map(new Func1<Pair<HashMap<String, String>, HashMap<String, String>>, Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay>>() {
@@ -302,6 +315,18 @@ public class BookingInteractionModel {
 
                     @Override
                     public void onNext(Triple<HashMap<String, String>, HashMap<String, String>, CalendarDay> result) {
+                        if(result.getLeft().isEmpty() || result.getMiddle().isEmpty()) {
+                            Timber.w(new Throwable(new IllegalStateException("Spinner values cannot be empty")),
+                                    "Error when parsing for spinner values, they cannot be empty");
+
+                            BookingInteractionEvent eventToFire =
+                                    new BookingInteractionEvent(
+                                            userRequest.timeCell,
+                                            BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR_NO_VALUES,
+                                            userRequest.dayOfMonthNumber,
+                                            userRequest.monthWord);
+                            getBookingInteractionEventReplaySubject().onNext(eventToFire);
+                        }
                         BookingInteractionEvent eventToFire =
                                 new BookingInteractionEvent(
                                         userRequest.timeCell,

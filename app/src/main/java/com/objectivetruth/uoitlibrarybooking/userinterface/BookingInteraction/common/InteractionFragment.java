@@ -21,4 +21,8 @@ public abstract class InteractionFragment extends Fragment {
         super.onStop();
     }
 
+    protected void popFragmentBackstack() {
+        Timber.d("Popping backstack");
+        getActivity().getSupportFragmentManager().popBackStack();
+    }
 }

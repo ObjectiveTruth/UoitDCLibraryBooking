@@ -37,17 +37,22 @@ public enum BookingInteractionEventType {
      */
     JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS,
     /**
-     * When the request to actually carry out the leave request is running
+     * States for joining a room in the JOINORLEAVE flow
      */
     JOIN_OR_LEAVE_LEAVE_RUNNING,
-    /**
-     * When the request to actually carry out the leave request errors
-     */
     JOIN_OR_LEAVE_LEAVE_ERROR,
-    /**
-     * When the request to actually carry out the leave request succeeds
-     */
     JOIN_OR_LEAVE_LEAVE_SUCCESS,
+
+    /**
+     * States for leaving a room in the JOINORLEAVE flow
+     */
+    JOIN_OR_LEAVE_JOIN_RUNNING,
+    JOIN_OR_LEAVE_JOIN_ERROR,
+    JOIN_OR_LEAVE_JOIN_SUCCESS,
+    /**
+     * Specific case when no spinner values were received, this means the reference doesn't exist, should push user out
+     */
+    JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR_NO_VALUES,
 
     /**
      * When an interaction flow succeeds

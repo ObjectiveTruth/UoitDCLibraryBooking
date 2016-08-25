@@ -10,7 +10,6 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.JoinOrLeaveLeaveRequest;
@@ -19,7 +18,6 @@ import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
@@ -38,7 +36,7 @@ public class JoinOrLeave extends InteractionFragment{
     private String currentJoinSpinnerValue;
     private String currentLeaveSpinnerValue;
     private CalendarDay calendarDay;
-    CompositeSubscription subscriptions = new CompositeSubscription();
+    private CompositeSubscription subscriptions = new CompositeSubscription();
     @Inject BookingInteractionModel bookingInteractionModel;
 
     @Nullable
@@ -109,76 +107,40 @@ public class JoinOrLeave extends InteractionFragment{
         ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
     }
 
-    private void _setupSpinnerSuccessCase() {
-        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
-                .filter(new Func1<BookingInteractionEvent, Boolean>() {
-                    @Override
-                    public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
-                        return bookingInteractionEvent.type ==
-                                BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS;
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-
-                .subscribe(new Action1<BookingInteractionEvent>() {
-                    @Override
-                    public void call(BookingInteractionEvent bookingInteractionEvent) {
-                        _setupSpinnerWithValues(
-                                bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getLeft(),
-                                bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getMiddle());
-                        calendarDay = bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getRight();
-                    }
-                }));
-    }
-
-    private void _setupSpinnerErrorCase() {
-        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
-                .filter(new Func1<BookingInteractionEvent, Boolean>() {
-                    @Override
-                    public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
-                        return bookingInteractionEvent.type ==
-                                BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR;
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-
-                .subscribe(new Action1<BookingInteractionEvent>() {
-                    @Override
-                    public void call(BookingInteractionEvent bookingInteractionEvent) {
-                        HashMap<String, String> errorSpinnerValues = new HashMap<>();
-                        errorSpinnerValues.put("ERROR", "error");
-                        _setupSpinnerWithValues(errorSpinnerValues, errorSpinnerValues);
-                        _showErrorMessage(bookingInteractionEvent.message);
-                    }
-                }));
-    }
-
-    private void _setupSpinnerRunningCase() {
-        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
-                .filter(new Func1<BookingInteractionEvent, Boolean>() {
-                    @Override
-                    public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
-                        return bookingInteractionEvent.type ==
-                                BookingInteractionEventType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING;
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-
-                .subscribe(new Action1<BookingInteractionEvent>() {
-                    @Override
-                    public void call(BookingInteractionEvent bookingInteractionEvent) {
-                        HashMap<String, String> loadingSpinnerValues = new HashMap<>();
-                        loadingSpinnerValues.put("Loading...", "loading");
-                        _setupSpinnerWithValues(loadingSpinnerValues, loadingSpinnerValues);
-                    }
-                }));
-    }
-
     @Override
     protected void setupViewBindings() {
-        _setupSpinnerSuccessCase();
-        _setupSpinnerRunningCase();
-        _setupSpinnerErrorCase();
+        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new Action1<BookingInteractionEvent>() {
+                    @Override
+                    public void call(BookingInteractionEvent bookingInteractionEvent) {
+                        switch(bookingInteractionEvent.type) {
+                            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING:
+                                HashMap<String, String> loadingSpinnerValues = new HashMap<>();
+                                loadingSpinnerValues.put("Loading...", "loading");
+                                _setupSpinnerWithValues(loadingSpinnerValues, loadingSpinnerValues);
+                                break;
+                            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR_NO_VALUES:
+                                Toast.makeText(getActivity(), R.string.ERROR_INVALID_EVENT, Toast.LENGTH_LONG).show();
+                                popFragmentBackstack();
+                                break;
+                            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR:
+                                HashMap<String, String> errorSpinnerValues = new HashMap<>();
+                                errorSpinnerValues.put("ERROR", "error");
+                                _setupSpinnerWithValues(errorSpinnerValues, errorSpinnerValues);
+                                _showErrorMessage(bookingInteractionEvent.message);
+                                break;
+                            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS:
+                                _setupSpinnerWithValues(
+                                        bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getLeft(),
+                                        bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getMiddle());
+                                calendarDay = bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getRight();
+                                break;
+                            // No default, should fall through
+                        }
+                    }
+                }));
     }
 
     @SuppressWarnings("Duplicates")
