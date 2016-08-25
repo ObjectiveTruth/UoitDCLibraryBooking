@@ -8,6 +8,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.BookRequestOptions;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.JoinOrLeaveLeaveRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.RequestOptions;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.LEAVE_GROUP_WEBPAGE;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.MAIN_CALENDAR_RELATIVE_PATH;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.MAIN_CALENDAR_URL;
 
@@ -57,7 +59,7 @@ public class BookingInteractionWebService {
             @Override
             public Observable<String> call() {
                 try {
-                    HashMap<String, String> urlFormData = new HashMap<String, String>();
+                    HashMap<String, String> urlFormData = new HashMap<>();
                     // Construct the URL encoded Form Data
                     urlFormData.put("__VIEWSTATE", calendarDay.extViewStateMain);
                     urlFormData.put("__VIEWSTATEGENERATOR", calendarDay.extViewStateGenerator);
@@ -73,9 +75,9 @@ public class BookingInteractionWebService {
                     urlFormData.put("ctl00$ContentPlaceHolder1$TextBoxPassword", userCredentials.password);
                     urlFormData.put("ctl00$ContentPlaceHolder1$TextBoxStudentID", userCredentials.username);
                     urlFormData.put("ctl00$ContentPlaceHolder1$RadioButtonListInstitutions", userCredentials.institutionId);
-                    urlFormData.put("ctl00$ContentPlaceHolder1$ButtonReserve", "Create+group");
+                    urlFormData.put("ctl00$ContentPlaceHolder1$ButtonReserve", "Create group");
 
-                    return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, timeCell));
+                    return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, timeCell.param_next, null));
                 } catch (InterruptedException | ExecutionException | ClassCastException e) {
                     Timber.e(e, "Error while getting final message.aspx");
                     return Observable.error(e);
@@ -84,12 +86,79 @@ public class BookingInteractionWebService {
         });
     }
 
+    public Observable<String> chooseLeaveBookingAndGetResultWebpage(final RequestOptions requestOptions) {
+        return Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                try {
+                    JoinOrLeaveLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveLeaveRequest) requestOptions;
+                    CalendarDay calendarDay = joinOrLeaveLeaveOptions.calendarDay;
+                    TimeCell timeCell = joinOrLeaveLeaveOptions.timeCell;
+                    String LEAVE_BUTTON_OPTION = "Leave the Group";
+
+                    HashMap<String, String> urlFormData = new HashMap<>();
+                    // Construct the URL encoded Form Data
+                    urlFormData.put("__VIEWSTATE", calendarDay.extViewStateMain);
+                    urlFormData.put("__VIEWSTATEGENERATOR", calendarDay.extViewStateGenerator);
+                    urlFormData.put("__EVENTVALIDATION", calendarDay.extEventValidation);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$RadiobuttonListLeaveGroup",
+                            joinOrLeaveLeaveOptions.leaveGroupValue);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$ButtonLeave", LEAVE_BUTTON_OPTION);
+                    return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, timeCell.param_next, null));
+                } catch (InterruptedException | ExecutionException | ClassCastException e) {
+                    Timber.e(e, "Error while choosing the group to leave: " +
+                            ((JoinOrLeaveLeaveRequest) requestOptions).timeCell.toString());
+                    return Observable.error(e);
+                }
+            }
+        });
+    }
+
+    public Observable<String> fillJoinOrLeaveLeaveFormAndGetResultWebpage(final UserCredentials userCredentials,
+                                                                          final RequestOptions requestOptions,
+                                                                          final CalendarDay calendarDay) {
+        return Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                try {
+                    JoinOrLeaveLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveLeaveRequest) requestOptions;
+                    String groupName = joinOrLeaveLeaveOptions.leaveGroupLabel;
+                    String leaveButtonOption = "Leave " + groupName; // yes, we use a plus here.. before URLencoding
+                    String refererOverride = MAIN_CALENDAR_RELATIVE_PATH + "leavegroup.aspx";
+
+                    HashMap<String, String> urlFormData = new HashMap<>();
+                    // Construct the URL encoded Form Data
+                    urlFormData.put("__VIEWSTATE", calendarDay.extViewStateMain);
+                    urlFormData.put("__VIEWSTATEGENERATOR", calendarDay.extViewStateGenerator);
+                    urlFormData.put("__EVENTVALIDATION", calendarDay.extEventValidation);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$TextBoxID", userCredentials.username);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$TextBoxPassword", userCredentials.password);
+                    urlFormData.put("ctl00$ContentPlaceHolder1$ButtonLeave", leaveButtonOption);
+                    return Observable.just(_getResultWebpageForPostByBlocking(urlFormData, LEAVE_GROUP_WEBPAGE,
+                            refererOverride));
+                } catch (InterruptedException | ExecutionException | ClassCastException e) {
+                    Timber.e(e, "Error while doing a leave for " + ((JoinOrLeaveLeaveRequest) requestOptions).timeCell.toString());
+                    return Observable.error(e);
+                }
+            }
+        });
+    }
+
+    /**
+     * Does a post request to the calendar application and returns the webpage as a string
+     * @param urlFormData Form data as a map
+     * @param nextUrl Ending path, example(temp.aspx    =>   something/temp.aspx)
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
     private String _getResultWebpageForPostByBlocking(final HashMap<String, String> urlFormData,
-                                                 TimeCell timeCell)
+                                                 String nextUrl, String refererOverride)
             throws InterruptedException, ExecutionException{
-        Timber.i("Starting the POST request to the booking endpoint");
         RequestFuture<String> future = RequestFuture.newFuture();
-        final String urlPath = MAIN_CALENDAR_RELATIVE_PATH + timeCell.param_next;
+        final String urlPath = MAIN_CALENDAR_RELATIVE_PATH + nextUrl;
+        Timber.i("Starting the POST request to: " + urlPath);
+        final String refererHeader = refererOverride == null ? urlPath : refererOverride;
 
         StringRequest stringRequest =
                 new StringRequest(Request.Method.POST, urlPath, future, future) {
@@ -97,7 +166,7 @@ public class BookingInteractionWebService {
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String> headers = new HashMap<>();
                         headers.put("Content-Type", "application/x-www-form-urlencoded");
-                        headers.put("Referer", urlPath);
+                        headers.put("Referer", refererHeader);
                         return headers;
                     }
 
@@ -108,7 +177,7 @@ public class BookingInteractionWebService {
                 };
         requestQueue.add(stringRequest);
         String webpage = future.get();
-        Timber.i("POST request to the booking endpoint is finished");
+        Timber.i("POST request finished to: " + urlPath);
         Timber.v(webpage);
         return webpage;
 
@@ -141,6 +210,12 @@ public class BookingInteractionWebService {
         return webpage;
     }
 
+    /**
+     * Converts a map of values into the URL encoded body required for post requests. Example: hello -> foo bar will give
+     * byte array of hello=foo+bar
+     * @param urlEncodedFormElements
+     * @return
+     */
     private byte[] _getBodyInBytesUsingMap(HashMap<String, String> urlEncodedFormElements) {
         try{
             String content = "";

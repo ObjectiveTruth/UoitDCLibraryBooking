@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class BookingInteractionParser {
 
-    public static LeftOrRight<String, String> parseWebpageForMessageLabel(String rawWebPage) {
+    public static Observable<LeftOrRight<String, String>> parseWebpageForMessageLabel(String rawWebPage) {
         String ERROR_LABEL_ID = "ContentPlaceHolder1_LabelError";
         String SUCCESS_LABEL_ID = "ContentPlaceHolder1_LabelMessage";
         String right = null;
@@ -26,7 +26,7 @@ public class BookingInteractionParser {
         }else {
             left = "Page had no result information, try again";
         }
-        return new LeftOrRight<>(left, right);
+        return Observable.just(new LeftOrRight<>(left, right));
     }
 
     @SuppressWarnings("Duplicates")

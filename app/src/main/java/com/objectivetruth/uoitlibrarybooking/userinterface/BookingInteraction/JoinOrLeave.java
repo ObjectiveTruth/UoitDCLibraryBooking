@@ -13,6 +13,8 @@ import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.JoinOrLeaveLeaveRequest;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
 import rx.android.schedulers.AndroidSchedulers;
@@ -35,6 +37,7 @@ public class JoinOrLeave extends InteractionFragment{
     private ImageView pictureOfRoom;
     private String currentJoinSpinnerValue;
     private String currentLeaveSpinnerValue;
+    private CalendarDay calendarDay;
     CompositeSubscription subscriptions = new CompositeSubscription();
     @Inject BookingInteractionModel bookingInteractionModel;
 
@@ -57,8 +60,6 @@ public class JoinOrLeave extends InteractionFragment{
 
         roomNumberTextView.setText(timeCell.param_room);
 
-        //roomPicture.setImageResource(getResources().getIdentifier(roomNumber.toLowerCase(), "drawable", getPackageName()));
-
         createButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -78,6 +79,16 @@ public class JoinOrLeave extends InteractionFragment{
         leaveButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                Timber.i("Clicked Leave button");
+                BookingInteractionEventUserRequest request = new BookingInteractionEventUserRequest(
+                        timeCell,
+                        BookingInteractionEventUserRequestType.JOINORLEAVE_LEAVE_REQUEST,
+                        dayOfMonthNumber,
+                        monthWord,
+                        new JoinOrLeaveLeaveRequest(calendarDay, leaveSpinner.getSelectedItem().toString(),
+                                currentLeaveSpinnerValue, timeCell));
+
+                bookingInteractionModel.getBookingInteractionEventUserRequestSubject().onNext(request);
             }
         });
         return view;
@@ -115,6 +126,7 @@ public class JoinOrLeave extends InteractionFragment{
                         _setupSpinnerWithValues(
                                 bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getLeft(),
                                 bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getMiddle());
+                        calendarDay = bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getRight();
                     }
                 }));
     }
@@ -232,7 +244,7 @@ public class JoinOrLeave extends InteractionFragment{
                 .onNext(
                         new BookingInteractionEventUserRequest(
                                 timeCell,
-                                BookingInteractionEventUserRequestType.JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_REQUEST,
+                                BookingInteractionEventUserRequestType.JOINORLEAVE_GETTING_SPINNER_VALUES_REQUEST,
                                 dayOfMonthNumber,
                                 monthWord,
                                 null));

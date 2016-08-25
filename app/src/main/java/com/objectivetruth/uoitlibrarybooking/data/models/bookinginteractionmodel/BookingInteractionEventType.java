@@ -37,13 +37,17 @@ public enum BookingInteractionEventType {
      */
     JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS,
     /**
-     * When the request to actually carry out an action the user selects is running
+     * When the request to actually carry out the leave request is running
      */
-    JOIN_OR_LEAVE_RUNNING,
+    JOIN_OR_LEAVE_LEAVE_RUNNING,
     /**
-     * When the request to actually carry out the action the user selects errors
+     * When the request to actually carry out the leave request errors
      */
-    JOIN_OR_LEAVE_ERROR,
+    JOIN_OR_LEAVE_LEAVE_ERROR,
+    /**
+     * When the request to actually carry out the leave request succeeds
+     */
+    JOIN_OR_LEAVE_LEAVE_SUCCESS,
 
     /**
      * When an interaction flow succeeds

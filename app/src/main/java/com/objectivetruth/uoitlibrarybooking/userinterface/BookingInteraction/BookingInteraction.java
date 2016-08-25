@@ -114,8 +114,8 @@ public class BookingInteraction extends Fragment {
            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR:
            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING:
            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS:
-           case JOIN_OR_LEAVE_ERROR:
-           case JOIN_OR_LEAVE_RUNNING:
+           case JOIN_OR_LEAVE_LEAVE_ERROR:
+           case JOIN_OR_LEAVE_LEAVE_RUNNING:
                Timber.i("Showing: JoinOrLeave");
                return JoinOrLeave.newInstance(bookingInteractionEvent);
            default:
@@ -141,13 +141,14 @@ public class BookingInteraction extends Fragment {
             case BOOK_ERROR:
                 return !(currentFragmentInContentFrame instanceof Book);
             case SUCCESS:
+            case JOIN_OR_LEAVE_LEAVE_SUCCESS:
                 return !(currentFragmentInContentFrame instanceof Success);
             case JOIN_OR_LEAVE:
             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR:
             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING:
             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS:
-            case JOIN_OR_LEAVE_ERROR:
-            case JOIN_OR_LEAVE_RUNNING:
+            case JOIN_OR_LEAVE_LEAVE_ERROR:
+            case JOIN_OR_LEAVE_LEAVE_RUNNING:
                 return !(currentFragmentInContentFrame instanceof JoinOrLeave);
             default:
                 Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();

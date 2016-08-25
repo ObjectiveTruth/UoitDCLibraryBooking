@@ -6,6 +6,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.statelessutilities.LeftOrRight;
 import com.objectivetruth.uoitlibrarybooking.statelessutilities.Triple;
 import rx.Observable;
@@ -96,9 +97,106 @@ public class BookingInteractionModel {
             case BOOK_REQUEST:
                 _doBookRequest(userRequest);
                 break;
-            case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_REQUEST:
+            case JOINORLEAVE_GETTING_SPINNER_VALUES_REQUEST:
                 _doJoinOrLeaveGettingSpinnerValuesRequest(userRequest);
+                break;
+            case JOINORLEAVE_LEAVE_REQUEST:
+                _doJoinOrLeaveLeaveRequest(userRequest);
+                break;
         }
+    }
+
+    private void _doJoinOrLeaveLeaveRequest(final BookingInteractionEventUserRequest userRequest) {
+        final String LOG_PREFIX = "JoinOrLeave Leave Flow: ";
+
+        BookingInteractionEvent eventToFire = new BookingInteractionEvent(userRequest.timeCell,
+                BookingInteractionEventType.JOIN_OR_LEAVE_LEAVE_RUNNING, userRequest.dayOfMonthNumber,
+                userRequest.monthWord);
+        getBookingInteractionEventReplaySubject().onNext(eventToFire);
+
+        Timber.i(LOG_PREFIX + "Clicking on the room to leave and getting page with form to fill with username/password");
+        bookingInteractionWebService
+                .chooseLeaveBookingAndGetResultWebpage(userRequest.requestOptions)
+
+                .flatMap(new Func1<String, Observable<CalendarDay>>() {
+                    @Override
+                    public Observable<CalendarDay> call(String rawWebpage) {
+                        Timber.i(LOG_PREFIX + "Parsing for state information");
+                        return CalendarParser.parseRawWebpageForViewStateGeneratorAndEventValidation(rawWebpage);
+                    }
+                })
+
+                .flatMap(new Func1<CalendarDay, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(CalendarDay calendarDay) {
+                        UserCredentials userCredentials = userModel.getUserCredentialsFromStorage();
+                        return bookingInteractionWebService
+                                .fillJoinOrLeaveLeaveFormAndGetResultWebpage(
+                                        userCredentials, userRequest.requestOptions, calendarDay);
+                    }
+                })
+
+                .flatMap(new Func1<String, Observable<LeftOrRight<String, String>>>() {
+                    @Override
+                    public Observable<LeftOrRight<String, String>> call(String rawWebpage) {
+                        return BookingInteractionParser.parseWebpageForMessageLabel(rawWebpage);
+                    }
+                })
+
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new Observer<LeftOrRight<String, String>>() {
+                    @Override
+                    public void onCompleted() {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.w(e, LOG_PREFIX + "Error from doing leave request for JoinrOrLeave");
+
+                        BookingInteractionEvent eventToFire =
+                                new BookingInteractionEvent(
+                                        userRequest.timeCell,
+                                        BookingInteractionEventType.JOIN_OR_LEAVE_LEAVE_ERROR,
+                                        userRequest.dayOfMonthNumber,
+                                        userRequest.monthWord);
+                        eventToFire.message = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+
+                        getBookingInteractionEventReplaySubject().onNext(eventToFire);
+                    }
+
+                    @Override
+                    public void onNext(LeftOrRight<String, String> result) {
+                        if(result.hasLeft()) {
+                            Timber.w(LOG_PREFIX + "Bad Result from trying to leave: " + result.getLeft());
+
+                            BookingInteractionEvent eventToFire =
+                                    new BookingInteractionEvent(
+                                            userRequest.timeCell,
+                                            BookingInteractionEventType.JOIN_OR_LEAVE_LEAVE_ERROR,
+                                            userRequest.dayOfMonthNumber,
+                                            userRequest.monthWord);
+                            eventToFire.message = result.getLeft();
+
+                            getBookingInteractionEventReplaySubject().onNext(eventToFire);
+
+                        }else {
+                            Timber.i(LOG_PREFIX + "Good Result from booking: " + result.getRight());
+
+                            BookingInteractionEvent eventToFire =
+                                    new BookingInteractionEvent(
+                                            userRequest.timeCell,
+                                            BookingInteractionEventType.JOIN_OR_LEAVE_LEAVE_SUCCESS,
+                                            userRequest.dayOfMonthNumber,
+                                            userRequest.monthWord);
+                            eventToFire.message = result.getRight();
+
+                            getBookingInteractionEventReplaySubject().onNext(eventToFire);
+                        }
+                    }
+                });
     }
 
     private void _doJoinOrLeaveGettingSpinnerValuesRequest(final BookingInteractionEventUserRequest userRequest) {
@@ -152,7 +250,7 @@ public class BookingInteractionModel {
                                 .map(new Func1<CalendarDay, Pair<String, CalendarDay>>() {
                                     @Override
                                     public Pair<String, CalendarDay> call(CalendarDay calendarDay) {
-                                        return new Pair<String, CalendarDay>(rawWebpage, calendarDay);
+                                        return new Pair<>(rawWebpage, calendarDay);
                                     }
                                 });
                     }
@@ -265,24 +363,24 @@ public class BookingInteractionModel {
                     }
                 })
 
-                .flatMap(new Func1<CalendarDay, Observable<LeftOrRight<String, String>>>() {
+                .flatMap(new Func1<CalendarDay, Observable<String>>() {
                     @Override
-                    public Observable<LeftOrRight<String, String>> call(CalendarDay calendarDay) {
+                    public Observable<String> call(CalendarDay calendarDay) {
                         Timber.i(LOG_PREFIX + "Parsing Complete, doing the final sending of options to server");
                         return bookingInteractionWebService.createNewBookingAndGetResultWebpage(
                                 calendarDay,
                                 userRequest.timeCell,
                                 userRequest.requestOptions,
-                                userModel.getUserCredentialsFromStorage())
-                                // Transform by grabbing just the error message or the success message
-                                .map(new Func1<String, LeftOrRight<String, String>>() {
-                                    @Override
-                                    public LeftOrRight<String, String> call(String rawWebpage) {
-                                        Timber.i(LOG_PREFIX + "Received result page, parsing before passing " +
-                                                "back. That will be the final step");
-                                        return BookingInteractionParser.parseWebpageForMessageLabel(rawWebpage);
-                                    }
-                                });
+                                userModel.getUserCredentialsFromStorage());
+                    }
+                })
+
+                .flatMap(new Func1<String, Observable<LeftOrRight<String, String>>>() {
+                    @Override
+                    public Observable<LeftOrRight<String, String>> call(String resultWebpage) {
+                        Timber.i(LOG_PREFIX + "Received result page, parsing before passing " +
+                                "back. That will be the final step");
+                        return BookingInteractionParser.parseWebpageForMessageLabel(resultWebpage);
                     }
                 })
 

@@ -16,16 +16,19 @@ import timber.log.Timber;
 
 public class Success extends InteractionFragment{
     private BookingInteractionEvent bookingInteractionEvent;
+    private static final String SUCCESS_MESSAGE_BUNDLE_KEY = "SUCCESS_MESSAGE_BUNDLE_KEY";
+    private String successParagraph;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        _restoreStateIfAvailable(savedInstanceState);
         View view = inflater.inflate(R.layout.bookinginteraction_success, container, false);
         TextView body = (TextView) view.findViewById(R.id.bookingInteraction_success_body);
 
-        body.setText(_getMessageOrDefault(bookingInteractionEvent.message));
+        body.setText(_getMessageOrDefault(successParagraph));
 
         TextView title = (TextView) view.findViewById(R.id.bookingInteraction_success_title);
 
@@ -37,8 +40,14 @@ public class Success extends InteractionFragment{
         return view;
     }
 
-    private Spanned _getMessageOrDefault(String message) {
-        String returnMessage = message == null ? "No Information Available" : message;
+    private void _restoreStateIfAvailable(Bundle inState) {
+        if(inState != null) {
+            successParagraph = inState.getString(SUCCESS_MESSAGE_BUNDLE_KEY, "No Information Available");
+        }
+    }
+
+    private Spanned _getMessageOrDefault(String successParagraph) {
+        String returnMessage = successParagraph == null ? "No Information Available" : successParagraph;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             return Html.fromHtml(returnMessage, Html.FROM_HTML_MODE_LEGACY);
@@ -50,6 +59,7 @@ public class Success extends InteractionFragment{
     public static Success newInstance(BookingInteractionEvent bookingInteractionEvent) {
         Success fragment = new Success();
         fragment.bookingInteractionEvent = bookingInteractionEvent;
+        fragment.successParagraph = bookingInteractionEvent.message;
         return fragment;
     }
 
@@ -70,6 +80,12 @@ public class Success extends InteractionFragment{
     private void _popFragmentBackstack() {
         Timber.d("Popping backstack");
         getActivity().getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SUCCESS_MESSAGE_BUNDLE_KEY, bookingInteractionEvent.message);
     }
 
     @Override
