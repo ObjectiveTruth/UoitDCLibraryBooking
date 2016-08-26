@@ -10,14 +10,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.RefreshActivateEvent;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
 import timber.log.Timber;
+
+import javax.inject.Inject;
 
 public class Success extends InteractionFragment{
     private BookingInteractionEvent bookingInteractionEvent;
     private static final String SUCCESS_MESSAGE_BUNDLE_KEY = "SUCCESS_MESSAGE_BUNDLE_KEY";
     private String successParagraph;
+    @Inject CalendarModel calendarModel;
 
     @Nullable
     @Override
@@ -36,6 +42,8 @@ public class Success extends InteractionFragment{
 
         Button okButton = (Button) view.findViewById(R.id.bookingInteraction_success_ok_button);
         _setupOkButton(okButton);
+        // Do it everytime this screen gets created so the user doesn't have to wait to do another refresh
+        _doRefresh();
 
         return view;
     }
@@ -54,6 +62,10 @@ public class Success extends InteractionFragment{
         } else {
             return Html.fromHtml(returnMessage);
         }
+    }
+
+    private void _doRefresh() {
+        calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
     }
 
     public static Success newInstance(BookingInteractionEvent bookingInteractionEvent) {
@@ -96,5 +108,11 @@ public class Success extends InteractionFragment{
     @Override
     protected void teardownViewBindings() {
 
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
     }
 }

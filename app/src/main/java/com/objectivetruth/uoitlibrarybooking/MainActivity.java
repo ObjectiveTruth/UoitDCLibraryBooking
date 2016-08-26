@@ -1,16 +1,13 @@
 package com.objectivetruth.uoitlibrarybooking;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
@@ -19,22 +16,18 @@ import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.Bo
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.whatsnew.WhatsNewDialog;
 import com.objectivetruth.uoitlibrarybooking.userinterface.common.ActivityBase;
 import rx.Observable;
-import rx.Subscription;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
 import javax.inject.Inject;
-import java.net.CookieManager;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.HAS_DISMISSED_WHATSNEW_DIALOG_THIS_VERSION;
 
 
 public class MainActivity extends ActivityBase {
-    public static final String GROUP_CODE_DIALOGFRAGMENT_TAG = "groupCodeInfoDiaFrag";
-	AppCompatActivity mActivity = this;
-	public static CookieManager cookieManager;
     private boolean isFirstLoadThisSession = false;
-    private Subscription bookingInteractionScreenLoadEventSubscription;
+    private CompositeSubscription subscriptions = new CompositeSubscription();
 	@Inject SharedPreferences mDefaultSharedPreferences;
 	@Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
     @Inject BookingInteractionModel bookingInteractionModel;
@@ -133,73 +126,11 @@ public class MainActivity extends ActivityBase {
 		
 		startActivity(intent);
 		
-	}
-	@Override
-	public void LaunchJoinOrLeave(CookieManager cookieManager,
-			String roomNumber, String weekDayName, String calendarDate,
-			String calendarMonth, String currentViewState,
-			String currentEventValidation,String[] joinSpinnerArr, String[] leaveSpinnerArr,
-			int shareRow, int shareColumn, int pageNumberInt, String viewStateGenerator){
-		Intent intent = new Intent(this, ActivityRoomInteraction.class
-                );
-		intent.putExtra("type", "joinorleave");
-		intent.putExtra("date", weekDayName + ", " + calendarDate + ", " + calendarMonth);
-		intent.putExtra("room", roomNumber);
-		intent.putExtra("shareRow", shareRow);
-		intent.putExtra("shareColumn", shareColumn);
-		intent.putExtra("pageNumberInt", pageNumberInt);
-		//Log.i(TAG, "room number"+ roomNumber);
-		intent.putExtra("viewState", currentViewState);
-		intent.putExtra("eventValidation", currentEventValidation);
-		intent.putExtra("joinSpinnerArr", joinSpinnerArr);
-		intent.putExtra("leaveSpinnerArr", leaveSpinnerArr);
-        intent.putExtra("viewStateGenerator", viewStateGenerator);
-		MainActivity.cookieManager = cookieManager;
-		
-		
-		
-		startActivity(intent);
 	}*/
-
-	@Override
-	protected void onRestart() {
-		Bundle intentExtras = getIntent().getExtras();
-        if(intentExtras == null){
-        	
-        }
-        else if(intentExtras.getString("bookURL") != null){
-        	
-        	String linkString = intentExtras.getString("bookURL");
-        	getIntent().removeExtra("bookURL");
-        	//Log.i(TAG, "linkString is " + linkString);
-			if(isNetworkAvailable(this)){
-				new AsyncModifiedBookOnly(this, cookieManager).execute(linkString);
-        	}
-        	else{
-        		new AlertDialog.Builder(this)
-        	    .setTitle("Connectivity Issue")
-        	    .setMessage(R.string.networkerrordialogue)
-        	    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-        	        public void onClick(DialogInterface dialog, int which) {
-        	            // Do nothing
-        	        }
-        	     })
-        	    .setIcon(R.drawable.ic_dialog_alert)
-        	     .show();
-        	}
-        }
-		super.onRestart();
-	}
 
 	private void _goToScreenByMenuID(int menuItemResourceID) {
 		MenuItem initialMenuItem = getDrawerView().getMenu().findItem(menuItemResourceID);
 		selectDrawerItem(initialMenuItem);
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent) {
-	    super.onNewIntent(intent);
-	    setIntent(intent);
 	}
 
     public boolean isNetworkAvailable(Context ctx){
@@ -224,24 +155,25 @@ public class MainActivity extends ActivityBase {
 
     @Override
     protected void onStop() {
-        if(bookingInteractionScreenLoadEventSubscription != null) {
-            bookingInteractionScreenLoadEventSubscription.unsubscribe();
+        if(subscriptions != null) {
+            subscriptions.unsubscribe();
         }
         super.onStop();
     }
 
     private void _bindBookingInteractionEventToLoadingBookingInteractionScreen(
 			Observable<BookingInteractionScreenLoadEvent> bookingInteractionEventObservable) {
-	    bookingInteractionScreenLoadEventSubscription = bookingInteractionEventObservable
+	    subscriptions
+                .add(bookingInteractionEventObservable
                 .subscribe(new Action1<BookingInteractionScreenLoadEvent>() {
-            @Override
-            public void call(BookingInteractionScreenLoadEvent bookingInteractionScreenLoadEvent) {
-                addHidingOfAllCurrentFragmentsToTransaction(getSupportFragmentManager().beginTransaction())
-                        .add(R.id.mainactivity_content_frame, BookingInteraction.newInstance())
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
+                    @Override
+                    public void call(BookingInteractionScreenLoadEvent bookingInteractionScreenLoadEvent) {
+                        addHidingOfAllCurrentFragmentsToTransaction(getSupportFragmentManager().beginTransaction())
+                                .add(R.id.mainactivity_content_frame, BookingInteraction.newInstance())
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                                .addToBackStack(null)
+                                .commit();
+                    }
+        }));
     }
 }

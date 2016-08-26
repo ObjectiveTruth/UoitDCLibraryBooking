@@ -598,7 +598,7 @@ public class BookingInteractionModel {
      * @see BookingInteractionEvent
      * @return
      */
-    private ReplaySubject<BookingInteractionEvent> getBookingInteractionEventReplaySubject() {
+    public ReplaySubject<BookingInteractionEvent> getBookingInteractionEventReplaySubject() {
         if(bookingInteractionEventReplaySubject == null || bookingInteractionEventReplaySubject.hasCompleted()) {
             bookingInteractionEventReplaySubject = ReplaySubject.createWithSize(1);
             bookingInteractionEventObservable = bookingInteractionEventReplaySubject.asObservable();

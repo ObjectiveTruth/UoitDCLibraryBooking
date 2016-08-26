@@ -10,11 +10,13 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.JoinOrLeaveRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCellType;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -23,6 +25,8 @@ import timber.log.Timber;
 
 import javax.inject.Inject;
 import java.util.HashMap;
+
+import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.BOOK_WEBPAGE;
 
 public class JoinOrLeave extends InteractionFragment{
     private TimeCell timeCell;
@@ -61,7 +65,14 @@ public class JoinOrLeave extends InteractionFragment{
         createButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Timber.w("Create Button Clicked, Not Implemented");
+                Timber.i("Clicked JOINORLEAVE-CREATE button");
+                // Done to recycle the booking flow, we simply mutate this timeCell into a booking one
+                TimeCell bookTimeCell = _convertJoinOrLeaveTimeCellToBookTimeCell(timeCell);
+                bookingInteractionModel.getBookingInteractionEventReplaySubject()
+                        .onNext(new BookingInteractionEvent(bookTimeCell,
+                                BookingInteractionEventType.BOOK,
+                                dayOfMonthNumber,
+                                monthWord));
             }
         });
 
@@ -72,6 +83,7 @@ public class JoinOrLeave extends InteractionFragment{
             @Override
             public void onClick(View view) {
                 Timber.i("Clicked JOINORLEAVE-JOIN button");
+                _hideErrorMessage();
                 BookingInteractionEventUserRequest request = new BookingInteractionEventUserRequest(
                         timeCell,
                         BookingInteractionEventUserRequestType.JOINORLEAVE_JOIN_REQUEST,
@@ -88,6 +100,7 @@ public class JoinOrLeave extends InteractionFragment{
             @Override
             public void onClick(View view) {
                 Timber.i("Clicked JOINORLEAVE-LEAVE button");
+                _hideErrorMessage();
                 BookingInteractionEventUserRequest request = new BookingInteractionEventUserRequest(
                         timeCell,
                         BookingInteractionEventUserRequestType.JOINORLEAVE_LEAVE_REQUEST,
@@ -100,6 +113,19 @@ public class JoinOrLeave extends InteractionFragment{
             }
         });
         return view;
+    }
+
+    private TimeCell _convertJoinOrLeaveTimeCellToBookTimeCell(TimeCell joinOrLeaveTimeCell) {
+        Timber.i(joinOrLeaveTimeCell.toString());
+        TimeCell bookTimeCell = new TimeCell();
+        bookTimeCell.timeCellType = TimeCellType.BOOKING_OPEN;
+        bookTimeCell.param_get_link = joinOrLeaveTimeCell.param_get_link;
+        bookTimeCell.param_next = BOOK_WEBPAGE;
+        bookTimeCell.param_starttime = joinOrLeaveTimeCell.param_starttime;
+        bookTimeCell.param_room = joinOrLeaveTimeCell.param_room;
+        bookTimeCell.param_eventargument = joinOrLeaveTimeCell.param_eventargument;
+        bookTimeCell.param_eventtarget = joinOrLeaveTimeCell.param_eventtarget;
+        return bookTimeCell;
     }
 
     public static JoinOrLeave newInstance(BookingInteractionEvent bookingInteractionEvent) {
@@ -205,7 +231,6 @@ public class JoinOrLeave extends InteractionFragment{
                 currentLeaveSpinnerValue = leaveSpinnerValues.get(labelOfSelection);
             }
         });
-
     }
 
     @Override
@@ -220,13 +245,12 @@ public class JoinOrLeave extends InteractionFragment{
     private void _doInitialRequestToGetSpinnerValues(BookingInteractionModel bookingInteractionModel) {
         bookingInteractionModel
                 .getBookingInteractionEventUserRequestSubject()
-                .onNext(
-                        new BookingInteractionEventUserRequest(
-                                timeCell,
-                                BookingInteractionEventUserRequestType.JOINORLEAVE_GETTING_SPINNER_VALUES_REQUEST,
-                                dayOfMonthNumber,
-                                monthWord,
-                                null));
+                .onNext(new BookingInteractionEventUserRequest(
+                        timeCell,
+                        BookingInteractionEventUserRequestType.JOINORLEAVE_GETTING_SPINNER_VALUES_REQUEST,
+                        dayOfMonthNumber,
+                        monthWord,
+                        null));
     }
 
     private void _showErrorMessage(String message) {

@@ -3,11 +3,11 @@ package com.objectivetruth.uoitlibrarybooking.data;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.app.networking.MockHttpStack;
 import com.objectivetruth.uoitlibrarybooking.app.networking.OkHttp3Stack;
-import com.objectivetruth.uoitlibrarybooking.app.networking.customvolley.CustomVolleyToHandleRedirects;
 import com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
@@ -72,9 +72,9 @@ public class DataModule {
     protected RequestQueue providesRequestQueue() {
         if(BuildConfig.DEBUG && _hasUserRequestedMockingOfHTTP()) {
             Timber.i("Using Mock Http Stack");
-            return CustomVolleyToHandleRedirects.newRequestQueue(mApplication, new MockHttpStack(mApplication));
+            return Volley.newRequestQueue(mApplication, new MockHttpStack(mApplication));
         }else {
-            return CustomVolleyToHandleRedirects.newRequestQueue(mApplication, new OkHttp3Stack());
+            return Volley.newRequestQueue(mApplication, new OkHttp3Stack());
         }
     }
 

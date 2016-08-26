@@ -5,18 +5,10 @@ package com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmode
  */
 public enum BookingInteractionEventType {
     /**
-     * When Booking is requested
+     * States for when booking is requested
      */
     BOOK,
-
-    /**
-     * An Error occured trying to do a book request
-     */
     BOOK_ERROR,
-
-    /**
-     * A request is in flight to do a booking
-     */
     BOOK_RUNNING,
 
     /**
@@ -25,16 +17,10 @@ public enum BookingInteractionEventType {
      */
     JOIN_OR_LEAVE,
     /**
-     * When request is in flight for the spinner values
+     * States for getting the spinner values whe opening up JoinOrLeave
      */
     JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING,
-    /**
-     * When the request for the spinner values errors out
-     */
     JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR,
-    /**
-     * When the request for the spinner values finishes successfully
-     */
     JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS,
     /**
      * States for joining a room in the JOINORLEAVE flow

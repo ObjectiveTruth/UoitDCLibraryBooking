@@ -13,7 +13,6 @@ import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
-import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,14 +27,11 @@ import timber.log.Timber;
 
 import javax.inject.Inject;
 import java.net.CookieManager;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.USER_PASSWORD;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS.USER_USERNAME;
 
-public class ActivityRoomInteraction extends FragmentActivity implements CommunicatorRoomInteractions {
+public class ActivityRoomInteraction extends FragmentActivity {
 	final public String TAG = "ActivityRoomInteraction";
 	CookieManager cookieManager;
 	String date;
@@ -48,7 +44,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 	String joinSpinnerValue;
 	String leaveSpinnerValue;
 	String durationSpinnerValue = null;
-	AsyncResponse comm;
 	boolean isCorrectlyFilled = false;
 	Button titleButton;
 	EditText groupNameEditText;
@@ -108,14 +103,13 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		}*/
         //getRandomGif();
 		
-		this.cookieManager = MainActivity.cookieManager;
+		//this.cookieManager = MainActivity.cookieManager;
 
 		
 		
 
 		if(bundleExtras.getString("type").equalsIgnoreCase("test")){
             Timber.i("CreateBooking SubRoutine Executing...");
-			InteractionSuccess("THIS IS A TEST LOREM IPSUM AND ALL THAT", true);
 		}
 
 		else if(bundleExtras.getString("type").equalsIgnoreCase("viewleaveorjoin")){
@@ -318,236 +312,6 @@ public class ActivityRoomInteraction extends FragmentActivity implements Communi
 		}*/
 
     
-	@Override
-	public void InteractionSuccess(final String returnMessage, final boolean isCalendarable) {
-		Button addToCalendarButton;
-		Button okButton;
-		firstHiddenFunny = false;
-		setContentView(R.layout.bookinginteraction_success);
-		final ImageView qrCodeActual = (ImageView) findViewById(R.id.qractual);
-		final TextView successMessage = (TextView) findViewById(R.id.bookingInteraction_success_body);
-
-
-
-        addToCalendarButton = (Button) findViewById(R.id.bookingInteraction_success_add_to_calendar_button);
-        //A Cancel success Event
-        if(!isCalendarable){
-        	addToCalendarButton.setVisibility(View.GONE);
-            qrCodeActual.setVisibility(View.INVISIBLE);
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Calendar Interaction")
-                            .setAction("Successfully Left a Booking")
-                            .build()
-            );
-
-        }
-        //Join/Create booking Success Event
-        else{
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Calendar Interaction")
-                            .setAction("Successfully Created/Joined a Booking")
-                            .build()
-            );
-            if(shareRow > -1){
-                String qrData = "uoitdclibrarybooking" + "-" + String.valueOf(shareRow) + "-" + String.valueOf(shareColumn) + "-" + String.valueOf(pageNumberInt);
-            }
-            else{
-                qrCodeActual.setImageResource(R.drawable.ic_stamp_no_info);
-            }
-            addToCalendarButton.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("Calendar Interaction")
-                            .setAction("Add to Calendar")
-                            .build());
-                    String calendarTitle = null;
-
-                    Calendar startTime = Calendar.getInstance();
-                    double MILLIESPERHOUR = 3600000.0;
-                    long eventDurationLong = (long) MILLIESPERHOUR;
-
-                    //Getting the groupname for the calendarEntry
-                    if (calendarGroupName == null) {
-                        calendarTitle = "Group Study Session";
-                    } else {
-                        calendarTitle = calendarGroupName + " - Group Study Session";
-                    }
-
-                    //Switch statments for each type of success
-                    if (bundleExtras.getString("type").compareTo("createbooking") == 0) {
-
-                        if (durationSpinnerValue != null) {
-                            eventDurationLong = (long) (Float.valueOf(durationSpinnerValue) * MILLIESPERHOUR);
-                        }
-                        try {
-                            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM d, y h:mm a");
-                            startTime.setTime(sdf.parse(date));
-                            //startTime.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    } else if (bundleExtras.getString("type").compareTo("joinorleave") == 0) {
-
-                        try {
-                            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d, MMMM, y h:mm a");
-                            if (spinnerJoinString != null) {
-                                int stateStart = spinnerJoinString.indexOf("(") + 1;
-
-                                int stateEnd = spinnerJoinString.indexOf("-", stateStart);
-                                String startTimeString = spinnerJoinString.substring(stateStart, stateEnd);
-
-                                stateStart = stateEnd + 1;
-                                stateEnd = spinnerJoinString.indexOf("C", stateStart) - 1;
-                                String endTimeString = spinnerJoinString.substring(stateStart, stateEnd);
-
-                                String startDate = date + ", " + startTime.get(Calendar.YEAR) + " " + startTimeString;
-                                String endDate = date + ", " + startTime.get(Calendar.YEAR) + " " + endTimeString;
-
-                                startTime.setTime(sdf.parse(startDate));
-                                Calendar endCalendar = Calendar.getInstance();
-                                endCalendar.setTime(sdf.parse(endDate));
-
-                                eventDurationLong = endCalendar.getTimeInMillis() - startTime.getTimeInMillis();
-                            }
-                        } catch (Exception p) {
-                            p.printStackTrace();
-                        }
-                    } else if (bundleExtras.getString("type").compareTo("viewleaveorjoin") == 0) {
-                        try {
-                            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM d, y, h:mm a");
-                            if (timeRange != null) {
-                                Timber.i(timeRange);
-                                int stateStart = 0;
-                                int stateEnd = timeRange.indexOf("-");
-                                String startTimeString = timeRange.substring(0, stateEnd - 1);
-
-                                stateStart = stateEnd + 1;
-                                //stateEnd = timeRange.indexOf(".", stateStart);
-
-                                String endTimeString = timeRange.substring(stateStart);
-
-                                String startDate = date + ", " + startTimeString;
-                                String endDate = date + ", " + endTimeString;
-                                Timber.i(startDate);
-                                Timber.i(endDate);
-                                startTime.setTime(sdf.parse(startDate));
-                                Calendar endCalendar = Calendar.getInstance();
-                                endCalendar.setTime(sdf.parse(endDate));
-
-                                eventDurationLong = endCalendar.getTimeInMillis() - startTime.getTimeInMillis();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-
-                    Timber.i(startTime.toString());
-
-                    CalendarOrganizer.createEvent(
-                            startTime.getTimeInMillis(),
-                            startTime.getTimeInMillis() + eventDurationLong,
-                            calendarTitle,
-                            getResources().getString(R.string.calendardescription),
-                            roomNumber + " @ UOIT/DC Library",
-                            false,
-                            mActivity);
-
-                            /*startTime,
-                            endTime,
-                            title,
-                            description,
-                            location,
-                            isAllDay,
-                            context)*/
-
-
-                }
-            });
-        }
-		okButton = (Button) findViewById(R.id.bookingInteraction_success_ok_button);
-		
-		
-		okButton.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View arg0) {
-
-				finish();
-				
-			}
-			
-		});
-		
-		successMessage.setText(Html.fromHtml(returnMessage));
-	}
-
-	@Override
-	public void CreateRoomFail(String errorMessage) {
-		errorTextView.setText(Html.fromHtml(errorMessage));
-        errorTextView.setVisibility(View.VISIBLE);
-        decreaseAlphaOnRoomPicture();
-		googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-		.setCategory("Calendar Interaction")
-		.setAction("Error Create Room")
-		.setLabel(errorMessage)
-		.build()
-		);
-	}
-
-	@Override
-	public void RoomLeaveFail(String returnMessage) {
-		TextView errorText = (TextView) findViewById(R.id.joinorleave_error_text);
-        errorText.setVisibility(View.VISIBLE);
-        decreaseAlphaOnRoomPicture();
-
-        errorText.setText(Html.fromHtml(returnMessage));
-		googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-		.setCategory("Calendar Interaction")
-		.setAction("Error Leave Room")
-		.setLabel(returnMessage)
-		.build()
-		);
-		
-	}
-
-	@Override
-	public void createFromJoinOrLeave(CookieManager cookieManager, String result) {
-
-		if(result == null){
-			Toast.makeText(mActivity.getApplicationContext(), "Couldn't find that time slot, try refreshing calendar",
-                    Toast.LENGTH_LONG).show();
-		}
-		else{
-			MainActivity.cookieManager = cookieManager;
-    		Intent intent = new Intent(this, MainActivity.class);
-    		intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-    		intent.putExtra("bookURL", result);
-			startActivity(intent);
-			finish();
-		}
-		
-		
-	}
-
-	@Override
-	public void ViewLeaveOrJoinFail(String returnMessage) {
-		TextView errorText = (TextView) findViewById(R.id.viewleaveorjoin_error_text);
-        errorText.setVisibility(View.VISIBLE);
-        decreaseAlphaOnRoomPicture();
-		errorText.setText(Html.fromHtml(returnMessage));
-		googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
-		.setCategory("Calendar Interaction")
-		.setAction("Error View Leave or Join")
-		.setLabel(returnMessage)
-		.build()
-		);
-		
-	}
     private void decreaseAlphaOnRoomPicture(){
         ImageView roomPicture = (ImageView)findViewById(R.id.room_landing_room_picture);
         AlphaAnimation alpha = new AlphaAnimation(0.1F, 0.1F);
