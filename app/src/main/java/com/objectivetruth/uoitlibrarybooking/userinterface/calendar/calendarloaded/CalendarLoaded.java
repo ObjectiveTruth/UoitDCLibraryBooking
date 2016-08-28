@@ -60,17 +60,19 @@ public class CalendarLoaded extends Fragment {
         // Only other case is if both are null, in which case, do nothing
         if(this.calendarData != null &&
                 this.calendarData.isNOTEqualTo(calendarData)) {
-            Timber.d("CalendarData for THIS instance has changed, will update the UI");
+            Timber.d("CalendarData for THIS instance has changed, will update the UI. Hash: " +
+                    calendarData.computedHashCode);
 
             _mPagerAdapter.saveInformationAndUpdatePagerFragmentUI(calendarData);
 
         }else if(calendarData != null &&
                 calendarData.isNOTEqualTo(this.calendarData)) {
-            Timber.d("CalendarData for THIS instance has changed, will update the UI");
-
+            Timber.d("CalendarData for THIS instance has changed, will update the UI. Hash: " +
+                    calendarData.computedHashCode);
             _mPagerAdapter.saveInformationAndUpdatePagerFragmentUI(calendarData);
         }else{
-            Timber.d("CalendarData for THIS instance has NOT changed, will NOT update UI");
+            Timber.d("CalendarData for THIS instance has NOT changed, will NOT update UI. Hash: " +
+                    calendarData.computedHashCode);
             _mPagerAdapter.saveInformationAndDONTUpdatePagerFragmentUI(calendarData);
         }
         this.calendarData = calendarData;

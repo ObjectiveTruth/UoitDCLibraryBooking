@@ -69,7 +69,6 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
                                                     CalendarData calendarData) {
         int indexOfObject = calendarData.days.indexOf(objectRequested);
         return indexOfObject > -1;
-
     }
 
     private boolean _shouldRefreshDataForObject(Object objectRequested, boolean[] arrayCopyToTellWhichViewsToRefresh,

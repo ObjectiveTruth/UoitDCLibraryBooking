@@ -11,7 +11,7 @@ public class CalendarData implements Parcelable {
 
     @Override
     public String toString() {
-        String returnString = "days:";
+        String returnString = "computerHashCode: " + computedHashCode + ", days:";
 
         if(days == null) {
             returnString += " NULL";

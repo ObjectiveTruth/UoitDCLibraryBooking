@@ -42,7 +42,7 @@ public class Book extends InteractionFragment{
     private TextView errorTextView;
     private ImageView pictureOfRoom;
     private CompositeSubscription subscriptions = new CompositeSubscription();
-    private String durationSpinnerValue = "1.0"; // a default value to avoid NPE. Stands for 1 hour
+    private String durationSpinnerValue;
     @Inject BookingInteractionModel bookingInteractionModel;
 
     @Nullable
@@ -199,6 +199,7 @@ public class Book extends InteractionFragment{
                                 durationSpinnerValue,
                                 comment
                         );
+                        Timber.v(requestOptions.toString());
                         bookingInteractionModel.getBookingInteractionEventUserRequestSubject()
                                 .onNext(new BookingInteractionEventUserRequest(
                                         timeCell,
@@ -221,8 +222,10 @@ public class Book extends InteractionFragment{
     }
 
     private void _setupDurationSpinner(Spinner durationSpinner) {
+        final int DURATION_SPINNER_DEFAULT_POSITION = 1;
+        final String[] durationValues = getResources().getStringArray(R.array.BOOK_STR_ARRAY_DURATION_SPINNER_VALUES);
         ArrayAdapter<CharSequence> durationAdapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.duration, android.R.layout.simple_spinner_item);
+                R.array.BOOK_STR_ARRAY_DURATION_SPINNER_LABELS, android.R.layout.simple_spinner_item);
         durationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         durationSpinner.setAdapter(durationAdapter);
         durationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
@@ -230,16 +233,17 @@ public class Book extends InteractionFragment{
             @Override
             public void onItemSelected(AdapterView<?> adapter, View view,
                                        int position, long id) {
-                String[] timeToDecimal = new String[]{"0.5", "1", "1.5", "2"};
-                durationSpinnerValue = timeToDecimal[position];
+                durationSpinnerValue = durationValues[position];
+                Timber.d("Spinner value is now: "+ durationSpinnerValue);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapter) {
-                durationSpinnerValue = "1";
+                // Do nothing
             }
         });
-        durationSpinner.setSelection(1);
+        durationSpinner.setSelection(DURATION_SPINNER_DEFAULT_POSITION);
+        durationSpinnerValue = durationValues[DURATION_SPINNER_DEFAULT_POSITION];
     }
 
     @Override
@@ -251,7 +255,6 @@ public class Book extends InteractionFragment{
     }
 
     private boolean _isFormFilledCorrectly() {
-        Timber.i("Some fields were not filled in correctly");
         return _isGroupCodeFilledCorrectly() && _isGroupNameFilledCorrectly();
     }
 

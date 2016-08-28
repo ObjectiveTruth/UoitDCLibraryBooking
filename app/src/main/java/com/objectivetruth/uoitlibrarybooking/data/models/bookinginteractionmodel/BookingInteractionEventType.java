@@ -41,6 +41,11 @@ public enum BookingInteractionEventType {
     JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR_NO_VALUES,
 
     /**
+     * The case where the booking is confirmed and user clicks
+     */
+    VIEWJOINORLEAVE,
+
+    /**
      * When an interaction flow succeeds
      */
     SUCCESS,

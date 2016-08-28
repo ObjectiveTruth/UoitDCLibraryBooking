@@ -13,4 +13,14 @@ public class BookRequestOptions implements RequestOptions{
         this.duration = duration;
         this.comments = comments;
     }
+
+    @Override
+    public String toString() {
+        return "BookRequestOptions{" +
+                "groupName='" + groupName + '\'' +
+                ", groupCode='" + groupCode + '\'' +
+                ", duration='" + duration + '\'' +
+                ", comments='" + comments + '\'' +
+                '}';
+    }
 }
