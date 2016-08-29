@@ -29,10 +29,6 @@ public class CalendarLoaded extends Fragment {
         ViewPager _mViewPager = (ViewPager) calendarLoadedView.findViewById(R.id.calendar_view_pager);
         TabLayout _mTabLayout = (TabLayout) calendarLoadedView.findViewById(R.id.calendar_tab_layout);
 
-        if(savedInstanceState != null) {
-            _restorePreviousState(savedInstanceState);
-        }
-
         // Will supply the ViewPager with what should be displayed
         _mPagerAdapter = new CalendarPagerAdapter(getChildFragmentManager(), calendarData);
         _mViewPager.setAdapter(_mPagerAdapter);
@@ -48,6 +44,14 @@ public class CalendarLoaded extends Fragment {
         calendarLoadedToReturn.calendarData = calendarData;
 
         return calendarLoadedToReturn;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        if(savedInstanceState != null) {
+            _restorePreviousState(savedInstanceState);
+        }
+        super.onCreate(savedInstanceState);
     }
 
     /**

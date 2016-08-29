@@ -20,7 +20,6 @@ public class Grid extends Fragment {
     @Inject CalendarModel calendarModel;
     private CalendarDay calendarDay;
     private GridAdapter gridAdapter;
-    private static final String CALENDAR_DAY_BUNDLE_KEY = "CALENDAR_DAY_BUNDLE_KEY";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,9 +34,6 @@ public class Grid extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View gridView = inflater.inflate(R.layout.calendar_page_grid, container, false);
 
-        if(savedInstanceState != null) {
-            _restorePreviousState(savedInstanceState);
-        }
         Timber.i("Starting creation of the grid and all required information for day: " +
                 calendarDay.extDayOfMonthNumber);
         Timber.v(calendarDay.toString());
@@ -64,15 +60,5 @@ public class Grid extends Fragment {
     public void saveNewCalendarDayWontUpdateUI(CalendarDay calendarDay) {
         this.calendarDay = calendarDay;
         gridAdapter.saveNewCalendarDayWontUpdateUI(calendarDay);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(CALENDAR_DAY_BUNDLE_KEY, calendarDay);
-    }
-
-    private void _restorePreviousState(Bundle inState) {
-        calendarDay = inState.getParcelable(CALENDAR_DAY_BUNDLE_KEY);
     }
 }

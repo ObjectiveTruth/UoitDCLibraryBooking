@@ -225,7 +225,6 @@ public class Calendar extends Fragment {
         }else if(calendarData == null || calendarData.days == null) {
             getChildFragmentManager().beginTransaction()
                     .replace(R.id.calendar_content_frame, SorryCartoon.newInstance()).commit();
-
         }else {
             _makeNewCalendarLoadedFragmentOrRefreshCurrentOne(calendarData);
         }

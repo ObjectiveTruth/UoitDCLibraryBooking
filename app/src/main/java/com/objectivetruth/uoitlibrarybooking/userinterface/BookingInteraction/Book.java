@@ -243,7 +243,6 @@ public class Book extends InteractionFragment{
             }
         });
         durationSpinner.setSelection(DURATION_SPINNER_DEFAULT_POSITION);
-        durationSpinnerValue = durationValues[DURATION_SPINNER_DEFAULT_POSITION];
     }
 
     @Override
