@@ -148,7 +148,7 @@ public class Book extends InteractionFragment{
         alert.setMessage(R.string.INFO_BOOKING_INTERACTION_BOOK_GROUPCODE_INFO_PARAGRAPH);
         alert.setTitle(R.string.INFO_BOOKING_INTERACTION_BOOK_GROUPCODE_INFO_TITLE);
 
-        alert.setPositiveButton("Comment", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 dialog.dismiss();
             }
@@ -171,7 +171,7 @@ public class Book extends InteractionFragment{
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 Timber.i("Comment edit canceled by user. Comment will be " + comment);
             }

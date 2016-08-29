@@ -118,6 +118,11 @@ public class BookingInteraction extends Fragment {
            case JOIN_OR_LEAVE_LEAVE_RUNNING:
                Timber.i("Showing: JoinOrLeave");
                return JoinOrLeave.newInstance(bookingInteractionEvent);
+           case VIEWJOINORLEAVE:
+           case VIEWJOINORLEAVE_ERROR:
+           case VIEWJOINORLEAVE_RUNNING:
+               Timber.i("Showing: ViewLeaveOrJoin");
+               return ViewLeaveOrJoin.newInstance(bookingInteractionEvent);
            default:
                Timber.w("No valid Fragment requested, showing Success");
                return Success.newInstance(bookingInteractionEvent);
@@ -143,6 +148,7 @@ public class BookingInteraction extends Fragment {
             case SUCCESS:
             case JOIN_OR_LEAVE_LEAVE_SUCCESS:
             case JOIN_OR_LEAVE_JOIN_SUCCESS:
+            case VIEWJOINORLEAVE_SUCCESS:
                 return !(currentFragmentInContentFrame instanceof Success);
             case JOIN_OR_LEAVE:
             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR:
@@ -154,6 +160,10 @@ public class BookingInteraction extends Fragment {
             case JOIN_OR_LEAVE_JOIN_RUNNING:
             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR_NO_VALUES:
                 return !(currentFragmentInContentFrame instanceof JoinOrLeave);
+            case VIEWJOINORLEAVE:
+            case VIEWJOINORLEAVE_ERROR:
+            case VIEWJOINORLEAVE_RUNNING:
+                return !(currentFragmentInContentFrame instanceof ViewLeaveOrJoin);
             default:
                 Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();
                 Timber.w(new Throwable(new IllegalStateException("No expected values match type: "

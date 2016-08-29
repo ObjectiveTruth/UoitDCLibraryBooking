@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <ImageView
+                android:id="@+id/room_landing_room_picture"
+                android:layout_width="350dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="10dp"
+                android:adjustViewBounds="true"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="Picture of the room"
+                android:scaleType="centerCrop"
+                android:src="@drawable/unknown_room" />
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+                android:layout_marginTop="10dp"
+                android:id="@+id/viewleaveorjoin_error_text"
+                android:visibility="invisible"
+                android:layout_width="350dp"
+                android:layout_height="100dp"
+                android:layout_centerHorizontal="true"
+                android:minLines="3"
+                android:textColor="@color/booked_red"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:gravity="center_horizontal"
+                android:text="@string/error_room_no_exist_comment"
+        />
+
+
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+                android:id="@+id/textView1"
+                android:layout_below="@+id/room_landing_room_picture"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="right"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/room_landing_room_picture"
+                android:layout_marginLeft="110dp"
+                android:text="Room: "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+                android:id="@+id/viewleaveorjoin_room_number"
+                android:layout_width="wrap_content"
+                android:layout_alignTop="@+id/textView1"
+                android:layout_below="@+id/room_landing_room_picture"
+                android:layout_toRightOf="@+id/textView1"
+                android:layout_marginLeft="10dp"
+                android:textColor="#0099CC"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:text="LIB999"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+
+                android:id="@+id/viewleaveorjoin_join_button"
+                android:layout_width="100dp"
+                android:layout_marginTop="5dp"
+                android:layout_alignRight="@id/room_landing_room_picture"
+                android:layout_height="wrap_content"
+                android:text="Join" android:layout_below="@+id/textView1"/>
+
+        <Button
+                android:id="@+id/viewleaveorjoin_leave_grou_button"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Leave"
+                android:layout_alignParentBottom="true" android:layout_alignLeft="@+id/room_landing_room_picture"
+                android:layout_alignStart="@+id/room_landing_room_picture"/>
+
+
+    </RelativeLayout>
+
+</ScrollView>
