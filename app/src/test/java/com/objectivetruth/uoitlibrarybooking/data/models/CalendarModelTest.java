@@ -162,7 +162,7 @@ public class CalendarModelTest {
                         .toBlocking().toFuture().get(300, TimeUnit.MILLISECONDS);
 
         // The hash represents the entire object's contents, so comparing we know the object is the same
-        int TEST_DATA_HASH = 1068626024;
+        int TEST_DATA_HASH = -2089589293;
         assertThat(currentState.type, is(SUCCESS));
         assertNull(currentState.exception);
         assertThat(currentState.calendarData.computedHashCode, is(TEST_DATA_HASH));
