@@ -16,8 +16,10 @@ import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.Utils;
+import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows.*;
 import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import timber.log.Timber;
 
@@ -66,6 +68,7 @@ public class BookingInteraction extends Fragment {
 
     private void _setupViewBindings(Observable<BookingInteractionEvent> bookingInteractionEventObservable) {
         bookingInteractionEventSubscription = bookingInteractionEventObservable
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<BookingInteractionEvent>() {
             @Override
             public void call(BookingInteractionEvent bookingInteractionEvent) {
@@ -107,7 +110,10 @@ public class BookingInteraction extends Fragment {
            case BOOK_ERROR:
                Timber.i("Showing: Book");
                return Book.newInstance(bookingInteractionEvent);
-           case SUCCESS:
+           case BOOK_SUCCESS:
+           case JOIN_OR_LEAVE_JOIN_SUCCESS:
+           case JOIN_OR_LEAVE_LEAVE_SUCCESS:
+           case VIEWLEAVEORJOIN_SUCCESS:
                Timber.i("Showing: Success");
                return Success.newInstance(bookingInteractionEvent);
            case JOIN_OR_LEAVE:
@@ -118,11 +124,14 @@ public class BookingInteraction extends Fragment {
            case JOIN_OR_LEAVE_LEAVE_RUNNING:
                Timber.i("Showing: JoinOrLeave");
                return JoinOrLeave.newInstance(bookingInteractionEvent);
-           case VIEWJOINORLEAVE:
-           case VIEWJOINORLEAVE_ERROR:
-           case VIEWJOINORLEAVE_RUNNING:
+           case VIEWLEAVEORJOIN:
+           case VIEWLEAVEORJOIN_ERROR:
+           case VIEWLEAVEORJOIN_RUNNING:
                Timber.i("Showing: ViewLeaveOrJoin");
                return ViewLeaveOrJoin.newInstance(bookingInteractionEvent);
+           case CREDENTIALS_LOGIN:
+               Timber.i("Showing: CredentialsLogin");
+               return CredentialsLogin.newInstance(bookingInteractionEvent);
            default:
                Timber.w("No valid Fragment requested, showing Success");
                return Success.newInstance(bookingInteractionEvent);
@@ -145,10 +154,10 @@ public class BookingInteraction extends Fragment {
             case BOOK_RUNNING:
             case BOOK_ERROR:
                 return !(currentFragmentInContentFrame instanceof Book);
-            case SUCCESS:
+            case BOOK_SUCCESS:
             case JOIN_OR_LEAVE_LEAVE_SUCCESS:
             case JOIN_OR_LEAVE_JOIN_SUCCESS:
-            case VIEWJOINORLEAVE_SUCCESS:
+            case VIEWLEAVEORJOIN_SUCCESS:
                 return !(currentFragmentInContentFrame instanceof Success);
             case JOIN_OR_LEAVE:
             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR:
@@ -160,10 +169,12 @@ public class BookingInteraction extends Fragment {
             case JOIN_OR_LEAVE_JOIN_RUNNING:
             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR_NO_VALUES:
                 return !(currentFragmentInContentFrame instanceof JoinOrLeave);
-            case VIEWJOINORLEAVE:
-            case VIEWJOINORLEAVE_ERROR:
-            case VIEWJOINORLEAVE_RUNNING:
+            case VIEWLEAVEORJOIN:
+            case VIEWLEAVEORJOIN_ERROR:
+            case VIEWLEAVEORJOIN_RUNNING:
                 return !(currentFragmentInContentFrame instanceof ViewLeaveOrJoin);
+            case CREDENTIALS_LOGIN:
+                return !(currentFragmentInContentFrame instanceof CredentialsLogin);
             default:
                 Toast.makeText(getActivity(), R.string.ERROR_GENERAL, Toast.LENGTH_LONG).show();
                 Timber.w(new Throwable(new IllegalStateException("No expected values match type: "

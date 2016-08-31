@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction;
+package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
@@ -15,8 +16,6 @@ import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
@@ -54,6 +53,7 @@ public class ViewLeaveOrJoin extends InteractionFragment {
             public void onClick(View view) {
                 Timber.i("Clicked VIEWLEAVEORJOIN-JOIN button");
                 _hideErrorMessage();
+                Toast.makeText(getActivity(), "Not implemented", Toast.LENGTH_LONG).show();
 /*                BookingInteractionEventUserRequest request = new BookingInteractionEventUserRequest(
                         timeCell,
                         BookingInteractionEventUserRequestType.VIEWLEAVEORJOIN_JOIN,
@@ -71,6 +71,7 @@ public class ViewLeaveOrJoin extends InteractionFragment {
             public void onClick(View view) {
                 Timber.i("Clicked VIEWLEAVEORJOIN-LEAVE button");
                 _hideErrorMessage();
+                Toast.makeText(getActivity(), "Not implemented", Toast.LENGTH_LONG).show();
 /*                BookingInteractionEventUserRequest request = new BookingInteractionEventUserRequest(
                         timeCell,
                         BookingInteractionEventUserRequestType.VIEWLEAVEORJOIN_LEAVE,
@@ -102,7 +103,7 @@ public class ViewLeaveOrJoin extends InteractionFragment {
 
     @Override
     protected void setupViewBindings() {
-        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
+/*        subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
                 .observeOn(AndroidSchedulers.mainThread())
 
                 .subscribe(new Action1<BookingInteractionEvent>() {
@@ -117,7 +118,7 @@ public class ViewLeaveOrJoin extends InteractionFragment {
                             // No default, should fall through
                         }
                     }
-                }));
+                }));*/
     }
 
     @Override

@@ -6,6 +6,8 @@ import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarParser;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
+import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginStateType;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserCredentials;
 import com.objectivetruth.uoitlibrarybooking.statelessutilities.LeftOrRight;
 import com.objectivetruth.uoitlibrarybooking.statelessutilities.Triple;
@@ -14,6 +16,7 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
@@ -82,31 +85,60 @@ public class BookingInteractionModel {
     private void _bindUserRequestEventToWebCalls(
             PublishSubject<BookingInteractionEventUserRequest> bookingInteractionEventUserRequestPublishSubject) {
         bookingInteractionEventUserRequestPublishSubject
+                .withLatestFrom(userModel.getLoginStateObservable(),
+                        new Func2<BookingInteractionEventUserRequest, MyAccountDataLoginState,
+                                Pair<BookingInteractionEventUserRequest, MyAccountDataLoginState>>() {
+                    @Override
+                    public Pair<BookingInteractionEventUserRequest, MyAccountDataLoginState> call(
+                            BookingInteractionEventUserRequest userRequest,
+                            MyAccountDataLoginState myAccountDataLoginState) {
+                        return new Pair<>(userRequest, myAccountDataLoginState);
+                    }
+                })
                 .subscribeOn(Schedulers.computation())
                 .observeOn(Schedulers.computation())
-                .subscribe(new Action1<BookingInteractionEventUserRequest>() {
+                .subscribe(new Action1<Pair<BookingInteractionEventUserRequest, MyAccountDataLoginState>>() {
                     @Override
-                    public void call(BookingInteractionEventUserRequest s) {
-                        _executeBasedOnUserRequestType(s);
+                    public void call(Pair<BookingInteractionEventUserRequest, MyAccountDataLoginState> p) {
+                        _executeBasedOnUserRequestType(p);
                     }
                 });
     }
 
-    private void _executeBasedOnUserRequestType(BookingInteractionEventUserRequest userRequest) {
-        switch(userRequest.type) {
-            case BOOK_REQUEST:
-                _doBookRequest(userRequest);
-                break;
-            case JOINORLEAVE_GETTING_SPINNER_VALUES_REQUEST:
-                _doJoinOrLeaveGettingSpinnerValuesRequest(userRequest);
-                break;
-            case JOINORLEAVE_LEAVE_REQUEST:
-                _doJoinOrLeaveLeaveRequest(userRequest);
-                break;
-            case JOINORLEAVE_JOIN_REQUEST:
-                _doJoinOrLeaveJoinRequest(userRequest);
-                break;
+    private void _executeBasedOnUserRequestType(Pair<BookingInteractionEventUserRequest, MyAccountDataLoginState> pair) {
+        BookingInteractionEventUserRequest userRequest = pair.first;
+        MyAccountDataLoginState loginState = pair.second;
+        if(loginState.type == MyAccountDataLoginStateType.SIGNED_IN) {
+            switch(userRequest.type) {
+                case BOOK_REQUEST:
+                    _doBookRequest(userRequest);
+                    break;
+                case JOINORLEAVE_GETTING_SPINNER_VALUES_REQUEST:
+                    _doJoinOrLeaveGettingSpinnerValuesRequest(userRequest);
+                    break;
+                case JOINORLEAVE_LEAVE_REQUEST:
+                    _doJoinOrLeaveLeaveRequest(userRequest);
+                    break;
+                case JOINORLEAVE_JOIN_REQUEST:
+                    _doJoinOrLeaveJoinRequest(userRequest);
+                    break;
+                default:
+                    Timber.e(new Throwable(new IllegalStateException("Unknown Request Type")),
+                            "A request was submitted but that request type was unknown: " + userRequest.type);
+            }
+        }else {
+            Timber.w("Aborting a users request because they are not logged in, sending login event to front end");
+            _sendEventToShowLoginScreen(userRequest);
         }
+    }
+
+    private void _sendEventToShowLoginScreen(BookingInteractionEventUserRequest userRequest) {
+        BookingInteractionEvent eventToFire = new BookingInteractionEvent(
+                userRequest.timeCell,
+                BookingInteractionEventType.CREDENTIALS_LOGIN,
+                userRequest.dayOfMonthNumber,
+                userRequest.monthWord);
+        getBookingInteractionEventReplaySubject().onNext(eventToFire);
     }
 
     private void _doJoinOrLeaveJoinRequest(final BookingInteractionEventUserRequest userRequest) {
@@ -542,7 +574,7 @@ public class BookingInteractionModel {
                             BookingInteractionEvent eventToFire =
                                     new BookingInteractionEvent(
                                         userRequest.timeCell,
-                                        BookingInteractionEventType.SUCCESS,
+                                        BookingInteractionEventType.BOOK_SUCCESS,
                                         userRequest.dayOfMonthNumber,
                                         userRequest.monthWord);
                             eventToFire.message = result.getRight();
@@ -601,7 +633,9 @@ public class BookingInteractionModel {
     public ReplaySubject<BookingInteractionEvent> getBookingInteractionEventReplaySubject() {
         if(bookingInteractionEventReplaySubject == null || bookingInteractionEventReplaySubject.hasCompleted()) {
             bookingInteractionEventReplaySubject = ReplaySubject.createWithSize(1);
-            bookingInteractionEventObservable = bookingInteractionEventReplaySubject.asObservable();
+            bookingInteractionEventObservable = bookingInteractionEventReplaySubject
+                    .asObservable()
+                    .subscribeOn(Schedulers.computation());
             return bookingInteractionEventReplaySubject;
         }else {
             return bookingInteractionEventReplaySubject;

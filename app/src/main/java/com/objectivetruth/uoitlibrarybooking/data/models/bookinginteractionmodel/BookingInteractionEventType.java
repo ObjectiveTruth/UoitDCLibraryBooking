@@ -10,6 +10,7 @@ public enum BookingInteractionEventType {
     BOOK,
     BOOK_ERROR,
     BOOK_RUNNING,
+    BOOK_SUCCESS,
 
     /**
      * When the user clicks on a booking that is being competed for, this loads the initial form that must be filled
@@ -43,15 +44,15 @@ public enum BookingInteractionEventType {
     /**
      * The case where the booking is confirmed and user clicks to open, they can either join or leave
      */
-    VIEWJOINORLEAVE,
-    VIEWJOINORLEAVE_RUNNING,
-    VIEWJOINORLEAVE_ERROR,
-    VIEWJOINORLEAVE_SUCCESS,
+    VIEWLEAVEORJOIN,
+    VIEWLEAVEORJOIN_RUNNING,
+    VIEWLEAVEORJOIN_ERROR,
+    VIEWLEAVEORJOIN_SUCCESS,
 
     /**
-     * When an interaction flow succeeds
+     * When the user isn't logged in, will throw this to tell frontend to show login screens
      */
-    SUCCESS,
+    CREDENTIALS_LOGIN,
 
     /**
      * Incase a cell contains unknown information, should error gracefully if this happens

@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction;
+package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows;
 
 import android.content.DialogInterface;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction;
+package com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

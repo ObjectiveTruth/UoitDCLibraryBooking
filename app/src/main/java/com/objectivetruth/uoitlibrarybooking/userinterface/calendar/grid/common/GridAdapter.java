@@ -230,6 +230,8 @@ public class GridAdapter extends FixedTableAdapter {
                 return BookingInteractionEventType.BOOK;
             case "joinorleave.aspx":
                 return BookingInteractionEventType.JOIN_OR_LEAVE;
+            case "viewleaveorjoin.aspx":
+                return BookingInteractionEventType.VIEWLEAVEORJOIN;
             default:
                 return BookingInteractionEventType.UNKNOWN;
         }
