@@ -107,6 +107,34 @@
             android:layout_alignRight="@id/room_landing_room_picture"
             android:layout_height="wrap_content"
             android:text="Leave" />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/joinorleave_join_loadingbar"
+            android:visibility="invisible"
+            android:layout_toRightOf="@+id/joinorleave_create_group_button"
+            android:layout_alignRight="@+id/joinorleave_join_button"
+            android:layout_alignEnd="@+id/joinorleave_join_button"
+            android:layout_alignBottom="@+id/joinorleave_join_spinner"
+            android:layout_alignTop="@+id/joinorleave_join_spinner"/>
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/joinorleave_leave_loadingbar"
+            android:visibility="invisible"
+            android:layout_alignLeft="@+id/joinorleave_join_loadingbar"
+            android:layout_alignStart="@+id/joinorleave_join_loadingbar"
+            android:layout_alignRight="@+id/joinorleave_leave_grou_button"
+            android:layout_alignEnd="@+id/joinorleave_leave_grou_button"
+            android:layout_alignBottom="@+id/joinorleave_leave_spinner"
+            android:layout_alignTop="@+id/joinorleave_leave_spinner"/>
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/joinorleave_create_loadingbar"
+            android:layout_alignBottom="@+id/joinorleave_create_group_button"
+            android:visibility="invisible"
+            android:layout_centerHorizontal="true"/>
 
 
     </RelativeLayout>

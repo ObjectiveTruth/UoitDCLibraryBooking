@@ -118,5 +118,15 @@
             android:layout_alignTop="@+id/bookingInteraction_book_create_button"
             android:layout_toRightOf="@+id/bookingInteraction_book_create_button"
             android:layout_marginLeft="50dp" />
+        <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:id="@+id/bookingInteraction_book_create_loadingbar"
+                android:layout_alignParentBottom="true"
+                android:layout_alignLeft="@+id/bookingInteraction_book_create_button"
+                android:layout_alignStart="@+id/bookingInteraction_book_create_button"
+                android:layout_toLeftOf="@+id/bookingInteraction_book_comment_button"
+                android:layout_toStartOf="@+id/bookingInteraction_book_comment_button"/>
     </RelativeLayout>
 </ScrollView>

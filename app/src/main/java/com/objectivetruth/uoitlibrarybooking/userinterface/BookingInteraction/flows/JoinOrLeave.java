@@ -36,6 +36,12 @@ public class JoinOrLeave extends InteractionFragment{
     private TextView errorTextView;
     private Spinner joinSpinner;
     private Spinner leaveSpinner;
+    private ProgressBar joinProgressBar;
+    private ProgressBar leaveProgressBar;
+    private ProgressBar createProgressBar;
+    private Button joinButton;
+    private Button leaveButton;
+    private Button createButton;
     private ImageView pictureOfRoom;
     private String currentJoinSpinnerValue;
     private String currentLeaveSpinnerValue;
@@ -51,11 +57,14 @@ public class JoinOrLeave extends InteractionFragment{
         View view = inflater.inflate(R.layout.bookinginteraction_joinorleave, container, false);
 
         TextView roomNumberTextView = (TextView) view.findViewById(R.id.joinorleave_room_number);
-        Button createButton = (Button) view.findViewById(R.id.joinorleave_create_group_button);
+        createButton = (Button) view.findViewById(R.id.joinorleave_create_group_button);
         joinSpinner = (Spinner) view.findViewById(R.id.joinorleave_join_spinner);
         leaveSpinner = (Spinner) view.findViewById(R.id.joinorleave_leave_spinner);
-        Button leaveButton = (Button) view.findViewById(R.id.joinorleave_leave_grou_button);
-        Button joinButton = (Button) view.findViewById(R.id.joinorleave_join_button);
+        leaveButton = (Button) view.findViewById(R.id.joinorleave_leave_grou_button);
+        joinButton = (Button) view.findViewById(R.id.joinorleave_join_button);
+        joinProgressBar = (ProgressBar) view.findViewById(R.id.joinorleave_join_loadingbar);
+        leaveProgressBar = (ProgressBar) view.findViewById(R.id.joinorleave_leave_loadingbar);
+        createProgressBar = (ProgressBar) view.findViewById(R.id.joinorleave_create_loadingbar);
         errorTextView = (TextView) view.findViewById(R.id.joinorleave_error_text);
 
         pictureOfRoom = (ImageView) view.findViewById(R.id.room_landing_room_picture);
@@ -152,32 +161,47 @@ public class JoinOrLeave extends InteractionFragment{
                     @Override
                     public void call(BookingInteractionEvent bookingInteractionEvent) {
                         switch(bookingInteractionEvent.type) {
+                            case JOIN_OR_LEAVE_JOIN_RUNNING:
+                            case JOIN_OR_LEAVE_LEAVE_RUNNING:
+                                _hideJoinAndLeaveButtonsAndShowLoadingBars();
+                                _hideCreateButtonAndShowCreateLoadingBar();
+                                break;
                             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_RUNNING:
                                 HashMap<String, String> loadingSpinnerValues = new HashMap<>();
                                 loadingSpinnerValues.put("Loading...", "loading");
                                 _setupSpinnerWithValues(loadingSpinnerValues, loadingSpinnerValues);
+                                _hideJoinAndLeaveButtonsAndShowLoadingBars();
+                                _showCreateButtonAndHideCreateLoadingBar();
                                 break;
+
                             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR_NO_VALUES:
                                 Toast.makeText(getActivity(), R.string.ERROR_INVALID_EVENT, Toast.LENGTH_LONG).show();
                                 popFragmentBackstack();
                                 break;
+
                             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_ERROR:
                                 HashMap<String, String> errorSpinnerValues = new HashMap<>();
                                 errorSpinnerValues.put("ERROR", "error");
                                 _setupSpinnerWithValues(errorSpinnerValues, errorSpinnerValues);
                                 _showErrorMessage(bookingInteractionEvent.message);
+                                _showJoinAndLeaveButtonsAndHideLoadingBars();
+                                _showCreateButtonAndHideCreateLoadingBar();
                                 break;
+
                             case JOIN_OR_LEAVE_GETTING_SPINNER_VALUES_SUCCESS:
                                 _setupSpinnerWithValues(
                                         bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getLeft(),
                                         bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getMiddle());
                                 calendarDay = bookingInteractionEvent.joinOrLeaveGetSpinnerResult.getRight();
+                                _showJoinAndLeaveButtonsAndHideLoadingBars();
+                                _showCreateButtonAndHideCreateLoadingBar();
                                 break;
+
                             case JOIN_OR_LEAVE_JOIN_ERROR:
-                                _showErrorMessage(bookingInteractionEvent.message);
-                                break;
                             case JOIN_OR_LEAVE_LEAVE_ERROR:
                                 _showErrorMessage(bookingInteractionEvent.message);
+                                _showJoinAndLeaveButtonsAndHideLoadingBars();
+                                _showCreateButtonAndHideCreateLoadingBar();
                                 break;
 
                             // No default, should fall through
@@ -265,5 +289,29 @@ public class JoinOrLeave extends InteractionFragment{
         errorTextView.setVisibility(View.INVISIBLE);
         errorTextView.setText("");
         pictureOfRoom.setAlpha(FULLY_VISIBLE);
+    }
+
+    private void _hideJoinAndLeaveButtonsAndShowLoadingBars() {
+        joinButton.setVisibility(View.INVISIBLE);
+        leaveButton.setVisibility(View.INVISIBLE);
+        joinProgressBar.setVisibility(View.VISIBLE);
+        leaveProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void _showJoinAndLeaveButtonsAndHideLoadingBars() {
+        joinButton.setVisibility(View.VISIBLE);
+        leaveButton.setVisibility(View.VISIBLE);
+        joinProgressBar.setVisibility(View.INVISIBLE);
+        leaveProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void _showCreateButtonAndHideCreateLoadingBar() {
+        createButton.setVisibility(View.VISIBLE);
+        createProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    private void _hideCreateButtonAndShowCreateLoadingBar() {
+        createButton.setVisibility(View.INVISIBLE);
+        createProgressBar.setVisibility(View.VISIBLE);
     }
 }

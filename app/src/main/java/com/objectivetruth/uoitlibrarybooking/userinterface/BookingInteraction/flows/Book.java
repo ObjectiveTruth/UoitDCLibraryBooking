@@ -14,14 +14,13 @@ import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEvent;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequest;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventUserRequestType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.requestoptions.BookRequestOptions;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.common.InteractionFragment;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 
@@ -38,6 +37,8 @@ public class Book extends InteractionFragment{
 
     private EditText groupNameET;
     private EditText groupCodeET;
+    private ProgressBar createProgressBar;
+    private Button createButton;
     private ImageButton groupCodeInfoImageButton;
     private TextView errorTextView;
     private ImageView pictureOfRoom;
@@ -56,6 +57,7 @@ public class Book extends InteractionFragment{
         pictureOfRoom = (ImageView) view.findViewById(R.id.bookingInteraction_book_room_picture);
         groupCodeET = (EditText) view.findViewById(R.id.book_group_code_actual);
         groupNameET = (EditText) view.findViewById(R.id.bookingInteraction_book_groupname);
+        createProgressBar = (ProgressBar) view.findViewById(R.id.bookingInteraction_book_create_loadingbar);
 
         TextView roomNumberTextView = (TextView) view.findViewById(R.id.bookingInteraction_book_roomnumber);
         if(roomNumberTextView != null) {roomNumberTextView.setText(timeCell.param_room.toUpperCase());}
@@ -63,7 +65,7 @@ public class Book extends InteractionFragment{
         ImageButton commentButton = (ImageButton) view.findViewById(R.id.bookingInteraction_book_comment_button);
         _setupCommentButton(commentButton);
 
-        Button createButton = (Button) view.findViewById(R.id.bookingInteraction_book_create_button);
+        createButton = (Button) view.findViewById(R.id.bookingInteraction_book_create_button);
         _setupCreateButton(createButton);
 
         groupCodeInfoImageButton = (ImageButton) view.findViewById(R.id.bookingInteraction_book_group_code_info);
@@ -84,16 +86,24 @@ public class Book extends InteractionFragment{
 
     protected void setupViewBindings() {
         subscriptions.add(bookingInteractionModel.getBookingInteractionEventObservable()
-                .filter(new Func1<BookingInteractionEvent, Boolean>() {
-                    @Override
-                    public Boolean call(BookingInteractionEvent bookingInteractionEvent) {
-                        return bookingInteractionEvent.type == BookingInteractionEventType.BOOK_ERROR;
-                    }
-                })
+                .observeOn(AndroidSchedulers.mainThread())
+
                 .subscribe(new Action1<BookingInteractionEvent>() {
                     @Override
                     public void call(BookingInteractionEvent bookingInteractionEvent) {
-                        _showErrorMessage(bookingInteractionEvent.message);
+                        switch(bookingInteractionEvent.type) {
+                            case BOOK_ERROR:
+                                _showErrorMessage(bookingInteractionEvent.message);
+                                _showCreateButtonHideLoading();
+                                break;
+                            case BOOK_RUNNING:
+                                _hideCreateButtonShowLoading();
+                                break;
+                            case BOOK:
+                                _showCreateButtonHideLoading();
+                                break;
+
+                        }
                     }
                 }));
     }
@@ -276,5 +286,15 @@ public class Book extends InteractionFragment{
             YoYo.with(Techniques.Shake).delay(100).duration(900).playOn(groupCodeET);
             YoYo.with(Techniques.Shake).delay(100).duration(900).playOn(groupCodeInfoImageButton);
         }
+    }
+
+    private void _hideCreateButtonShowLoading() {
+        createButton.setVisibility(View.INVISIBLE);
+        createProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void _showCreateButtonHideLoading() {
+        createButton.setVisibility(View.VISIBLE);
+        createProgressBar.setVisibility(View.INVISIBLE);
     }
 }
