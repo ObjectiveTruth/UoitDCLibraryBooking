@@ -80,54 +80,6 @@ public class MainActivity extends ActivityBase {
         return getActionBarDrawerToggle().onOptionsItemSelected(item);
 	}
 
-/*	@Override
-	public void LaunchRoomInteraction(CookieManager cookieManager, String roomNumber, String date, String viewState, String eventValidation,
-			int shareRow, int shareColumn, int pageNumberInt, String viewStateGenerator){
-			
-		Intent intent = new Intent(this, ActivityRoomInteraction.class);
-		intent.putExtra("type", "createbooking");
-		intent.putExtra("date", date);
-		intent.putExtra("room", roomNumber);
-		intent.putExtra("shareRow", shareRow);
-		intent.putExtra("shareColumn", shareColumn);
-		intent.putExtra("pageNumberInt", pageNumberInt);
-		intent.putExtra("viewState", viewState);
-		intent.putExtra("eventValidation", eventValidation);
-        intent.putExtra("viewStateGenerator", viewStateGenerator);
-		MainActivity.cookieManager = cookieManager;
-		
-		startActivity(intent);
-	}
-	@Override
-	public void LaunchViewLeaveOrJoin(CookieManager cookieManager,
-			String roomNumber, String date, String groupName, String groupCode, String timeRange,
-			String institution, String notes, String currentViewState,
-			String currentEventValidation,
-			int shareRow, int shareColumn, int pageNumberInt,
-            String viewStateGenerator){
-		Intent intent = new Intent(this, ActivityRoomInteraction.class);
-		intent.putExtra("type", "viewleaveorjoin");
-		intent.putExtra("groupName", groupName);
-		intent.putExtra("date", date);
-		intent.putExtra("room", roomNumber);
-		intent.putExtra("shareRow", shareRow);
-		intent.putExtra("shareColumn", shareColumn);
-		intent.putExtra("pageNumberInt", pageNumberInt);
-		intent.putExtra("groupCode", groupCode);
-		intent.putExtra("viewState", currentViewState);
-		intent.putExtra("eventValidation", currentEventValidation);
-		intent.putExtra("timeRange", timeRange);
-		intent.putExtra("institution", institution);
-		intent.putExtra("notes", notes);
-        intent.putExtra("viewStateGenerator", viewStateGenerator);
-		MainActivity.cookieManager = cookieManager;
-		
-		
-		
-		startActivity(intent);
-		
-	}*/
-
 	private void _goToScreenByMenuID(int menuItemResourceID) {
 		MenuItem initialMenuItem = getDrawerView().getMenu().findItem(menuItemResourceID);
 		selectDrawerItem(initialMenuItem);

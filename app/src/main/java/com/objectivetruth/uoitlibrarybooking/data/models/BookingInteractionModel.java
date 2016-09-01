@@ -108,13 +108,12 @@ public class BookingInteractionModel {
     private void _executeBasedOnUserRequestType(Pair<BookingInteractionEventUserRequest, MyAccountDataLoginState> pair) {
         BookingInteractionEventUserRequest userRequest = pair.first;
         MyAccountDataLoginState loginState = pair.second;
-        if(loginState.type == MyAccountDataLoginStateType.SIGNED_IN) {
-            switch(userRequest.type) {
+        if(userRequest.type == BookingInteractionEventUserRequestType.JOINORLEAVE_GETTING_SPINNER_VALUES_REQUEST) {
+            _doJoinOrLeaveGettingSpinnerValuesRequest(userRequest);
+        }else if(loginState.type == MyAccountDataLoginStateType.SIGNED_IN) {
+            switch (userRequest.type) {
                 case BOOK_REQUEST:
                     _doBookRequest(userRequest);
-                    break;
-                case JOINORLEAVE_GETTING_SPINNER_VALUES_REQUEST:
-                    _doJoinOrLeaveGettingSpinnerValuesRequest(userRequest);
                     break;
                 case JOINORLEAVE_LEAVE_REQUEST:
                     _doJoinOrLeaveLeaveRequest(userRequest);
