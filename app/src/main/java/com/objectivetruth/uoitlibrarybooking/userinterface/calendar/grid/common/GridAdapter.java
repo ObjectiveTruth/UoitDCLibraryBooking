@@ -8,7 +8,6 @@ import android.widget.TextView;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
-import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionEventType;
 import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionScreenLoadEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
@@ -18,6 +17,7 @@ import timber.log.Timber;
 import javax.inject.Inject;
 import java.util.Random;
 
+import static com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.common.Utils.getBookingInteractionEventTypeBasedOnTimeCell;
 import static com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCellType.BOOKING_CONFIRMED;
 
 public class GridAdapter extends FixedTableAdapter {
@@ -219,21 +219,9 @@ public class GridAdapter extends FixedTableAdapter {
             Timber.i("Clicked: " + timeCell.toString());
             bookingInteractionModel.getBookingInteractionScreenLoadEventPublishSubject().onNext(
                     new BookingInteractionScreenLoadEvent(timeCell,
-                            _getBookingInteractionEventTypeBasedOnTimeCell(timeCell),
+                            getBookingInteractionEventTypeBasedOnTimeCell(timeCell),
                     calendarDay.extDayOfMonthNumber, calendarDay.extMonthWord));
         }
     }
 
-    private static BookingInteractionEventType _getBookingInteractionEventTypeBasedOnTimeCell(TimeCell timeCell) {
-        switch(timeCell.param_next) {
-            case "book.aspx":
-                return BookingInteractionEventType.BOOK;
-            case "joinorleave.aspx":
-                return BookingInteractionEventType.JOIN_OR_LEAVE;
-            case "viewleaveorjoin.aspx":
-                return BookingInteractionEventType.VIEWLEAVEORJOIN;
-            default:
-                return BookingInteractionEventType.UNKNOWN;
-        }
-    }
 }

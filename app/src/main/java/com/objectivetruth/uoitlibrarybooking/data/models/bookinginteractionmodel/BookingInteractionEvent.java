@@ -21,4 +21,16 @@ public class BookingInteractionEvent {
         this.dayOfMonthNumber = dayOfMonthNumber;
         this.monthWord = monthWord;
     }
+
+    @Override
+    public String toString() {
+        return "BookingInteractionEvent{" +
+                "timeCell=" + timeCell +
+                ", type=" + type +
+                ", dayOfMonthNumber='" + dayOfMonthNumber + '\'' +
+                ", monthWord='" + monthWord + '\'' +
+                ", message='" + message + '\'' +
+                ", joinOrLeaveGetSpinnerResult=" + joinOrLeaveGetSpinnerResult +
+                '}';
+    }
 }

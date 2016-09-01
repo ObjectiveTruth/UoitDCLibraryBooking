@@ -7,10 +7,7 @@ import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebService;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.*;
-import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows.Book;
-import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows.JoinOrLeave;
-import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows.Success;
-import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows.ViewLeaveOrJoin;
+import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows.*;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.Grid;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.common.GridAdapter;
@@ -37,6 +34,7 @@ public interface AppComponent {
     void inject(MyAccountLoaded myAccountLoaded);
     void inject(JoinOrLeave joinOrLeave);
     void inject(ViewLeaveOrJoin viewLeaveOrJoin);
+    void inject(CredentialsLogin credentialsLogin);
     void inject(Success success);
     void inject(GridAdapter gridAdapter);
     void inject(Book book);
