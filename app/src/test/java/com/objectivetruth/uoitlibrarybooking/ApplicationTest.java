@@ -1,22 +1,23 @@
 package com.objectivetruth.uoitlibrarybooking;
 
+import com.objectivetruth.uoitlibrarybooking.statelessutilities.Triple;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 
 public class ApplicationTest {
-    private SillyNameValuePairClass mSillyNameValuePairClass;
+    private Triple<String, String, String> triple;
 
     @Before
     public void setUp() throws Exception {
-        mSillyNameValuePairClass = new SillyNameValuePairClass("", "", "", "");
+        triple = new Triple<>("foo", "", "");
     }
 
 
     @Test
-    public void sillyNameValuePair_emptyArguments_isNotEmpty() {
-        assertFalse(mSillyNameValuePairClass.toString().isEmpty());
+    public void tripleInitializingIsNotEmpty() {
+        assertFalse(triple.getLeft().isEmpty());
     }
 }
 

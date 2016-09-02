@@ -15,4 +15,7 @@ public class SHARED_PREFERENCES_KEYS {
     public static final String USER_INSTITUTION = "shared_pref_institution";
     public static final String USER_DATA_JSON = "user_data_json";
     public static final String CALENDAR_DATA_JSON = "user_data_json";
+
+    public static final String DEBUG_SHOULD_MOCK_HTTP_CALLS = "DEBUG_SHOULD_MOCK_HTTP_CALLS";
+    public static final String DEBUG_DUMP_SHARED_PREFERENCES_BUTTON = "DEBUG_DUMP_SHARED_PREFERENCES_BUTTON";
 }

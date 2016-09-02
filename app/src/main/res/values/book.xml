@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="BOOK_STR_ARRAY_DURATION_SPINNER_VALUES">
+        <item>0.5</item>
+        <item>1</item>
+        <item>1.5</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="BOOK_STR_ARRAY_DURATION_SPINNER_LABELS">
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>1 hour and 30 minutes</item>
+        <item>2 hours</item>
+    </string-array>
+
+    <string-array name="BOOK_STR_ARRAY_INSTITUTION_SPINNER_LABELS">
+        <item>Select School</item>
+        <item>UOIT</item>
+        <item>Durham College</item>
+    </string-array>
+</resources>

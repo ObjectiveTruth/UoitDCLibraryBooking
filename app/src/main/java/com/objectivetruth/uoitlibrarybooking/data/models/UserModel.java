@@ -104,7 +104,7 @@ public class UserModel {
             @Override
             public void call(UserCredentials userCredentials) {
                 UserCredentials userCredentialsToUse =
-                        userCredentials == null ?  _getUserCredentialsFromStorage() : userCredentials;
+                        userCredentials == null ?  getUserCredentialsFromStorage() : userCredentials;
                 if(isASigninRequestRunning()) {Timber.d("Signin request is already running, ignoring request"); return;}
 
                 Timber.d("Running a new request for Signin since none are running");
@@ -235,7 +235,7 @@ public class UserModel {
                 .commit();
     }
 
-    private UserCredentials _getUserCredentialsFromStorage() {
+    public UserCredentials getUserCredentialsFromStorage() {
         Timber.d("Getting user's credentials from storage");
         UserCredentials userCredentials = new UserCredentials(
                 userSharedPreferences.getString(USER_USERNAME, ""),

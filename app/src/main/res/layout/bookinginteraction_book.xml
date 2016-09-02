@@ -1,0 +1,132 @@
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+        <ImageView
+            android:id="@+id/bookingInteraction_book_room_picture"
+            android:layout_width="350dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="Picture of the room"
+            android:scaleType="centerCrop"
+            android:visibility="visible"
+            android:src="@drawable/unknown_room" />
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/textView1"
+            android:layout_below="@+id/bookingInteraction_book_room_picture"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="right"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/bookingInteraction_book_room_picture"
+            android:layout_marginLeft="110dp"
+            android:text="Room: "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/bookingInteraction_book_roomnumber"
+            android:layout_width="wrap_content"
+            android:layout_alignTop="@+id/textView1"
+            android:layout_below="@+id/bookingInteraction_book_room_picture"
+            android:layout_toRightOf="@+id/textView1"
+            android:layout_marginLeft="10dp"
+            android:textColor="#0099CC"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:text="LIB999"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:layout_marginTop="20dp"
+            android:id="@+id/bookingInteraction_book_error_text"
+            android:visibility="invisible"
+            android:layout_width="350dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:minLines="3"
+            android:textColor="@color/booked_red"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="center_horizontal"
+            android:text="@string/error_room_no_exist_comment" />
+
+        <EditText
+            android:id="@+id/bookingInteraction_book_groupname"
+            android:layout_width="200dp"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/textView1"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:text="fooba"
+            android:digits="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:maxLength="10"
+            android:hint="Group Name" />
+
+        <EditText
+            android:id="@+id/book_group_code_actual"
+            android:layout_width="200dp"
+            android:layout_marginTop="20dp"
+            android:text="3421"
+            android:digits="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            android:layout_below="@+id/bookingInteraction_book_groupname"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:textColorHint="@color/dark_light"
+            android:inputType="textNoSuggestions"
+            android:maxLength="4"
+            android:hint="Code" />
+
+        <ImageButton
+            style="@style/edittext_info"
+            android:id="@+id/bookingInteraction_book_group_code_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/book_group_code_actual"
+            android:layout_toRightOf="@+id/book_group_code_actual" />
+
+        <Spinner
+            android:id="@+id/book_spinner_duration"
+            android:layout_width="200dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_below="@+id/book_group_code_actual"
+            android:layout_centerHorizontal="true"/>
+
+        <Button
+            style="@style/flat_ui_button"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/bookingInteraction_book_create_button"
+            android:layout_below="@+id/book_spinner_duration"
+            android:layout_alignLeft="@+id/bookingInteraction_book_room_picture"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="25dp"
+            android:text="Create Group" />
+
+        <ImageButton
+            android:id="@+id/bookingInteraction_book_comment_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/comment_button_selector"
+            android:layout_alignTop="@+id/bookingInteraction_book_create_button"
+            android:layout_toRightOf="@+id/bookingInteraction_book_create_button"
+            android:layout_marginLeft="50dp" />
+        <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:id="@+id/bookingInteraction_book_create_loadingbar"
+                android:layout_alignParentBottom="true"
+                android:layout_alignLeft="@+id/bookingInteraction_book_create_button"
+                android:layout_alignStart="@+id/bookingInteraction_book_create_button"
+                android:layout_toLeftOf="@+id/bookingInteraction_book_comment_button"
+                android:layout_toStartOf="@+id/bookingInteraction_book_comment_button"/>
+    </RelativeLayout>
+</ScrollView>

@@ -5,9 +5,15 @@ import android.os.Parcelable;
 
 public class TimeCell implements Parcelable {
     public TimeCellType timeCellType;
-    public String hrefSource;
     public String groupNameForWhenFullyBookedRoom;
     public String timeStringOrRoomName;
+    // Used when doing the interactions with the server
+    public String param_next;
+    public String param_get_link;
+    public String param_starttime;
+    public String param_room;
+    public String param_eventargument;
+    public String param_eventtarget;
 
     @Override
     public String toString() {
@@ -15,8 +21,23 @@ public class TimeCell implements Parcelable {
         returnString += "timeCellType: ";
         if(notNull(timeCellType)) {returnString += timeCellType.name() + ", ";} else {returnString += "NULL, ";}
 
-        returnString += "hrefSource: ";
-        if(notNull(hrefSource)) {returnString += hrefSource + ", ";} else {returnString += "NULL, ";}
+        returnString += "param_get_link: ";
+        if(notNull(param_get_link)) {returnString += param_get_link + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "param_next: ";
+        if(notNull(param_next)) {returnString += param_next + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "param_starttime: ";
+        if(notNull(param_starttime)) {returnString += param_starttime + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "param_room: ";
+        if(notNull(param_room)) {returnString += param_room + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "param_eventargument: ";
+        if(notNull(param_eventargument)) {returnString += param_eventargument + ", ";} else {returnString += "NULL, ";}
+
+        returnString += "param_eventtarget: ";
+        if(notNull(param_eventtarget)) {returnString += param_eventtarget + ", ";} else {returnString += "NULL, ";}
 
         returnString += "groupNameForWhenFullyBookedRoom: ";
         if(notNull(groupNameForWhenFullyBookedRoom))
@@ -40,7 +61,12 @@ public class TimeCell implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.timeCellType == null ? -1 : this.timeCellType.ordinal());
-        dest.writeString(this.hrefSource);
+        dest.writeString(this.param_next);
+        dest.writeString(this.param_get_link);
+        dest.writeString(this.param_starttime);
+        dest.writeString(this.param_room);
+        dest.writeString(this.param_eventargument);
+        dest.writeString(this.param_eventtarget);
         dest.writeString(this.groupNameForWhenFullyBookedRoom);
         dest.writeString(this.timeStringOrRoomName);
     }
@@ -51,7 +77,12 @@ public class TimeCell implements Parcelable {
     protected TimeCell(Parcel in) {
         int tmpTimeCellType = in.readInt();
         this.timeCellType = tmpTimeCellType == -1 ? null : TimeCellType.values()[tmpTimeCellType];
-        this.hrefSource = in.readString();
+        this.param_next = in.readString();
+        this.param_get_link = in.readString();
+        this.param_starttime = in.readString();
+        this.param_room = in.readString();
+        this.param_eventargument = in.readString();
+        this.param_eventtarget = in.readString();
         this.groupNameForWhenFullyBookedRoom = in.readString();
         this.timeStringOrRoomName = in.readString();
     }

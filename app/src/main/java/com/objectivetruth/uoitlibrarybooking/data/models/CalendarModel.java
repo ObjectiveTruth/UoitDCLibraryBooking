@@ -233,7 +233,8 @@ public class CalendarModel {
                         // Pass it through if there's no days
                         if(calendarData == null) {return Observable.just(null);}
 
-                        return Observable.just(_addComputedHashCodeToCalendarData(calendarData));
+                        CalendarData output = _addComputedHashCodeToCalendarData(calendarData);
+                        return Observable.just(output);
                     }
                 })
 

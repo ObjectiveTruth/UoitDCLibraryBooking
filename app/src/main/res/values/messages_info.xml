@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="INFO_BOOKING_INTERACTION_BOOK_GROUPCODE_INFO_PARAGRAPH">
+        4 length code used by the library booking system to uniquely identify your booking.\n\n
+        Can contain only alphaneumeric characters (letters and/or numbers)
+    </string>
+    <string name="INFO_BOOKING_INTERACTION_BOOK_GROUPCODE_INFO_TITLE">Group Code</string>
+
+    <string name="INFO_BOOKING_INTERACTION_BOOK_COMMENT_INFO_PARAGRAPH">
+        Visible in the library system to all users
+    </string>
+    <string name="INFO_BOOKING_INTERACTION_BOOK_COMMENT_INFO_TITLE">Add Comment</string>
+</resources>

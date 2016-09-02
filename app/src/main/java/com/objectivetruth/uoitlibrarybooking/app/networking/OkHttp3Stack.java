@@ -47,13 +47,9 @@ import java.util.concurrent.TimeUnit;
  * use okhttp-urlconnection
  */
 public class OkHttp3Stack implements HttpStack {
-    private CustomCookieJar customCookieJar;
     final static private String USER_AGENT_VALUE =
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:46.0) Gecko/20100101 Firefox/46.0";
-
-    public OkHttp3Stack() {
-        customCookieJar = new CustomCookieJar();
-    }
+    private CookieJar cookieJar = new CustomCookieJar();
 
     @Override
     public HttpResponse performRequest(com.android.volley.Request<?> request, Map<String, String> additionalHeaders)
@@ -61,12 +57,13 @@ public class OkHttp3Stack implements HttpStack {
         String USER_AGENT_KEY_NAME = "User-Agent";
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        //clientBuilder.cookieJar(customCookieJar);
         int timeoutMs = request.getTimeoutMs();
 
         clientBuilder.connectTimeout(timeoutMs, TimeUnit.MILLISECONDS);
         clientBuilder.readTimeout(timeoutMs, TimeUnit.MILLISECONDS);
         clientBuilder.writeTimeout(timeoutMs, TimeUnit.MILLISECONDS);
+        //clientBuilder.followRedirects(false);
+        clientBuilder.cookieJar(cookieJar);
 
         okhttp3.Request.Builder okHttpRequestBuilder = new okhttp3.Request.Builder();
         okHttpRequestBuilder.url(request.getUrl());

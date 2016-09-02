@@ -29,10 +29,6 @@ public class CalendarLoaded extends Fragment {
         ViewPager _mViewPager = (ViewPager) calendarLoadedView.findViewById(R.id.calendar_view_pager);
         TabLayout _mTabLayout = (TabLayout) calendarLoadedView.findViewById(R.id.calendar_tab_layout);
 
-        if(savedInstanceState != null) {
-            _restorePreviousState(savedInstanceState);
-        }
-
         // Will supply the ViewPager with what should be displayed
         _mPagerAdapter = new CalendarPagerAdapter(getChildFragmentManager(), calendarData);
         _mViewPager.setAdapter(_mPagerAdapter);
@@ -50,6 +46,14 @@ public class CalendarLoaded extends Fragment {
         return calendarLoadedToReturn;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        if(savedInstanceState != null) {
+            _restorePreviousState(savedInstanceState);
+        }
+        super.onCreate(savedInstanceState);
+    }
+
     /**
      * Compares the data that's being passed in with the data currently stored in the fragment, if its different, then
      * a redraw/refresh takes place, otherwise, does nothing
@@ -60,15 +64,19 @@ public class CalendarLoaded extends Fragment {
         // Only other case is if both are null, in which case, do nothing
         if(this.calendarData != null &&
                 this.calendarData.isNOTEqualTo(calendarData)) {
+            Timber.d("CalendarData for THIS instance has changed, will update the UI. Hash: " +
+                    calendarData.computedHashCode);
 
             _mPagerAdapter.saveInformationAndUpdatePagerFragmentUI(calendarData);
 
         }else if(calendarData != null &&
                 calendarData.isNOTEqualTo(this.calendarData)) {
-
+            Timber.d("CalendarData for THIS instance has changed, will update the UI. Hash: " +
+                    calendarData.computedHashCode);
             _mPagerAdapter.saveInformationAndUpdatePagerFragmentUI(calendarData);
         }else{
-            Timber.d("CalendarData for THIS instance has not changed, will NOT update UI");
+            Timber.d("CalendarData for THIS instance has NOT changed, will NOT update UI. Hash: " +
+                    calendarData.computedHashCode);
             _mPagerAdapter.saveInformationAndDONTUpdatePagerFragmentUI(calendarData);
         }
         this.calendarData = calendarData;

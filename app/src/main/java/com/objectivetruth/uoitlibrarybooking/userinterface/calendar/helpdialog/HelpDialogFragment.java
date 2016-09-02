@@ -17,7 +17,7 @@ public class HelpDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Timber.d("Help Dialog being created...");
-        View rootView = inflater.inflate(R.layout.diafrag_help, container, false);
+        View rootView = inflater.inflate(R.layout.calendar_dialog_help, container, false);
         Button okButton = (Button) rootView.findViewById(R.id.help_ok_button);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override

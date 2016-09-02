@@ -10,4 +10,13 @@ public class MyAccountDataLoginState {
         this.userData = userData;
         this.exception = exception;
     }
+
+    @Override
+    public String toString() {
+        return "MyAccountDataLoginState{" +
+                "type=" + type +
+                ", exception=" + exception +
+                ", userData=" + userData +
+                '}';
+    }
 }

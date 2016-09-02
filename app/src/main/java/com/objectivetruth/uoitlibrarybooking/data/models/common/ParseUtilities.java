@@ -18,7 +18,7 @@ public class ParseUtilities {
         int offsetOfBeginningSearchTerm = beginingSearchTerm.length();
 
         int startSearchResult = original.indexOf(beginingSearchTerm);
-        int endSearchResult = original.indexOf(endSearchTerm, startSearchResult + 1);
+        int endSearchResult = original.indexOf(endSearchTerm, startSearchResult + offsetOfBeginningSearchTerm);
 
         int startOfResultString = startSearchResult + offsetOfBeginningSearchTerm;
 

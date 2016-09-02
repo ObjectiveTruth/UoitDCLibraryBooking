@@ -31,15 +31,16 @@ import java.util.Set;
 import static com.objectivetruth.uoitlibrarybooking.common.constants.FragmentTags.*;
 
 public abstract class ActivityBase extends AppCompatActivity {
-    protected abstract String                           getActivityTitle();
     private ActionBarDrawerToggle _mDrawerToggle;
     private DrawerLayout _mDrawerLayout;
     private HashMap<String, Fragment> stringFragmentHashMap = new HashMap<String, Fragment>();
     private int _lastMenuItemIDRequested;
     private boolean _isFirstTimeSelectDrawerItem = true;
     private NavigationView navigationView;
-    private String LAST_MENU_ITEM_ID_REQUESTED_BUNDLE_KEY = "LAST_MENU_ITEM_ID_REQUESTED";
-    private String MAIN_FRAGMENT_TAGS_BUNDLE_KEY = "MAIN_FRAGMENT_TAGS_BUNDLE_KEY";
+    private String BUNDLE_KEY_LAST_MENU_ITEM_ID_REQUESTED = "LAST_MENU_ITEM_ID_REQUESTED";
+    private String BUNDLE_KEY_MAIN_FRAGMENT_TAGS = "BUNDLE_KEY_MAIN_FRAGMENT_TAGS";
+    private String BUNDLE_KEY_IS_A_NON_DRAWER_SCREEN_SHOWING = "BUNDLE_KEY_IS_A_NON_DRAWER_SCREEN_SHOWING";
+    private boolean _isANonDrawerScreenShowing = false;
     private boolean isFirstLoadThisSession = false;
 
     @Override
@@ -81,14 +82,14 @@ public abstract class ActivityBase extends AppCompatActivity {
         if(getSupportActionBar() != null) {
             // enable ActionBar app icon to behave as any action menu item to toggle nav drawer
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(getActivityTitle());
         }
     }
 
     private void _restorePreviousInstanceInformation(Bundle savedInstanceState) {
-        _lastMenuItemIDRequested = savedInstanceState.getInt(LAST_MENU_ITEM_ID_REQUESTED_BUNDLE_KEY);
+        _lastMenuItemIDRequested = savedInstanceState.getInt(BUNDLE_KEY_LAST_MENU_ITEM_ID_REQUESTED);
+        _isANonDrawerScreenShowing = savedInstanceState.getBoolean(BUNDLE_KEY_IS_A_NON_DRAWER_SCREEN_SHOWING);
 
-        String[] previousFragmentTags = savedInstanceState.getStringArray(MAIN_FRAGMENT_TAGS_BUNDLE_KEY);
+        String[] previousFragmentTags = savedInstanceState.getStringArray(BUNDLE_KEY_MAIN_FRAGMENT_TAGS);
         stringFragmentHashMap = new HashMap<String, Fragment>(); // Android destroyed the previous HashMap. Must rebuild
         for(String fragTag: previousFragmentTags) {
             stringFragmentHashMap.put(fragTag, null);
@@ -157,8 +158,24 @@ public abstract class ActivityBase extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         String[] mainFragmentTags = _stringSetToStringArray(stringFragmentHashMap.keySet());
 
-        outState.putInt (LAST_MENU_ITEM_ID_REQUESTED_BUNDLE_KEY, _lastMenuItemIDRequested);
-        outState.putStringArray(MAIN_FRAGMENT_TAGS_BUNDLE_KEY, mainFragmentTags);
+        outState.putInt (BUNDLE_KEY_LAST_MENU_ITEM_ID_REQUESTED, _lastMenuItemIDRequested);
+        outState.putBoolean(BUNDLE_KEY_IS_A_NON_DRAWER_SCREEN_SHOWING, _isANonDrawerScreenShowing);
+        outState.putStringArray(BUNDLE_KEY_MAIN_FRAGMENT_TAGS, mainFragmentTags);
+    }
+
+    /**
+     * Tells the Activity that a non-drawer related screen is currently showing, this will give it a hint that
+     * it should NOT track the last item being shown. This is important for when app comma happens (everything is fully
+     * destroyed and needs to be created). This is because the other screen will handle the backstack itself.
+     * @see com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.BookingInteraction
+     * @param isANonDrawerScreenShowing
+     */
+    public void setIsNonDrawerScreenShowing(boolean isANonDrawerScreenShowing) {
+        _isANonDrawerScreenShowing = isANonDrawerScreenShowing;
+    }
+
+    protected boolean areOnlyDrawerRelatedScreensShowing() {
+        return !_isANonDrawerScreenShowing;
     }
 
     private String[] _stringSetToStringArray(Set<String> strings) {
@@ -314,6 +331,10 @@ public abstract class ActivityBase extends AppCompatActivity {
         }
     }
 
+    protected FragmentTransaction addHidingOfAllCurrentFragmentsToTransaction(FragmentTransaction fragmentTransaction) {
+        return _addHideAllVisibleFragmentsToFragmentTransaction(stringFragmentHashMap, fragmentTransaction);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -345,6 +366,25 @@ public abstract class ActivityBase extends AppCompatActivity {
     private void _closeNavDrawer() {
         if (_mDrawerLayout != null) {
             _mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    public void setDrawerState(boolean isEnabled) {
+        if ( isEnabled ) {
+            _mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
+            if(getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+            getActionBarDrawerToggle().syncState();
+        }
+        else {
+            _mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+            if(getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            }
+            getActionBarDrawerToggle().syncState();
         }
     }
 }

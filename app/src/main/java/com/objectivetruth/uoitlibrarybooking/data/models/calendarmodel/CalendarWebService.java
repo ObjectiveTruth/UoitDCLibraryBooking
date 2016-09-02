@@ -11,6 +11,7 @@ import rx.functions.Func0;
 import rx.functions.FuncN;
 import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -18,13 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class CalendarWebService {
-    RequestQueue requestQueue;
-    final private static String UOIT_LIBRARY_MAIN_CALENDAR_URL =
-            "https://rooms.library.dc-uoit.ca/dc_studyrooms/calendar.aspx";
+import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.MAIN_CALENDAR_URL;
 
-    public CalendarWebService(UOITLibraryBookingApp mApplication, RequestQueue requestQueue) {
-        this.requestQueue = requestQueue;
+public class CalendarWebService {
+    @Inject RequestQueue requestQueue;
+
+    public CalendarWebService(UOITLibraryBookingApp mApplication) {
+        mApplication.getComponent().inject(this);
     }
 
     public Observable<String> getRawInitialWebPageObs() {
@@ -34,7 +35,7 @@ public class CalendarWebService {
                 try {
                     return Observable.just(_getRawInitialWebpage());
                 } catch (InterruptedException | ExecutionException e) {
-                    Timber.e(e, "Error while trying to load main uoitlibrary webpage");
+                    Timber.w(e, "Error while trying to load main uoitlibrary webpage");
                     return Observable.error(e);
                 }
             }
@@ -68,6 +69,45 @@ public class CalendarWebService {
         });
     }
 
+    public Observable<String> getRawClickableCalendarDayPageUsingCalendarDay(final CalendarDay calendarDay) {
+        return Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                try {
+                    return Observable.just(_getRawCalendarDayPage(calendarDay));
+                } catch (InterruptedException | ExecutionException e) {
+                    Timber.w(e, "Error while getting raw clickable date" + calendarDay.toString());
+                    return Observable.error(e);
+                }
+            }
+        });
+    }
+
+    private String _getRawCalendarDayPage(final CalendarDay calendarDay)
+            throws InterruptedException, ExecutionException{
+        Timber.d("Starting the POST request to the clickable date " + calendarDay.extDayOfMonthNumber + "...");
+        RequestFuture<String> future = RequestFuture.newFuture();
+        StringRequest stringRequest =
+                new StringRequest(Request.Method.POST, MAIN_CALENDAR_URL, future, future) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String>  headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/x-www-form-urlencoded");
+                        headers.put("Referer", MAIN_CALENDAR_URL);
+                        return headers;
+                    }
+
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        return _getBodyInBytesForCalendarDayData(calendarDay);
+                    }
+                };
+        requestQueue.add(stringRequest);
+        String rawWebPage = future.get();
+        Timber.i("POST request finished when searching for cookie on day: " + calendarDay.extDayOfMonthNumber);
+        return rawWebPage;
+    }
+
     /**
      * Returns an observable that gets the raw Webpage for 1 clickable calendarday
      * @param calendarDay
@@ -81,7 +121,7 @@ public class CalendarWebService {
                 try {
                     return Observable.just(_getRawClickableDateWebPage(calendarDay, calendarData));
                 } catch (InterruptedException | ExecutionException e) {
-                    Timber.e(e, "Error while trying to load a clickable date here was the contents: " +
+                    Timber.w(e, "Error while trying to load a clickable date here was the contents: " +
                             calendarDay.toString());
                     return Observable.error(e);
                 }
@@ -100,7 +140,7 @@ public class CalendarWebService {
         Timber.i("Starting the POST request to the clickable date " + calendarDay.extDayOfMonthNumber + "...");
         RequestFuture<String> future = RequestFuture.newFuture();
         StringRequest stringRequest =
-                new StringRequest(Request.Method.POST, UOIT_LIBRARY_MAIN_CALENDAR_URL, future, future) {
+                new StringRequest(Request.Method.POST, MAIN_CALENDAR_URL, future, future) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String>  headers = new HashMap<String, String>();
@@ -114,8 +154,9 @@ public class CalendarWebService {
                     }
                 };
         requestQueue.add(stringRequest);
+        String rawWebpage = future.get();
         Timber.i("POST request finished for clickable date " + calendarDay.extDayOfMonthNumber);
-        return future.get();
+        return rawWebpage;
     }
 
     /**
@@ -128,7 +169,7 @@ public class CalendarWebService {
         Timber.i("Starting the GET request to the initial uoitlibrary webpage...");
         RequestFuture<String> future = RequestFuture.newFuture();
         StringRequest stringRequest =
-                new StringRequest(Request.Method.GET, UOIT_LIBRARY_MAIN_CALENDAR_URL, future, future) {
+                new StringRequest(Request.Method.GET, MAIN_CALENDAR_URL, future, future) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String>  headers = new HashMap<String, String>();
@@ -138,8 +179,9 @@ public class CalendarWebService {
         };
 
         requestQueue.add(stringRequest);
+        String rawWebpage = future.get();
         Timber.i("GET request to the initial uoitlibrary webpage finished");
-        return future.get();
+        return rawWebpage;
     }
 
     /**
@@ -175,5 +217,4 @@ public class CalendarWebService {
         }
 
     }
-
 }

@@ -3,10 +3,7 @@ package com.objectivetruth.uoitlibrarybooking.data.models;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDataRefreshState;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarWebService;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.RefreshActivateEvent;
-import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.ScrollAtTopOfGridEvent;
+import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,8 +24,7 @@ import static com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.Ca
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 
 public class CalendarModelTest {
     private SharedPreferences sharedPreferencesMock;
@@ -48,7 +44,9 @@ public class CalendarModelTest {
         testSubscriber = new TestSubscriber<>();
 
         Mockito.when(sharedPreferencesMock.edit()).thenReturn(sharedPreferencesEditorMock);
-        Mockito.when(sharedPreferencesEditorMock.putString(CALENDAR_DATA_JSON, nullJSON))
+        Mockito.when(sharedPreferencesEditorMock.putString(eq(CALENDAR_DATA_JSON), eq(nullJSON)))
+                .thenReturn(sharedPreferencesEditorMock);
+        Mockito.when(sharedPreferencesEditorMock.putString(eq(CALENDAR_DATA_JSON), anyString()))
                 .thenReturn(sharedPreferencesEditorMock);
         Mockito.when(applicationMock.getSharedPreferences(CALENDAR_SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE))
                 .thenReturn(sharedPreferencesMock);
@@ -87,7 +85,7 @@ public class CalendarModelTest {
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         CalendarDataRefreshState currentState =
                 calendarModel.getCalendarDataRefreshObservable().first()
@@ -109,7 +107,7 @@ public class CalendarModelTest {
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         CalendarDataRefreshState currentState =
                 calendarModel.getCalendarDataRefreshObservable().first()
@@ -131,7 +129,7 @@ public class CalendarModelTest {
         CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
         // Activate a refresh
         calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
-        Thread.sleep(100);
+        Thread.sleep(200);
 
         CalendarDataRefreshState currentState =
                 calendarModel.getCalendarDataRefreshObservable().first()
@@ -140,6 +138,34 @@ public class CalendarModelTest {
         assertThat(currentState.type, is(SUCCESS));
         assertNull(currentState.exception);
         assertNull(currentState.calendarData);
+    }
+
+    @Test
+    public void whenRefreshEventCompletesSuccessfullyWithMockDataReturnsSuccessWithCalendarDataParsedCorrectly() throws
+            InterruptedException, ExecutionException, TimeoutException {
+        // Shared Prefs returns null if its the first time the app loads and has no default data
+        Mockito.when(sharedPreferencesMock.getString(eq(CALENDAR_DATA_JSON), anyString()))
+                .thenReturn(null);
+        Mockito.when(calendarWebServiceMock.getRawInitialWebPageObs())
+                .thenReturn(Observable.<String>just(_getRawInitialWebpageWithONEDaysAvailableFromTestResources()));
+        Mockito.when(calendarWebServiceMock.getRawClickableDatesWebPagesObs(any(CalendarData.class)))
+                .thenReturn(Observable.<String[]>just(
+                        new String[]{_getRawClickableDateHalfClosedHalfOpenFromTestResources()}));
+
+        CalendarModel calendarModel = new CalendarModel(applicationMock, calendarWebServiceMock);
+        // Activate a refresh
+        calendarModel.getRefreshActivatePublishSubject().onNext(new RefreshActivateEvent());
+        Thread.sleep(2000);
+
+        CalendarDataRefreshState currentState =
+                calendarModel.getCalendarDataRefreshObservable().first()
+                        .toBlocking().toFuture().get(300, TimeUnit.MILLISECONDS);
+
+        // The hash represents the entire object's contents, so comparing we know the object is the same
+        int TEST_DATA_HASH = -2089589293;
+        assertThat(currentState.type, is(SUCCESS));
+        assertNull(currentState.exception);
+        assertThat(currentState.calendarData.computedHashCode, is(TEST_DATA_HASH));
     }
 
     @Test
@@ -185,6 +211,31 @@ public class CalendarModelTest {
         String delim = File.separator;
         String noDaysAvailableFileLocation = ".." + delim + "app" + delim + "src" + delim +
                 "testResources" + delim + "server_responses" + delim + "no_days_available.aspx";
+        try {
+            return FileUtils.readFileToString(new File(noDaysAvailableFileLocation), "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String _getRawInitialWebpageWithONEDaysAvailableFromTestResources() {
+        String delim = File.separator;
+        String noDaysAvailableFileLocation = ".." + delim + "app" + delim + "src" + delim +
+                "testResources" + delim + "server_responses" + delim + "1_day_available.aspx";
+        try {
+            return FileUtils.readFileToString(new File(noDaysAvailableFileLocation), "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String _getRawClickableDateHalfClosedHalfOpenFromTestResources() {
+        String delim = File.separator;
+        String noDaysAvailableFileLocation = ".." + delim + "app" + delim + "src" + delim +
+                "testResources" + delim + "server_responses" + delim + "clickabledate" + delim +
+                "half_closed_half_open_8am-330pm.aspx";
         try {
             return FileUtils.readFileToString(new File(noDaysAvailableFileLocation), "UTF-8");
         } catch (IOException e) {

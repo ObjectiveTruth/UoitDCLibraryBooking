@@ -97,7 +97,8 @@ public class MyAccount extends Fragment {
 
                         @Override
                         public void onNext(MyAccountDataLoginState myAccountDataLoginState) {
-                            Timber.i("On next called: " + myAccountDataLoginState.type.name());
+                            Timber.i("On next called: " + myAccountDataLoginState.type);
+                            Timber.v(myAccountDataLoginState.toString());
                             // We check if the AccountLoaded is showing because if it is, we do nothing since it takes
                             // care of handling the events
                             switch(myAccountDataLoginState.type) {

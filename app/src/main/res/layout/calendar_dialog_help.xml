@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:background="@drawable/rounded_white_square"
+    android:layout_height="wrap_content">
+
+<RelativeLayout
+    android:layout_width="300dp"
+    android:layout_margin="20dp"
+    android:layout_height="300dp">
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+        android:id="@+id/textView1"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Help"
+        android:gravity="center"
+        android:textColor="@color/blue_font"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="@dimen/dialog_title_text" />
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+        android:layout_marginTop="20dp"
+        android:id="@+id/book_cell_example"
+        android:layout_width="@dimen/table_width"
+        android:layout_below="@+id/textView1"
+        android:text="Open"
+        android:gravity="center"
+        android:background="@drawable/cell_book_selector"
+        android:layout_height="@dimen/table_height" />
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/book_cell_description"
+            android:layout_width="wrap_content"
+            android:textColor="@color/blue_font"
+            android:text="Partial"
+            android:gravity="start"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_height="match_parent" android:layout_alignTop="@+id/book_cell_example"
+            android:layout_alignLeft="@+id/textView1" android:layout_alignStart="@+id/textView1"/>
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+        android:layout_marginTop="20dp"
+        android:id="@+id/joinorleave_cell_example"
+        android:layout_width="@dimen/table_width"
+        android:layout_below="@+id/book_cell_example"
+        android:text="Open"
+        android:gravity="center"
+        android:background="@drawable/cell_joinorleave_selector"
+        android:layout_height="@dimen/table_height" />
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/joinorleave_cell_description"
+            android:layout_width="wrap_content"
+            android:textColor="@color/blue_font"
+            android:text="Partial"
+            android:gravity="start"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true" android:layout_alignLeft="@+id/book_cell_description"
+            android:layout_alignStart="@+id/book_cell_description"/>
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+        android:layout_marginTop="20dp"
+        android:id="@+id/viewleaveorjoin_cell_example"
+        android:layout_width="@dimen/table_width"
+        android:layout_below="@+id/joinorleave_cell_example"
+        android:text="GroupNA"
+        android:gravity="center"
+        android:background="@drawable/cell_viewleaveorjoin_selector"
+        android:layout_height="@dimen/table_height" />
+
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/viewleaveorjoin_cell_description"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@color/blue_font"
+            android:text="Booked"
+            android:gravity="start"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_alignTop="@+id/viewleaveorjoin_cell_example"
+            android:layout_alignLeft="@+id/joinorleave_cell_description"
+            android:layout_alignStart="@+id/joinorleave_cell_description"/>
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/help_ok_button"
+        android:text="@android:string/ok"
+        android:layout_alignParentBottom="true" android:layout_centerHorizontal="true"/>
+
+
+    </RelativeLayout>
+</ScrollView>

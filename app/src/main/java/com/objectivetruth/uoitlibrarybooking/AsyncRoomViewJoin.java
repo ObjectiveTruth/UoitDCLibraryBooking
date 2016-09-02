@@ -22,7 +22,6 @@ public class AsyncRoomViewJoin extends AsyncTask<String[], int[], String> {
 	final String TAG = "AsyncRoomViewJoin";
 	Activity mActivity;
 	ProgressDialog progDialog;
-	CommunicatorRoomInteractions comm;
 	String returnMessage;
 	AsyncRoomViewJoin mAsyncRoomViewJoin;
 
@@ -51,7 +50,6 @@ public class AsyncRoomViewJoin extends AsyncTask<String[], int[], String> {
 	}
 	public AsyncRoomViewJoin(CookieManager cookieManager, Activity mActivity){
 		mAsyncRoomViewJoin = this;
-		this.comm = (CommunicatorRoomInteractions) mActivity;
 		this.cookieManager = cookieManager;
 		this.mActivity = mActivity;
 	}
@@ -162,10 +160,8 @@ public class AsyncRoomViewJoin extends AsyncTask<String[], int[], String> {
 					Toast.LENGTH_LONG).show();
 		}
 		else if(result.equalsIgnoreCase("success")){
-			comm.InteractionSuccess(returnMessage, true);
 		}
 		else{
-			comm.ViewLeaveOrJoinFail(returnMessage);
 		}
 		progDialog.dismiss();
 	}

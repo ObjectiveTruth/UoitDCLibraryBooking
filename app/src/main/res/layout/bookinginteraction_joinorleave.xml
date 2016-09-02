@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/room_landing_room_picture"
+            android:layout_width="350dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="10dp"
+            android:adjustViewBounds="true"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="Picture of the room"
+            android:scaleType="centerCrop"
+            android:src="@drawable/unknown_room" />
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/joinorleave_error_text"
+            android:visibility="invisible"
+            android:layout_width="350dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:minLines="3"
+            android:textColor="@color/booked_red"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="center_horizontal"
+            android:text="@string/error_room_no_exist_comment"
+            />
+
+
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/textView1"
+            android:layout_below="@+id/room_landing_room_picture"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="right"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/room_landing_room_picture"
+            android:layout_marginLeft="110dp"
+            android:text="Room: "
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+            android:id="@+id/joinorleave_room_number"
+            android:layout_width="wrap_content"
+            android:layout_alignTop="@+id/textView1"
+            android:layout_below="@+id/room_landing_room_picture"
+            android:layout_toRightOf="@+id/textView1"
+            android:layout_marginLeft="10dp"
+            android:textColor="#0099CC"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:text="LIB999"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            android:id="@+id/joinorleave_create_group_button"
+            android:layout_below="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="Create New Group" />
+
+        <Spinner
+            android:id="@+id/joinorleave_join_spinner"
+            android:layout_below="@+id/joinorleave_create_group_button"
+            android:layout_alignLeft="@+id/room_landing_room_picture"
+            android:layout_marginTop="20dp"
+            android:layout_width="225dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+
+        <Button
+
+            android:id="@+id/joinorleave_join_button"
+            android:layout_width="100dp"
+            android:layout_marginTop="5dp"
+            android:layout_alignTop="@+id/joinorleave_join_spinner"
+            android:layout_alignRight="@id/room_landing_room_picture"
+            android:layout_height="wrap_content"
+            android:text="Join" />
+        
+        <Spinner
+            android:id="@+id/joinorleave_leave_spinner"
+            android:layout_below="@+id/joinorleave_join_spinner"
+            android:layout_alignLeft="@+id/room_landing_room_picture"
+            android:layout_marginTop="10dp"
+            android:layout_width="225dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+
+        <Button
+            android:id="@+id/joinorleave_leave_grou_button"
+            android:layout_width="100dp"
+            android:layout_alignTop="@+id/joinorleave_leave_spinner"
+            android:layout_marginTop="5dp"
+            android:layout_alignRight="@id/room_landing_room_picture"
+            android:layout_height="wrap_content"
+            android:text="Leave" />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/joinorleave_join_loadingbar"
+            android:visibility="invisible"
+            android:layout_toRightOf="@+id/joinorleave_create_group_button"
+            android:layout_alignRight="@+id/joinorleave_join_button"
+            android:layout_alignEnd="@+id/joinorleave_join_button"
+            android:layout_alignBottom="@+id/joinorleave_join_spinner"
+            android:layout_alignTop="@+id/joinorleave_join_spinner"/>
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/joinorleave_leave_loadingbar"
+            android:visibility="invisible"
+            android:layout_alignLeft="@+id/joinorleave_join_loadingbar"
+            android:layout_alignStart="@+id/joinorleave_join_loadingbar"
+            android:layout_alignRight="@+id/joinorleave_leave_grou_button"
+            android:layout_alignEnd="@+id/joinorleave_leave_grou_button"
+            android:layout_alignBottom="@+id/joinorleave_leave_spinner"
+            android:layout_alignTop="@+id/joinorleave_leave_spinner"/>
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/joinorleave_create_loadingbar"
+            android:layout_alignBottom="@+id/joinorleave_create_group_button"
+            android:visibility="invisible"
+            android:layout_centerHorizontal="true"/>
+
+
+    </RelativeLayout>
+
+</ScrollView>

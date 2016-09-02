@@ -6,21 +6,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
+import com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.BookingInteractionScreenLoadEvent;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDay;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCell;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.tablefixheaders.FixedTableAdapter;
+import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.util.Random;
 
+import static com.objectivetruth.uoitlibrarybooking.data.models.bookinginteractionmodel.common.Utils.getBookingInteractionEventTypeBasedOnTimeCell;
 import static com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.TimeCellType.BOOKING_CONFIRMED;
 
 public class GridAdapter extends FixedTableAdapter {
     private int _width_of_cell_in_pixels;
     private int _height_of_cell_in_pixels;
     private CalendarDay calendarDay;
+    @Inject BookingInteractionModel bookingInteractionModel;
 
     public GridAdapter(Context context, CalendarDay calendarDay) {
         super(context);
+        ((UOITLibraryBookingApp) context.getApplicationContext()).getComponent().inject(this);
         _width_of_cell_in_pixels = context.getResources().getDimensionPixelSize(R.dimen.table_width);
         _height_of_cell_in_pixels = context.getResources().getDimensionPixelSize(R.dimen.table_height);
         this.calendarDay = calendarDay;
@@ -99,35 +107,46 @@ public class GridAdapter extends FixedTableAdapter {
 
         switch(currentTimeCellForThisViewCall.timeCellType) {
             case TABLE_COLUMN_HEADER:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName); break;
+                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName);
+                holder.textViewOnly.setOnClickListener(null); break;
 
             case TABLE_ROW_HEADER:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName); break;
+                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName);
+                holder.textViewOnly.setOnClickListener(null); break;
 
             case TABLE_TOP_LEFT_CELL:
-                holder.textViewOnly.setText(""); break;
-
-            case BOOKING_OPEN:
-                holder.textViewOnly.setText("Open"); break;
+                holder.textViewOnly.setText("");
+                holder.textViewOnly.setOnClickListener(null); break;
 
             case BOOKING_LIBRARY_CLOSED:
-                holder.textViewOnly.setText("Closed"); break;
+                holder.textViewOnly.setText(R.string.timecell_calendar_label_closed);
+                holder.textViewOnly.setOnClickListener(null); break;
+
+            case BOOKING_OPEN:
+                holder.textViewOnly.setText(R.string.timecell_calendar_label_book);
+                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                        bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_COMPETING:
-                holder.textViewOnly.setText("Open"); break;
+                holder.textViewOnly.setText(R.string.timecell_calendar_label_book_joinorleave);
+                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                        bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_CONFIRMED:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.groupNameForWhenFullyBookedRoom); break;
+                holder.textViewOnly.setText(currentTimeCellForThisViewCall.groupNameForWhenFullyBookedRoom);
+                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                        bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_LOCKED:
                 TimeCell parentTimeCell = _getTimeCellWithGroupNameAboutThisOne(row, column);
                 if(parentTimeCell == null) {
                     parentTimeCell = new TimeCell(); parentTimeCell.groupNameForWhenFullyBookedRoom = "";}
-                holder.textViewOnly.setText(parentTimeCell.groupNameForWhenFullyBookedRoom); break;
+                holder.textViewOnly.setText(parentTimeCell.groupNameForWhenFullyBookedRoom);
+                holder.textViewOnly.setOnClickListener(null); break;
 
             default:
                 holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeCellType.name());
-
+                holder.textViewOnly.setOnClickListener(null);
 
         }
         return convertView;
@@ -182,4 +201,27 @@ public class GridAdapter extends FixedTableAdapter {
     private boolean _isTopLeftCell(int row, int column) {
         return (row < 0 && column < 0);
     }
+
+    private static class TimeCellOnClickListener implements View.OnClickListener {
+        private TimeCell timeCell;
+        private CalendarDay calendarDay;
+        BookingInteractionModel bookingInteractionModel;
+
+        TimeCellOnClickListener(TimeCell timeCell, BookingInteractionModel bookingInteractionModel,
+                                CalendarDay calendarDay) {
+            this.timeCell = timeCell;
+            this.bookingInteractionModel = bookingInteractionModel;
+            this.calendarDay = calendarDay;
+        }
+
+        @Override
+        public void onClick(View view) {
+            Timber.i("Clicked: " + timeCell.toString());
+            bookingInteractionModel.getBookingInteractionScreenLoadEventPublishSubject().onNext(
+                    new BookingInteractionScreenLoadEvent(timeCell,
+                            getBookingInteractionEventTypeBasedOnTimeCell(timeCell),
+                    calendarDay.extDayOfMonthNumber, calendarDay.extMonthWord));
+        }
+    }
+
 }
