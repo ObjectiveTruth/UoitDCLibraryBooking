@@ -41,7 +41,7 @@ public class MockHttpStack extends OkHttp3Stack{
             throws IOException, AuthFailureError {
         if(_hasUserNOTRequestedMockingOfHTTP()) {return super.performRequest(request, stringStringMap);}
         URL url = new URL(request.getUrl());
-        String baseUrlAndPath = url.getProtocol() + url.getHost() + url.getPath();
+        String baseUrlAndPath = url.getProtocol() + "://" + url.getHost() + url.getPath();
 
         switch(baseUrlAndPath) {
             case MY_RESERVATIONS_SIGNIN_ABSOLUTE_URL: switch(request.getMethod()) {
@@ -53,16 +53,27 @@ public class MockHttpStack extends OkHttp3Stack{
                     case GET: return _simulateResponseWithBody(request, _getInitialWebpageEntity());
                     case POST: return _simulateResponseWithBody(request, _getClickableDateEntity());
                 } break;
-            case "temp.aspx": switch(request.getMethod()) {
-                    case GET: return _simulateResponseWithBody(request, _getBookWebpageEntity());
+            case PRE_OPERATION_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case GET:
+                        if(url.getQuery().contains("next=book.aspx")) {
+                            return _simulateResponseWithBody(request, _getBookWebpageEntity());
+                        }else if(url.getQuery().contains("next=joinorleave.aspx")) {
+                            return _simulateResponseWithBody(request, _getJoinOrLeaveWebpageEntity());
+                        }
                 } break;
             case BOOK_ABSOLUTE_URL: switch(request.getMethod()) {
                     case POST: return _simulateResponseWithBody(request, _getBookSuccessWebpageEntity());
                 } break;
+            case JOINORLEAVE_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case POST: return _simulateResponseWithBody(request, _getJoinGroupWebpageEntity());
+                } break;
+            case JOIN_GROUP_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case GET: return _simulateResponseWithBody(request, _getJoinGroupFailWebpageEntity());
+                } break;
 
         }
         Timber.w("No valid mock available for method: " + request.getMethod() + ", URL: "
-                + request.getUrl() + ". Delegating to real HTTP Stack");
+                + baseUrlAndPath + ". Delegating to real HTTP Stack");
         return super.performRequest(request, stringStringMap);
     }
 
@@ -81,6 +92,18 @@ public class MockHttpStack extends OkHttp3Stack{
         }
 
         return response;
+    }
+
+    private HttpEntity _getJoinGroupFailWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/join_fail_message.aspx"));
+    }
+
+    private HttpEntity _getJoinGroupWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/joingroup.aspx"));
+    }
+
+    private HttpEntity _getJoinOrLeaveWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/joinorleave.aspx"));
     }
 
     private HttpEntity _getBookSuccessWebpageEntity() throws UnsupportedEncodingException {

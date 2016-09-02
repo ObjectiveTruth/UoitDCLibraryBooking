@@ -6,9 +6,11 @@
     android:gravity="center"
     android:orientation="vertical" >
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
+        android:id="@+id/calendar_grid_item"
         android:text="HELLO WORLD"
-        android:id="@+id/calendar_grid_item"/>
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>
