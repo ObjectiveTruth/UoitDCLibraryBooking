@@ -55,8 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
-            <com.cengalabs.flatui.views.FlatButton
-                style="@style/flat_ui_button"
+            <Button
                 android:id="@+id/bookingInteraction_success_ok_button"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -66,8 +65,7 @@
                 android:layout_marginRight="10dp"
                 android:text="@android:string/ok" />
 
-            <com.cengalabs.flatui.views.FlatButton
-                style="@style/flat_ui_button"
+            <Button
                 android:id="@+id/bookingInteraction_success_add_to_calendar_button"
                 android:layout_width="0dp"
                 android:layout_weight="1"

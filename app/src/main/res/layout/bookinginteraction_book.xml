@@ -77,7 +77,6 @@
             android:layout_below="@+id/bookingInteraction_book_groupname"
             android:layout_centerHorizontal="true"
             android:layout_height="wrap_content"
-            android:textColorHint="@color/dark_light"
             android:inputType="textNoSuggestions"
             android:maxLength="4"
             android:hint="Code" />
@@ -100,7 +99,6 @@
             android:layout_centerHorizontal="true"/>
 
         <Button
-            style="@style/flat_ui_button"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:id="@+id/bookingInteraction_book_create_button"

@@ -46,7 +46,7 @@ public class MockHttpStack extends OkHttp3Stack{
         switch(baseUrlAndPath) {
             case MY_RESERVATIONS_SIGNIN_ABSOLUTE_URL: switch(request.getMethod()) {
                     case GET: return _simulateResponseWithBody(request, _getInitialReservationWebpageEntity());
-                    case POST: return _simulateResponseWithBody(request, _getSignInFailReservationWebpageEntity());
+                    case POST: return _simulateResponseWithBody(request, _getSignInSuccessReservationWebpageEntity());
                 } break;
 
             case CALENDAR_ABSOLUTE_URL: switch(request.getMethod()) {
@@ -112,6 +112,10 @@ public class MockHttpStack extends OkHttp3Stack{
 
     private HttpEntity _getBookWebpageEntity() throws UnsupportedEncodingException {
         return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/book.aspx"));
+    }
+
+    private HttpEntity _getSignInSuccessReservationWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/sign_in_success_1_incomplete_reservation.aspx"));
     }
 
     private HttpEntity _getSignInFailReservationWebpageEntity() throws UnsupportedEncodingException {

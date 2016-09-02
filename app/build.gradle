@@ -202,12 +202,6 @@ dependencies {
     provided 'javax.annotation:jsr250-api:1.0'
     // Logging library
     compile 'com.jakewharton.timber:timber:3.1.0'
-    // Library for making a standardized flatUI style
-    compile 'com.github.eluleci:flatui:3.0.0'
-    // Horizontal Listview used for the Column Headers
-    compile 'it.sephiroth.android.library.horizontallistview:hlistview:1.2.2'
-    // An Event bus for communicating between fragments
-    compile 'com.squareup:otto:1.3.8'
     // For simple animations anywhere in the app
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.daimajia.easing:library:1.0.1@aar'
@@ -224,8 +218,6 @@ dependencies {
     compile 'org.immutables:gson:2.1.16'
     // For quickly generating about pages
     compile 'com.github.medyo:android-about-page:1.0'
-    // For usage with OKHTTP3 to pesist the cookies
-    compile 'com.github.franmontiel:PersistentCookieJar:v0.9.3'
     // Crashlytics for logging production logs
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
         transitive = true;
