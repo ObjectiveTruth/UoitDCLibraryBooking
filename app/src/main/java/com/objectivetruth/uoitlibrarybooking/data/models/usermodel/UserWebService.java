@@ -18,11 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.MY_RESERVATIONS_SIGNIN_ABSOLUTE_URL;
+
 public class UserWebService {
     @Inject RequestQueue requestQueue;
-    final private static String UOIT_LIBRARY_SIGNIN_URL =
-            "https://rooms.library.dc-uoit.ca/uoit_studyrooms/myreservations.aspx";
-
     public UserWebService(UOITLibraryBookingApp mApplication) {
         mApplication.getComponent().inject(this);
     }
@@ -68,7 +67,7 @@ public class UserWebService {
         RequestFuture<String> future = RequestFuture.newFuture();
 
         StringRequest stringRequest =
-                new StringRequest(Request.Method.POST, UOIT_LIBRARY_SIGNIN_URL, future, future) {
+                new StringRequest(Request.Method.POST, MY_RESERVATIONS_SIGNIN_ABSOLUTE_URL, future, future) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String> headers = new HashMap<>();
@@ -98,7 +97,7 @@ public class UserWebService {
         RequestFuture<String> future = RequestFuture.newFuture();
 
         StringRequest stringRequest =
-                new StringRequest(Request.Method.GET, UOIT_LIBRARY_SIGNIN_URL, future, future);
+                new StringRequest(Request.Method.GET, MY_RESERVATIONS_SIGNIN_ABSOLUTE_URL, future, future);
         requestQueue.add(stringRequest);
         Timber.i("GET request to the initial sign-in uoitlibrary webpage finished");
         return future.get();

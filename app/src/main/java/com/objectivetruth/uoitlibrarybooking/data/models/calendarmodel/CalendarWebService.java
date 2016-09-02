@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.MAIN_CALENDAR_URL;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.CALENDAR_ABSOLUTE_URL;
 
 public class CalendarWebService {
     @Inject RequestQueue requestQueue;
@@ -88,12 +88,12 @@ public class CalendarWebService {
         Timber.d("Starting the POST request to the clickable date " + calendarDay.extDayOfMonthNumber + "...");
         RequestFuture<String> future = RequestFuture.newFuture();
         StringRequest stringRequest =
-                new StringRequest(Request.Method.POST, MAIN_CALENDAR_URL, future, future) {
+                new StringRequest(Request.Method.POST, CALENDAR_ABSOLUTE_URL, future, future) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String>  headers = new HashMap<String, String>();
                         headers.put("Content-Type", "application/x-www-form-urlencoded");
-                        headers.put("Referer", MAIN_CALENDAR_URL);
+                        headers.put("Referer", CALENDAR_ABSOLUTE_URL);
                         return headers;
                     }
 
@@ -140,7 +140,7 @@ public class CalendarWebService {
         Timber.i("Starting the POST request to the clickable date " + calendarDay.extDayOfMonthNumber + "...");
         RequestFuture<String> future = RequestFuture.newFuture();
         StringRequest stringRequest =
-                new StringRequest(Request.Method.POST, MAIN_CALENDAR_URL, future, future) {
+                new StringRequest(Request.Method.POST, CALENDAR_ABSOLUTE_URL, future, future) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String>  headers = new HashMap<String, String>();
@@ -169,7 +169,7 @@ public class CalendarWebService {
         Timber.i("Starting the GET request to the initial uoitlibrary webpage...");
         RequestFuture<String> future = RequestFuture.newFuture();
         StringRequest stringRequest =
-                new StringRequest(Request.Method.GET, MAIN_CALENDAR_URL, future, future) {
+                new StringRequest(Request.Method.GET, CALENDAR_ABSOLUTE_URL, future, future) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String>  headers = new HashMap<String, String>();
