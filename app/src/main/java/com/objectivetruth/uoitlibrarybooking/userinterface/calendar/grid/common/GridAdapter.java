@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
@@ -91,9 +91,9 @@ public class GridAdapter extends FixedTableAdapter {
         View convertView = recycleView;
         ViewHolder holder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.calendar_table_item_actual, parent, false);
+            convertView = inflater.inflate(R.layout.calendar_grid_item, parent, false);
             holder = new ViewHolder();
-            holder.textViewOnly = (TextView) convertView.findViewById(android.R.id.text1);
+            holder.button = (Button) convertView.findViewById(R.id.calendar_grid_item);
             convertView.setTag(holder);
         }
         else{
@@ -107,53 +107,53 @@ public class GridAdapter extends FixedTableAdapter {
 
         switch(currentTimeCellForThisViewCall.timeCellType) {
             case TABLE_COLUMN_HEADER:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName);
-                holder.textViewOnly.setOnClickListener(null); break;
+                holder.button.setText(currentTimeCellForThisViewCall.timeStringOrRoomName);
+                holder.button.setOnClickListener(null); break;
 
             case TABLE_ROW_HEADER:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeStringOrRoomName);
-                holder.textViewOnly.setOnClickListener(null); break;
+                holder.button.setText(currentTimeCellForThisViewCall.timeStringOrRoomName);
+                holder.button.setOnClickListener(null); break;
 
             case TABLE_TOP_LEFT_CELL:
-                holder.textViewOnly.setText("");
-                holder.textViewOnly.setOnClickListener(null); break;
+                holder.button.setText("");
+                holder.button.setOnClickListener(null); break;
 
             case BOOKING_LIBRARY_CLOSED:
-                holder.textViewOnly.setText(R.string.timecell_calendar_label_closed);
-                holder.textViewOnly.setOnClickListener(null); break;
+                holder.button.setText(R.string.timecell_calendar_label_closed);
+                holder.button.setOnClickListener(null); break;
 
             case BOOKING_OPEN:
-                holder.textViewOnly.setText(R.string.timecell_calendar_label_book);
-                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                holder.button.setText(R.string.timecell_calendar_label_book);
+                holder.button.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
                         bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_COMPETING:
-                holder.textViewOnly.setText(R.string.timecell_calendar_label_book_joinorleave);
-                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                holder.button.setText(R.string.timecell_calendar_label_book_joinorleave);
+                holder.button.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
                         bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_CONFIRMED:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.groupNameForWhenFullyBookedRoom);
-                holder.textViewOnly.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
+                holder.button.setText(currentTimeCellForThisViewCall.groupNameForWhenFullyBookedRoom);
+                holder.button.setOnClickListener(new TimeCellOnClickListener(currentTimeCellForThisViewCall,
                         bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_LOCKED:
                 TimeCell parentTimeCell = _getTimeCellWithGroupNameAboutThisOne(row, column);
                 if(parentTimeCell == null) {
                     parentTimeCell = new TimeCell(); parentTimeCell.groupNameForWhenFullyBookedRoom = "";}
-                holder.textViewOnly.setText(parentTimeCell.groupNameForWhenFullyBookedRoom);
-                holder.textViewOnly.setOnClickListener(null); break;
+                holder.button.setText(parentTimeCell.groupNameForWhenFullyBookedRoom);
+                holder.button.setOnClickListener(null); break;
 
             default:
-                holder.textViewOnly.setText(currentTimeCellForThisViewCall.timeCellType.name());
-                holder.textViewOnly.setOnClickListener(null);
+                holder.button.setText(currentTimeCellForThisViewCall.timeCellType.name());
+                holder.button.setOnClickListener(null);
 
         }
         return convertView;
     }
 
     private static class ViewHolder {
-        TextView textViewOnly;
+        Button button;
     }
 
     /**

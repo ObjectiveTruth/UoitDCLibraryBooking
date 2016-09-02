@@ -114,23 +114,23 @@ public class ActivityRoomInteraction extends FragmentActivity {
 
 		else if(bundleExtras.getString("type").equalsIgnoreCase("viewleaveorjoin")){
             Timber.i("ViewLeaveOfJoin SubRoutine Executing...");
-			setContentView(R.layout.interaction_viewleaveorjoin);
+			//setContentView(R.layout.interaction_viewleaveorjoin);
 			String groupCode = bundleExtras.getString("groupCode");
 			timeRange = bundleExtras.getString("timeRange");
 			String institution = bundleExtras.getString("institution");
 			String notes = bundleExtras.getString("notes");
 			String groupName = bundleExtras.getString("groupName");
-            TextView groupNameTV = (TextView) findViewById(R.id.viewleaveorjoin_groupname);
+/*            TextView groupNameTV = (TextView) findViewById(R.id.viewleaveorjoin_groupname);
 			TextView roomTV = (TextView) findViewById(R.id.viewleaveorjoin_room);
 			TextView dateTV = (TextView) findViewById(R.id.viewleaveorjoin_date);
 			TextView groupCodeTV = (TextView) findViewById(R.id.viewleaveorjoin_groupcode);
 			TextView timeRangeTV = (TextView) findViewById(R.id.viewleaveorjoin_timerange);
 			TextView institutionTV = (TextView) findViewById(R.id.viewleaveorjoin_institution);
-			TextView notesTV = (TextView) findViewById(R.id.viewleaveorjoin_notes);
+			TextView notesTV = (TextView) findViewById(R.id.viewleaveorjoin_notes);*/
             ImageView roomPicture = (ImageView) findViewById(R.id.room_landing_room_picture);
             roomPicture.setImageResource(getResources().getIdentifier(roomNumber.toLowerCase(), "drawable", getPackageName()));
 			
-			calendarGroupName = groupName;
+/*			calendarGroupName = groupName;
 			groupNameTV.setText(groupName);
 			roomTV.setText(roomNumber);
 			dateTV.setText(date);
@@ -142,13 +142,13 @@ public class ActivityRoomInteraction extends FragmentActivity {
 			}
 			else{
 				notesTV.setText(notes);	
-			}
+			}*/
 			
 			
 
 					
 			Button joinButton = (Button) findViewById(R.id.viewleaveorjoin_join_button);
-			Button leaveButton = (Button) findViewById(R.id.viewleaveorjoin_leave_group_button);
+			//Button leaveButton = (Button) findViewById(R.id.viewleaveorjoin_leave_group_button);
 			
 			joinButton.setOnClickListener(new OnClickListener(){
 
@@ -193,7 +193,7 @@ public class ActivityRoomInteraction extends FragmentActivity {
                 }
 			});
 			
-			leaveButton.setOnClickListener(new OnClickListener(){
+/*			leaveButton.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View view) {
                     String inputUsername = mDefaultSharedPreferences.getString(USER_USERNAME, null);
@@ -231,7 +231,7 @@ public class ActivityRoomInteraction extends FragmentActivity {
                         Toast.makeText(mActivity, R.string.error_shared_pref_values_incorrect, Toast.LENGTH_LONG).show();
                     }
 				}
-			});
+			});*/
 		}
 
         googleAnalyticsTracker.send(new HitBuilders.EventBuilder()

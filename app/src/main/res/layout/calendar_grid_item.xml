@@ -3,15 +3,12 @@
     android:layout_width="@dimen/table_width"
     android:layout_height="@dimen/table_height"
     android:id="@+id/calendar_item_layout"
-
     android:gravity="center"
     android:orientation="vertical" >
 
-    <com.objectivetruth.uoitlibrarybooking.userinterface.common.RobotoTextView
-        android:id="@android:id/text1"
-        android:text="HELLO WORLD"
-        android:gravity="center"
+    <Button
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:text="HELLO WORLD"
+        android:id="@+id/calendar_grid_item"/>
 </LinearLayout>
