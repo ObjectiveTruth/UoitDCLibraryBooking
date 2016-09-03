@@ -84,12 +84,16 @@ public class UOITLibraryBookingApp extends Application {
             Timber.plant(new Timber.DebugTree());
         } else {
             Timber.plant(new CrashReportingTree());
-            String mUUID = PreferenceManager.getDefaultSharedPreferences(this).getString(UUID, null);
-            if(mUUID == null){
-                mUUID = java.util.UUID.randomUUID().toString();
-            }
-            Crashlytics.setUserIdentifier(mUUID);
         }
+        String mUUID = PreferenceManager.getDefaultSharedPreferences(this).getString(UUID, null);
+        if(mUUID == null){
+            mUUID = java.util.UUID.randomUUID().toString();
+            Timber.i("UUID NOT found, creating a new one and storing: " + mUUID);
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putString(UUID, mUUID).commit();
+        }else{
+            Timber.d("UUID found: " + mUUID);
+        }
+        Crashlytics.setUserIdentifier(mUUID);
     }
 
     private void _checkIfFirstTimeAppLaunchedSinceInstall() {

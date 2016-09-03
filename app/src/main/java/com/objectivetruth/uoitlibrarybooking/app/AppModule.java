@@ -48,8 +48,8 @@ public class AppModule {
         String usersUUID = defaultSharedPreferences.getString(UUID, null);
 
         if(usersUUID == null){
-            // Generate new Unique User ID if there isn't one already made. Ensures anonymity
             usersUUID = java.util.UUID.randomUUID().toString();
+            defaultSharedPreferences.edit().putString(UUID, usersUUID).apply();
         }
         googleAnalyticsTracker.set("&cid", usersUUID);
         return googleAnalyticsTracker;

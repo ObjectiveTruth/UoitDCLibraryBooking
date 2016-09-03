@@ -7,4 +7,7 @@ public class Analytics {
             "HT58WSY00626", // HTC 360
             "836f484f53504942" // Note 5
     };
+    public class Categories {
+        public static final String CALENDAR = "calendar";
+    }
 }
