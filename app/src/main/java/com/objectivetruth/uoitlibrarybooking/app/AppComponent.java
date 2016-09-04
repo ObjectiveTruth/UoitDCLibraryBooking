@@ -7,9 +7,11 @@ import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarW
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.UserWebService;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.BookingInteraction;
 import com.objectivetruth.uoitlibrarybooking.userinterface.BookingInteraction.flows.*;
+import com.objectivetruth.uoitlibrarybooking.userinterface.about.About;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.Calendar;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.Grid;
 import com.objectivetruth.uoitlibrarybooking.userinterface.calendar.grid.common.GridAdapter;
+import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.GuidelinesAndPolicies;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.MyAccount;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.login.LoginFragment;
 import com.objectivetruth.uoitlibrarybooking.userinterface.myaccount.myaccountloaded.MyAccountLoaded;
@@ -37,4 +39,6 @@ public interface AppComponent {
     void inject(GridAdapter gridAdapter);
     void inject(Book book);
     void inject(Grid grid);
+    void inject(GuidelinesAndPolicies guidelinesAndPolicies);
+    void inject(About about);
 }

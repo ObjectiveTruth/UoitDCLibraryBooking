@@ -7,9 +7,12 @@ import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.common.constants.Analytics;
 import com.objectivetruth.uoitlibrarybooking.data.models.UserModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountDataLoginState;
 import com.objectivetruth.uoitlibrarybooking.userinterface.loading.Loading;
@@ -27,6 +30,7 @@ public class MyAccount extends Fragment {
     private Subscription myAccountDataLoginStateObservableSubscription;
     private static final String MY_ACCOUNT_TITLE = "My Account";
     public @Inject UserModel userModel;
+    @Inject Tracker tracker;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,6 +61,8 @@ public class MyAccount extends Fragment {
             Timber.d(getClass().getSimpleName() + " isNowVisible");
             _setTitle(MY_ACCOUNT_TITLE);
             _setupViewBindings(userModel.getLoginStateObservable());
+            tracker.setScreenName(Analytics.ScreenNames.MY_ACCOUNT);
+            tracker.send(new HitBuilders.ScreenViewBuilder().build());
         }
         super.onHiddenChanged(isNowHidden);
     }

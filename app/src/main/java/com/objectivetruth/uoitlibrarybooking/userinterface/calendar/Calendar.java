@@ -19,6 +19,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.common.constants.Analytics;
 import com.objectivetruth.uoitlibrarybooking.data.models.CalendarModel;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarData;
 import com.objectivetruth.uoitlibrarybooking.data.models.calendarmodel.CalendarDataRefreshState;
@@ -44,7 +45,7 @@ public class Calendar extends Fragment {
     @Inject CalendarModel calendarModel;
     @Inject SharedPreferences mDefaultSharedPreferences;
     @Inject SharedPreferences.Editor mDefaultSharedPreferencesEditor;
-    @Inject Tracker googleAnalyticsTracker;
+    @Inject Tracker tracker;
     private static final String HAS_SHOWN_INITIAL_SCREEN_BUNDLE_KEY = "HAS_SHOWN_INTIAL_SCREEN";
     private Subscription calendarDataRefreshStateObservableSubscription;
     private SwipeRefreshLayout _mSwipeLayout;
@@ -88,6 +89,8 @@ public class Calendar extends Fragment {
             Timber.d(getClass().getSimpleName() + "isNowVisible");
             _setTitle(CALENDAR_TITLE);
             _setupViewBindings(_mSwipeLayout, calendarModel.getCalendarDataRefreshObservable());
+            tracker.setScreenName(Analytics.ScreenNames.CALENDAR);
+            tracker.send(new HitBuilders.ScreenViewBuilder().build());
         }
         super.onHiddenChanged(isNowHidden);
     }
@@ -184,9 +187,7 @@ public class Calendar extends Fragment {
                             Timber.i("On next called: " + calendarDataRefreshState.type.name());
                             switch(calendarDataRefreshState.type) {
                                 case RUNNING:
-                                    if(!swipeRefreshLayout.isRefreshing()) {
-                                        swipeRefreshLayout.setRefreshing(true);
-                                    }
+                                    swipeRefreshLayout.setRefreshing(true);
                                     break;
                                 case ERROR:
                                     swipeRefreshLayout.setRefreshing(false);
@@ -271,7 +272,7 @@ public class Calendar extends Fragment {
         int id = item.getItemId();
 
         if(id == R.id.help_calendar){
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
+            tracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Calendar Home")
                     .setAction("HelpDialog")
                     .setLabel("Pressed by User")
@@ -293,7 +294,7 @@ public class Calendar extends Fragment {
         String HELP_DIALOG_FRAGMENT_TAG = "SINGLETON_HELP_DIALOG_FRAGMENT_TAG";
         Timber.i("User Clicked Help Dialog");
         if(!mDefaultSharedPreferences.getBoolean(HAS_LEARNED_HELP, false)){
-            googleAnalyticsTracker.send(new HitBuilders.EventBuilder()
+            tracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Calendar Home")
                     .setAction("HelpDialog")
                     .setLabel("First Time Help Pressed")

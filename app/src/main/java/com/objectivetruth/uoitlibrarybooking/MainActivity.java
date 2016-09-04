@@ -91,9 +91,7 @@ public class MainActivity extends ActivityBase {
 
     @Override
     protected void onStop() {
-        if(subscriptions != null) {
-            subscriptions.unsubscribe();
-        }
+        subscriptions.unsubscribe();
         super.onStop();
     }
 
