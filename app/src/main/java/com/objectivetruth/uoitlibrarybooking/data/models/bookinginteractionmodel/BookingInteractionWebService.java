@@ -162,7 +162,7 @@ public class BookingInteractionWebService {
                     JoinOrLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveRequest) requestOptions;
                     String groupName = joinOrLeaveLeaveOptions.groupLabel;
                     String leaveButtonOption = "Leave " + groupName;
-                    String refererOverride = MAIN_CALENDAR_RELATIVE_PATH + LEAVE_GROUP_WEBPAGE;
+                    String refererOverride = LEAVE_GROUP_ABSOLUTE_URL;
 
                     HashMap<String, String> urlFormData = new HashMap<>();
                     // Construct the URL encoded Form Data
@@ -195,7 +195,7 @@ public class BookingInteractionWebService {
                     JoinOrLeaveRequest joinOrLeaveLeaveOptions = (JoinOrLeaveRequest) requestOptions;
                     String groupName = joinOrLeaveLeaveOptions.groupLabel;
                     String joinButtonOption = "Join " + groupName;
-                    String refererOverride = MAIN_CALENDAR_RELATIVE_PATH + JOIN_GROUP_WEBPAGE;
+                    String refererOverride = JOIN_GROUP_ABSOLUTE_URL;
 
                     HashMap<String, String> urlFormData = new HashMap<>();
                     // Construct the URL encoded Form Data
@@ -230,7 +230,7 @@ public class BookingInteractionWebService {
                                                  String nextUrl, String refererOverride)
             throws InterruptedException, ExecutionException{
         RequestFuture<String> future = RequestFuture.newFuture();
-        final String urlPath = MAIN_CALENDAR_RELATIVE_PATH + nextUrl;
+        final String urlPath = MAIN_LIBRARY_URL + nextUrl;
         Timber.i("Starting the POST request to: " + urlPath);
         final String refererHeader = refererOverride == null ? urlPath : refererOverride;
 
@@ -267,13 +267,13 @@ public class BookingInteractionWebService {
         queryParams.put("room", timeCell.param_room);
         queryParams.put("next", timeCell.param_next);
 
-        String urlPath = MAIN_CALENDAR_RELATIVE_PATH + timeCell.param_get_link + _mapToQueryString(queryParams);
+        String urlPath = MAIN_LIBRARY_URL + timeCell.param_get_link + _mapToQueryString(queryParams);
         StringRequest stringRequest =
                 new StringRequest(Request.Method.GET, urlPath, future, future) {
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String>  headers = new HashMap<String, String>();
-                        headers.put("Referer", MAIN_CALENDAR_URL);
+                        headers.put("Referer", CALENDAR_ABSOLUTE_URL);
                         return headers;
                     }
                 };

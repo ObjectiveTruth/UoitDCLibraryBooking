@@ -5,15 +5,24 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.*;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.common.constants.Analytics;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.debugpreferences.DebugPreferences;
 import com.objectivetruth.uoitlibrarybooking.userinterface.guidelinespolicies.guidelinesandpoliciesloaded.GuidelinesAndPoliciesLoaded;
 import timber.log.Timber;
 
+import javax.inject.Inject;
+
 public class GuidelinesAndPolicies extends Fragment{
     private static final String GUIDELINES_AND_POLICIES_TITLE = "Policies";
+    @Inject
+    public Tracker tracker;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -36,6 +45,8 @@ public class GuidelinesAndPolicies extends Fragment{
         }else {
             Timber.d(getClass().getSimpleName() + " isNowVisible");
             _setTitle(GUIDELINES_AND_POLICIES_TITLE);
+            tracker.setScreenName(Analytics.ScreenNames.GUIDELINES_AND_POLICIES);
+            tracker.send(new HitBuilders.ScreenViewBuilder().build());
         }
         super.onHiddenChanged(isNowHidden);
     }
@@ -53,6 +64,12 @@ public class GuidelinesAndPolicies extends Fragment{
         if(BuildConfig.DEBUG){
             inflater.inflate(R.menu.debug_options, menu);
         }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
     }
 
     @Override

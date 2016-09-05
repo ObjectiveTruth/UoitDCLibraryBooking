@@ -91,9 +91,9 @@ public class GridAdapter extends FixedTableAdapter {
         View convertView = recycleView;
         ViewHolder holder;
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.calendar_table_item_actual, parent, false);
+            convertView = inflater.inflate(R.layout.calendar_grid_item, parent, false);
             holder = new ViewHolder();
-            holder.textViewOnly = (TextView) convertView.findViewById(android.R.id.text1);
+            holder.textViewOnly = (TextView) convertView.findViewById(R.id.calendar_grid_item);
             convertView.setTag(holder);
         }
         else{

@@ -6,19 +6,27 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.BuildConfig;
 import com.objectivetruth.uoitlibrarybooking.MainActivity;
 import com.objectivetruth.uoitlibrarybooking.R;
+import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
+import com.objectivetruth.uoitlibrarybooking.common.constants.Analytics;
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
 import timber.log.Timber;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
 public class About extends Fragment{
     private static final String ABOUT_TITLE = "About";
+    @Inject public Tracker tracker;
 
     @Nullable
     @Override
@@ -61,8 +69,6 @@ public class About extends Fragment{
         librariesList.put("Otto",                           "https://github.com/square/otto");
         librariesList.put("RoadRunner",                     "https://github.com/glomadrian/RoadRunner");
         librariesList.put("Timber",                         "https://github.com/JakeWharton/timber");
-        librariesList.put("Horizontal Variable ListView",   "https://github.com/sephiroth74/HorizontalVariableListView");
-        librariesList.put("FlatUI",                         "https://github.com/eluleci/FlatUI");
         librariesList.put("NineoldAndroid",                 "https://github.com/JakeWharton/NineOldAndroids");
         librariesList.put("Anroid Animations",              "https://github.com/daimajia/AndroidViewAnimations");
         librariesList.put("Android About Page",             "https://github.com/medyo/android-about-page");
@@ -73,12 +79,20 @@ public class About extends Fragment{
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((UOITLibraryBookingApp) getActivity().getApplication()).getComponent().inject(this);
+    }
+
+    @Override
     public void onHiddenChanged(boolean isNowHidden) {
         if(isNowHidden) {
             Timber.d(getClass().getSimpleName() + " isNowHidden");
         }else {
             Timber.d(getClass().getSimpleName() + " isNowVisible");
             _setTitle(ABOUT_TITLE);
+            tracker.setScreenName(Analytics.ScreenNames.ABOUT);
+            tracker.send(new HitBuilders.ScreenViewBuilder().build());
         }
         super.onHiddenChanged(isNowHidden);
     }

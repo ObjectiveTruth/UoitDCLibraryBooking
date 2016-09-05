@@ -37,51 +37,10 @@
         <item name="android:windowExitAnimation">@anim/slide_out_right</item>
     </style>
 
-    <style name="flat_edittext">
-        <item name="fl_theme">@array/sea</item>
-        <item name="fl_fontFamily">roboto</item>
-        <item name="fl_fontWeight">light</item>
-        <item name="fl_fontExtension">ttf</item>
-        <item name="fl_borderWidth">2dp</item>
-        <item name="fl_cornerRadius">5dp</item>
-        <item name="fl_size">20dp</item>
-    </style>
-
-    <style name="flat_checkbox">
-        <item name="fl_theme">@array/sea</item>
-        <item name="fl_fontFamily">roboto</item>
-        <item name="fl_fontWeight">light</item>
-        <item name="fl_fontExtension">ttf</item>
-        <item name="fl_cornerRadius">5dp</item>
-        <item name="fl_size">25dp</item>
-        <item name="fl_dotMargin">3dp</item>
-    </style>
-
-    <style name="flat_radio">
-        <item name="fl_theme">@array/sea</item>
-        <item name="fl_dotMargin">3dp</item>
-        <item name="fl_fontFamily">roboto</item>
-        <item name="fl_fontWeight">normal</item>
-        <item name="fl_fontExtension">ttf</item>
-        <item name="fl_borderWidth">2dp</item>
-        <item name="fl_cornerRadius">5dp</item>
-        <item name="fl_size">20dp</item>
-    </style>
     <style name="edittext_info">
         <item name="android:background">@drawable/info_generic_selector</item>
         <item name="android:layout_marginTop">7dp</item>
         <item name="android:layout_marginLeft">-38dp</item>
     </style>
 
-    <style name="flat_ui_button">
-        <item name="fl_theme">@array/sea</item>
-
-        <item name="fl_fontFamily">roboto</item>
-        <item name="fl_fontWeight">light</item>
-        <item name="fl_fontExtension">ttf</item>
-        <item name="fl_borderWidth">2dp</item>
-        <item name="fl_cornerRadius">5dp</item>
-        <item name="fl_size">20dp</item>
-        <item name="fl_blockButtonEffectHeight">3dp</item>
-    </style>
 </resources>

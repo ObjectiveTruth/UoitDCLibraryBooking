@@ -1,10 +1,7 @@
 package com.objectivetruth.uoitlibrarybooking;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
@@ -85,19 +82,6 @@ public class MainActivity extends ActivityBase {
 		selectDrawerItem(initialMenuItem);
 	}
 
-    public boolean isNetworkAvailable(Context ctx){
-	    ConnectivityManager cm = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
-	    if (netInfo != null && netInfo.isConnectedOrConnecting()&& cm.getActiveNetworkInfo().isAvailable()&& cm.getActiveNetworkInfo().isConnected()) 
-	    {
-	        return true;
-	    }
-	    else
-	    {
-	        return false;
-	    }
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -107,9 +91,7 @@ public class MainActivity extends ActivityBase {
 
     @Override
     protected void onStop() {
-        if(subscriptions != null) {
-            subscriptions.unsubscribe();
-        }
+        subscriptions.unsubscribe();
         super.onStop();
     }
 

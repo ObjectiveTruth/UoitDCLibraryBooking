@@ -1,9 +1,11 @@
 package com.objectivetruth.uoitlibrarybooking.app.networking;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.v7.preference.PreferenceManager;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.toolbox.HttpStack;
+import com.objectivetruth.uoitlibrarybooking.common.constants.SHARED_PREFERENCES_KEYS;
 import com.objectivetruth.uoitlibrarybooking.statelessutilities.ResourceLoadingUtilities;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -11,55 +13,109 @@ import org.apache.http.HttpVersion;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
+import timber.log.Timber;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
 
-public class MockHttpStack implements HttpStack{
-    private static final int SIMULATED_DELAY_MS = 500;
+import static com.android.volley.Request.Method.GET;
+import static com.android.volley.Request.Method.POST;
+import static com.objectivetruth.uoitlibrarybooking.common.constants.LIBRARY.*;
+
+public class MockHttpStack extends OkHttp3Stack{
+    private static final int SIMULATED_DELAY_MS = 300;
     private final Context context;
+    private SharedPreferences sharedPreferences;
 
     public MockHttpStack(Context context) {
+        super();
         this.context = context;
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
     public HttpResponse performRequest(Request<?> request, Map<String, String> stringStringMap)
             throws IOException, AuthFailureError {
-        try {
-            Thread.sleep(SIMULATED_DELAY_MS);
-        } catch (InterruptedException e) {
+        if(_hasUserNOTRequestedMockingOfHTTP()) {return super.performRequest(request, stringStringMap);}
+        URL url = new URL(request.getUrl());
+        String baseUrlAndPath = url.getProtocol() + "://" + url.getHost() + url.getPath();
+
+        switch(baseUrlAndPath) {
+            case MY_RESERVATIONS_SIGNIN_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case GET: return _simulateResponseWithBody(request, _getInitialReservationWebpageEntity());
+                    case POST: return _simulateResponseWithBody(request, _getSignInSuccessReservationWebpageEntity());
+                } break;
+
+            case CALENDAR_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case GET: return _simulateResponseWithBody(request, _getInitialWebpageEntity());
+                    case POST: return _simulateResponseWithBody(request, _getClickableDateEntity());
+                } break;
+            case PRE_OPERATION_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case GET:
+                        if(url.getQuery().contains("next=book.aspx")) {
+                            return _simulateResponseWithBody(request, _getBookWebpageEntity());
+                        }else if(url.getQuery().contains("next=joinorleave.aspx")) {
+                            return _simulateResponseWithBody(request, _getJoinOrLeaveWebpageEntity());
+                        }
+                } break;
+            case BOOK_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case POST: return _simulateResponseWithBody(request, _getBookSuccessWebpageEntity());
+                } break;
+            case JOINORLEAVE_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case POST: return _simulateResponseWithBody(request, _getJoinGroupWebpageEntity());
+                } break;
+            case JOIN_GROUP_ABSOLUTE_URL: switch(request.getMethod()) {
+                    case GET: return _simulateResponseWithBody(request, _getJoinGroupFailWebpageEntity());
+                } break;
+
         }
+        Timber.w("No valid mock available for method: " + request.getMethod() + ", URL: "
+                + baseUrlAndPath + ". Delegating to real HTTP Stack");
+        return super.performRequest(request, stringStringMap);
+    }
+
+    private HttpResponse _simulateResponseWithBody(Request<?> request, HttpEntity bodyEntity) throws AuthFailureError {
         HttpResponse response
                 = new BasicHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, "OK"));
         response.setLocale(Locale.CANADA);
-        String MY_RESERVATIONS_ASPX = "https://rooms.library.dc-uoit.ca/uoit_studyrooms/myreservations.aspx";
+        response.setEntity(bodyEntity);
         request.getHeaders(); //Simulate getting the headers
         request.getBody(); // Simulate getting the request body
 
-        if(request.getUrl().equalsIgnoreCase(MY_RESERVATIONS_ASPX)) {
-            switch(request.getMethod()) {
-                case Request.Method.GET:
-                    response.setEntity(_getInitialReservationWebpageEntity());
-                    break;
-                case Request.Method.POST:
-                    response.setEntity(_getSignInFailReservationWebpageEntity());
-                    break;
-            }
-        }else{
-            switch(request.getMethod()) {
-                case Request.Method.GET:
-                    response.setEntity(_getInitialWebpageEntity(request));
-                    break;
-                case Request.Method.POST:
-                    response.setEntity(_getClickableDateEntity(request));
-                    break;
-            }
+        try {
+            Thread.sleep(SIMULATED_DELAY_MS);
+        } catch (InterruptedException e) {
+            Timber.e(e, "Error delaying in MockHTTPStack");
         }
 
         return response;
+    }
+
+    private HttpEntity _getJoinGroupFailWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/join_fail_message.aspx"));
+    }
+
+    private HttpEntity _getJoinGroupWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/joingroup.aspx"));
+    }
+
+    private HttpEntity _getJoinOrLeaveWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/joinorleave.aspx"));
+    }
+
+    private HttpEntity _getBookSuccessWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/book_success_message.aspx"));
+    }
+
+    private HttpEntity _getBookWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/book.aspx"));
+    }
+
+    private HttpEntity _getSignInSuccessReservationWebpageEntity() throws UnsupportedEncodingException {
+        return new StringEntity(ResourceLoadingUtilities.loadAssetTextAsString(context, "mock_responses/sign_in_success_1_incomplete_reservation.aspx"));
     }
 
     private HttpEntity _getSignInFailReservationWebpageEntity() throws UnsupportedEncodingException {
@@ -76,17 +132,22 @@ public class MockHttpStack implements HttpStack{
         return new StringEntity(rawWebPage);
     }
 
-    private HttpEntity _getInitialWebpageEntity(Request request) throws UnsupportedEncodingException {
+    private HttpEntity _getInitialWebpageEntity() throws UnsupportedEncodingException {
         String FAKE_1_CLICKABLE_DATE_RESPONSE_FILENAME = "1_day_available.aspx";
         String rawWebPage = ResourceLoadingUtilities.loadAssetTextAsString(context,
                 FAKE_1_CLICKABLE_DATE_RESPONSE_FILENAME);
         return new StringEntity(rawWebPage);
     }
 
-    private HttpEntity _getClickableDateEntity(Request request) throws UnsupportedEncodingException {
+    private HttpEntity _getClickableDateEntity() throws UnsupportedEncodingException {
         String FAKE_HALF_CLOSED_HALF_OPEN_RESPONSE_FILENAME = "half_closed_half_open_8am-330pm.aspx";
         String rawWebPage = ResourceLoadingUtilities.loadAssetTextAsString(context,
                 FAKE_HALF_CLOSED_HALF_OPEN_RESPONSE_FILENAME);
         return new StringEntity(rawWebPage);
+    }
+
+    private boolean _hasUserNOTRequestedMockingOfHTTP() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return !sharedPreferences.getBoolean(SHARED_PREFERENCES_KEYS.DEBUG_SHOULD_MOCK_HTTP_CALLS, false);
     }
 }

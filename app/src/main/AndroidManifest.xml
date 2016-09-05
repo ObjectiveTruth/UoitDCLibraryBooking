@@ -45,15 +45,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-                android:name=".ActivityRoomInteraction"
-                android:configChanges="keyboardHidden|orientation|screenSize"
-                android:launchMode="standard"
-                android:windowSoftInputMode="stateHidden" >
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value="com.objectivetruth.uoitlibrarybooking.MainActivity" />
-        </activity>
         <meta-data
                 android:name="com.crashlytics.ApiKey"
                 android:value="33f64deb44c8b23abaa0e0b5ba951b29710f027f" />

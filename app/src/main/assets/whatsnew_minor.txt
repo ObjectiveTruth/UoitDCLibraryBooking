@@ -1,3 +1,7 @@
+August 14, 2016
+===
+‣ Scrolling downwards on the grid no longer randomly triggers pull to refresh
+
 July 21, 2016
 ===
 ‣ Added proper backstack navigation (back pressing)

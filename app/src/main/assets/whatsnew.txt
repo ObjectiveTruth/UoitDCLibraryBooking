@@ -11,11 +11,6 @@ Major Updates:
     Nobody was using it
 ‣ Ridiculous amount of bug fixes
 
-Known Issues:
-==============
-‣ Can't book any rooms
-    Disabled until its fully working
-
 Dev Stuff:
 ===============
 ‣ New Slack Channel

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.google.android.gms.analytics.Tracker;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.app.UOITLibraryBookingApp;
 import com.objectivetruth.uoitlibrarybooking.data.models.BookingInteractionModel;
@@ -45,6 +46,7 @@ public class Book extends InteractionFragment{
     private CompositeSubscription subscriptions = new CompositeSubscription();
     private String durationSpinnerValue;
     @Inject BookingInteractionModel bookingInteractionModel;
+    @Inject Tracker tracker;
 
     @Nullable
     @Override
