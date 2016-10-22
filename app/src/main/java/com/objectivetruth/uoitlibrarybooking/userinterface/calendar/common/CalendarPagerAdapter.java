@@ -129,6 +129,9 @@ public class CalendarPagerAdapter extends FragmentStatePagerAdapter{
         } catch (ParseException e) {
             Timber.e(e, "Couldn't parse the string for the date. Got: " + parseMe);
             return "";
+        } catch (ArrayIndexOutOfBoundsException e) {
+            Timber.w(e, "Day of week was not in the expected range");
+            return "";
         }
     }
 
