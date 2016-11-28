@@ -138,7 +138,7 @@ public class GridAdapter extends FixedTableAdapter {
                         bookingInteractionModel, calendarDay)); break;
 
             case BOOKING_LOCKED:
-                TimeCell parentTimeCell = _getTimeCellWithGroupNameAboutThisOne(row, column);
+                TimeCell parentTimeCell = _getTimeCellWithGroupNameAboveThisOne(row, column);
                 if(parentTimeCell == null) {
                     parentTimeCell = new TimeCell(); parentTimeCell.groupNameForWhenFullyBookedRoom = "";}
                 holder.textViewOnly.setText(parentTimeCell.groupNameForWhenFullyBookedRoom);
@@ -187,7 +187,7 @@ public class GridAdapter extends FixedTableAdapter {
      * @return if null, it means it wasn't found
      */
     @Nullable
-    private TimeCell _getTimeCellWithGroupNameAboutThisOne(int row, int column) {
+    private TimeCell _getTimeCellWithGroupNameAboveThisOne(int row, int column) {
         for(int irow = row; irow > 0; irow--) {
             TimeCell suspect = calendarDay.timeCells.get(_convertRowAndColumnToTimeCellIndex(irow, column));
             if(suspect.timeCellType == BOOKING_CONFIRMED) {
