@@ -1,3 +1,4 @@
-November 27, 2016
+November 28, 2016
 ===
-‣ Fixed issue with MyAccount no loading records properly
+‣ More bug fixes
+‣ Room picture now show correctly

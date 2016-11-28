@@ -44,6 +44,14 @@ public class BookingInteractionModel {
         this.bookingInteractionWebService = bookingInteractionWebService;
         this.calendarWebService = calendarWebService;
         this.userModel = userModel;
+        _initialize();
+    }
+
+    /**
+     * Initializes observables so they're ready when they are requested
+     */
+    private void _initialize() {
+        getBookingInteractionEventUserRequestSubject();
     }
 
     /**
@@ -79,7 +87,6 @@ public class BookingInteractionModel {
         }else {
             return bookingInteractionEventUserRequestPublishSubject;
         }
-
     }
 
     private void _bindUserRequestEventToWebCalls(

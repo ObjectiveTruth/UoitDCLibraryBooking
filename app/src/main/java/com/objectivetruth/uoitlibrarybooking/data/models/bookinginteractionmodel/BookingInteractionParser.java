@@ -18,7 +18,8 @@ public class BookingInteractionParser {
         if(rawWebPage.contains(ERROR_LABEL_ID)) {
             String search = ParseUtilities.findStringFromStringBetweenSearchTerms(rawWebPage,
                     ERROR_LABEL_ID, "</span>");
-            left = search.split(">")[1];
+            String[] searchSplit = search.split(">");
+            left = searchSplit[searchSplit.length - 1]; // Take the last part For example "<b>ERROR</b>real message"
         }else if(rawWebPage.contains(SUCCESS_LABEL_ID)){
             String search = ParseUtilities.findStringFromStringBetweenSearchTerms(rawWebPage,
                     SUCCESS_LABEL_ID, "</span>");

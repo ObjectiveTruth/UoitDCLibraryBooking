@@ -63,6 +63,7 @@ public class Book extends InteractionFragment{
 
         TextView roomNumberTextView = (TextView) view.findViewById(R.id.bookingInteraction_book_roomnumber);
         if(roomNumberTextView != null) {roomNumberTextView.setText(timeCell.param_room.toUpperCase());}
+        if(pictureOfRoom != null) {pictureOfRoom.setImageResource(getResourceIDForRoomOrDefault(timeCell));}
 
         ImageButton commentButton = (ImageButton) view.findViewById(R.id.bookingInteraction_book_comment_button);
         _setupCommentButton(commentButton);

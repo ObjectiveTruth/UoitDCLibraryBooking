@@ -86,7 +86,7 @@ public class GridAdapter extends FixedTableAdapter {
     }
 
     @Override
-    public View getView(int row, int column, View recycleView, ViewGroup parent) {
+    public View getView(final int row, final int column, View recycleView, ViewGroup parent) {
         // ViewHolder Pattern. Recommended to make listviews that use the recycler faster
         View convertView = recycleView;
         ViewHolder holder;
@@ -188,7 +188,7 @@ public class GridAdapter extends FixedTableAdapter {
      */
     @Nullable
     private TimeCell _getTimeCellWithGroupNameAboveThisOne(int row, int column) {
-        for(int irow = row; irow > 0; irow--) {
+        for(int irow = row; irow >= 0; irow--) {
             TimeCell suspect = calendarDay.timeCells.get(_convertRowAndColumnToTimeCellIndex(irow, column));
             if(suspect.timeCellType == BOOKING_CONFIRMED) {
                 // Quit early once we find the first BookingConfirmed TimeCell above this one
