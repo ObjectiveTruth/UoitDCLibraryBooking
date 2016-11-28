@@ -7,7 +7,7 @@
             android:id="@+id/my_account_menu_item_logout"
             android:orderInCategory="50"
             android:title="logout"
-            android:icon="@drawable/ic_logout"
+            android:icon="@drawable/ic_action_action_exit_to_app"
             app:showAsAction="always"
     />
 </menu>
