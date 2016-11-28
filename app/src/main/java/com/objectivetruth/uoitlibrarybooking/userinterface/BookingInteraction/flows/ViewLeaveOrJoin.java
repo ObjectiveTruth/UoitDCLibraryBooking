@@ -46,7 +46,8 @@ public class ViewLeaveOrJoin extends InteractionFragment {
 
         pictureOfRoom = (ImageView) view.findViewById(R.id.room_landing_room_picture);
 
-        roomNumberTextView.setText(timeCell.param_room);
+        if(roomNumberTextView != null) {roomNumberTextView.setText(timeCell.param_room);}
+        if(pictureOfRoom != null) {pictureOfRoom.setImageResource(getResourceIDForRoomOrDefault(timeCell));}
 
         joinButton.setOnClickListener(new View.OnClickListener(){
             @Override
