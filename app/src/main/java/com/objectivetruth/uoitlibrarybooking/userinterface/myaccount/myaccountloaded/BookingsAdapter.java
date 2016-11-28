@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.objectivetruth.uoitlibrarybooking.R;
 import com.objectivetruth.uoitlibrarybooking.data.models.usermodel.MyAccountBooking;
+import timber.log.Timber;
 
 import java.util.ArrayList;
 
@@ -47,7 +48,12 @@ public class BookingsAdapter extends ArrayAdapter<MyAccountBooking>{
                 viewHolder.textView.setText(myAccountBooking.date);
                 break;
             case 2:
-                String startAndEndTime = myAccountBooking.startTime + "-" + myAccountBooking.endTime;
+                String startAndEndTime = myAccountBooking.startTime;
+                if(startAndEndTime == null) {
+                    startAndEndTime = "<not found>";
+                    Timber.w(new Throwable(new NullPointerException()),
+                            "Starttime was null, which is never expected");
+                }
                 viewHolder.textView.setText(startAndEndTime);
                 break;
             default:

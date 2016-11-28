@@ -98,10 +98,11 @@ public class MyAccountParser {
             ArrayList<MyAccountBooking> returnArrayList = new ArrayList<MyAccountBooking>();
 
             // Start at 2 because 0 is the empty string and 1 is the headers in the table
+            // also -1 on the length because the last row is a </tr> which isn't a full row
             // Example: "<tr".split("<tr")    =>    {"", "<tr"}
             // Example:
             // Header Row: // <tr><td>Room</td><td>Date</td><td>From</td><td>To</td></tr>
-            for(int i = 2; i < trStore.length; i++) {
+            for(int i = 2; i < trStore.length - 1; i++) {
                 MyAccountBooking returnMyAccountBooking = new MyAccountBooking();
                 String[] tdElements = trStore[2].split("<td");
 
@@ -112,8 +113,6 @@ public class MyAccountParser {
                         findStringFromStringBetweenSearchTerms(tdElements[2], ">", "</td");
                 returnMyAccountBooking.startTime =
                         findStringFromStringBetweenSearchTerms(tdElements[3], ">", "</td");
-                returnMyAccountBooking.endTime =
-                        findStringFromStringBetweenSearchTerms(tdElements[4], ">", "</td");
 
                 returnArrayList.add(returnMyAccountBooking);
             }
